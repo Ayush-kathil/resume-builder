@@ -2,78 +2,52 @@
 
 import { EditorPane } from '@/components/builder/EditorPane';
 import { PreviewPane } from '@/components/builder/PreviewPane';
-import { Download, Share2, Sparkles, ArrowLeft } from 'lucide-react';
+import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
+import { Download, Share2, Sparkles, ArrowLeft, FileText, FileDown, X } from 'lucide-react';
 import Link from 'next/link';
-
 import { useState } from 'react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useResumeStore } from '@/store/resumeStore';
+import { exportDocx } from '@/lib/exportDocx';
+import { ATSWidget } from '@/components/ui/ATSWidget';
 
 export default function BuilderPage() {
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const { data } = useResumeStore();
 
-  const exportToPDF = async () => {
-    const resumeElement = document.getElementById('resume-preview');
-    if (!resumeElement) {
-      toast.error('Resume preview not found');
-      return;
-    }
+  const handleExportPDF = () => {
+    setIsExportModalOpen(false);
+    // Give modal time to close before printing so it doesn't show in the print view
+    setTimeout(() => {
+      window.print();
+    }, 300);
+  };
 
-    setIsExporting(true);
-    toast.loading('Generating PDF...', { id: 'pdf-export' });
-
+  const handleExportDocx = async () => {
+    setIsExportingDocx(true);
     try {
-      // Temporarily remove borders for the screenshot if they exist
-      const originalBorder = resumeElement.style.border;
-      resumeElement.style.border = 'none';
-
-      const canvas = await html2canvas(resumeElement, {
-        scale: 2, // Higher resolution
-        useCORS: true,
-        logging: false,
-      });
-
-      resumeElement.style.border = originalBorder;
-
-      const imgData = canvas.toDataURL('image/png');
-      
-      // A4 dimensions in mm
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // Add subsequent pages if the resume is super long
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save('My_Resume.pdf');
-      
-      toast.success('PDF exported successfully!', { id: 'pdf-export' });
+      await exportDocx(data);
+      setIsExportModalOpen(false);
     } catch (error) {
-      console.error('Error exporting PDF:', error);
-      toast.error('Failed to export PDF', { id: 'pdf-export' });
+      console.error("Failed to export DOCX:", error);
     } finally {
-      setIsExporting(false);
+      setIsExportingDocx(false);
     }
   };
 
+  const springTransition = {
+    type: "spring",
+    stiffness: 300,
+    damping: 30
+  };
+
   return (
-    <div className="h-screen w-full flex flex-col bg-[#050505] overflow-hidden">
+    <div className="h-screen w-full flex flex-col bg-transparent overflow-hidden relative">
+      <AntigravityBackground />
+      
       {/* Top Navbar */}
-      <header className="h-16 flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-md px-6 flex items-center justify-between">
+      <header className="h-16 flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-md px-6 flex items-center justify-between z-10 relative">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
@@ -87,34 +61,125 @@ export default function BuilderPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-sm font-medium text-white hover:bg-white/5 transition-all">
+        <div className="flex items-center gap-4">
+          <motion.button 
+            animate={{ y: [0, -3, 0] }}
+            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-sm font-medium text-white hover:bg-white/5 transition-all backdrop-blur-md"
+          >
             <Share2 className="h-4 w-4" />
             Share Link
-          </button>
-          <button 
-            onClick={exportToPDF}
-            disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-gray-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          </motion.button>
+          
+          <motion.div
+            animate={{ y: [0, -4, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           >
-            <Download className="h-4 w-4" />
-            {isExporting ? 'Exporting...' : 'Export PDF'}
-          </button>
+            <button 
+              onClick={() => setIsExportModalOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-500/20 backdrop-blur-md border border-white/10"
+            >
+              <Download className="h-4 w-4" />
+              Export Resume
+            </button>
+          </motion.div>
         </div>
       </header>
 
       {/* Main Content Split */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Pane: Editor */}
-        <div className="w-1/2 lg:w-[45%] h-full flex-shrink-0">
-          <EditorPane />
-        </div>
-
-        {/* Right Pane: Live Preview */}
-        <div className="w-1/2 lg:w-[55%] h-full flex-shrink-0">
-          <PreviewPane />
+        {/* Document Editor & Preview container */}
+        <div className="flex-1 flex overflow-hidden relative">
+          <div className="w-1/2 h-full z-10">
+            <EditorPane />
+          </div>
+          <div className="w-1/2 h-full z-10 shadow-2xl">
+            <PreviewPane />
+          </div>
         </div>
       </div>
+      
+      <ATSWidget />
+
+      {/* Antigravity Export Modal */}
+      <AnimatePresence>
+        {isExportModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            {/* Glassmorphic Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              onClick={() => setIsExportModalOpen(false)}
+            />
+
+            {/* Modal Container */}
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={springTransition}
+              className="relative w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl shadow-purple-500/10"
+            >
+              <button 
+                onClick={() => setIsExportModalOpen(false)}
+                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Export Your Resume</h2>
+                <p className="text-gray-400">Choose the format that best fits your application needs.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* PDF Card */}
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={springTransition}
+                  onClick={handleExportPDF}
+                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-purple-500/50 transition-colors group text-left w-full h-full"
+                >
+                  <div className="h-16 w-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <FileText className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">PDF Document</h3>
+                  <p className="text-sm text-gray-400 text-center leading-relaxed">
+                    Best for sharing & printing. High-quality vector text.
+                  </p>
+                </motion.button>
+
+                {/* Word Card */}
+                <motion.button
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={springTransition}
+                  onClick={handleExportDocx}
+                  disabled={isExportingDocx}
+                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-blue-500/50 transition-colors group text-left w-full h-full disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="h-16 w-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <FileDown className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Word Document (.docx)</h3>
+                  <p className="text-sm text-gray-400 text-center leading-relaxed">
+                    Best for ATS systems & manual editing.
+                  </p>
+                  
+                  {isExportingDocx && (
+                    <div className="mt-4 text-xs font-medium text-blue-400 animate-pulse">
+                      Compiling document...
+                    </div>
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

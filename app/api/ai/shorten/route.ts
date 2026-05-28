@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+import { generateContentWithFallback } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
@@ -13,32 +10,31 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-You are an expert ATS resume writer. I am providing you with a JSON object representing a user's resume.
-Your task is to take this resume and aggressively shorten it so that it perfectly fits onto a single A4 page.
+You are an expert executive resume writer. Your task is to aggressively shorten the provided resume JSON so it fits beautifully on a single A4 page.
 
-CRITICAL LENGTH LIMITS:
-- Maximum of 3-4 Work Experiences total. Cut out older or less relevant experiences.
-- Maximum of 3-4 bullet points per experience.
-- Be incredibly concise. Merge similar bullet points. Strip out "fluff" and generic corporate jargon.
-- Retain only the most impactful metrics (XYZ formula).
-- Keep the Education section brief.
+CRITICAL INSTRUCTIONS:
+1. Shorten the summary to maximum 3 concise sentences.
+2. Keep only the 3-4 most relevant or recent work experiences.
+3. For each experience, keep a maximum of 3 highly impactful bullet points.
+4. Merge related skills to save space.
+5. Keep only the top 2 most impressive projects (if any).
+6. Do NOT change the JSON structure/keys at all. Only modify the values.
+7. Return ONLY the raw JSON object. Do not wrap it in markdown block quotes (like \`\`\`json).
 
-DO NOT alter the core structure of the JSON. Do not change the JSON schema.
-Only return the shortened, optimized JSON.
-
-Here is the current resume data:
-${JSON.stringify(resumeData, null, 2)}
-
-RETURN ONLY VALID JSON. NO MARKDOWN FORMATTING OR BACKTICKS.
+Input JSON:
+${JSON.stringify(resumeData)}
 `;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-    const result = await model.generateContent(prompt);
-    
-    let text = result.response.text();
-    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const content = await generateContentWithFallback(prompt, { responseMimeType: 'application/json' });
 
-    const parsedData = JSON.parse(text);
+    let cleanContent = content.trim();
+    if (cleanContent.startsWith('```json')) {
+      cleanContent = cleanContent.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (cleanContent.startsWith('```')) {
+      cleanContent = cleanContent.replace(/^```/, '').replace(/```$/, '').trim();
+    }
+
+    const parsedData = JSON.parse(cleanContent);
     return NextResponse.json(parsedData);
 
   } catch (error) {

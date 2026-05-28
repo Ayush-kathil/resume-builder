@@ -43,6 +43,11 @@
   body * {
     visibility: hidden;
   }
+  /* Hide the navbar, editor, toolbars */
+  header, nav, button, .editor-pane-container {
+    display: none !important;
+  }
+  
   #resume-preview, #resume-preview * {
     visibility: visible;
   }
@@ -51,13 +56,12 @@
     left: 0;
     top: 0;
     width: 100% !important;
+    height: 100% !important;
     max-width: none !important;
     margin: 0 !important;
     padding: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    height: auto !important;
-    min-height: auto !important;
     background: white !important;
   }
   @page {

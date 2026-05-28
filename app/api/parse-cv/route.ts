@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generateContentWithFallback } from '@/lib/gemini';
 
 // Use the exact key name requested by the user
 const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
 
 export async function POST(req: Request) {
   try {
@@ -101,50 +100,49 @@ The JSON MUST exactly match this TypeScript interface structure:
 Return ONLY the raw JSON object. Do not wrap it in markdown block quotes (like \`\`\`json). Just the raw object.
     `;
 
-    const modelsToTry = ['gemini-3.1-pro-preview', 'gemini-3.5-flash', 'gemini-2.5-flash'];
     let content: string | undefined;
-    let lastError: any;
 
     // Determine mimeType (fallback to application/pdf)
     let mimeType = 'application/pdf';
     if (file.name && file.name.toLowerCase().endsWith('.docx')) {
-      // Pass docs as application/octet-stream if needed, but PDF is assumed here
+      mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
 
-    for (const modelName of modelsToTry) {
-      try {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent([
-          prompt,
-          {
-            inlineData: {
-              data: buffer.toString('base64'),
-              mimeType: file.type || mimeType
-            }
+    try {
+      content = await generateContentWithFallback([
+        prompt,
+        {
+          inlineData: {
+            data: buffer.toString('base64'),
+            mimeType: file.type || mimeType
           }
-        ]);
-        
-        content = result.response.text();
-        if (content) {
-          console.log(`Successfully parsed using model: ${modelName}`);
-          break; // Exit the loop if successful
         }
-      } catch (err: any) {
-        console.warn(`Model ${modelName} failed:`, err.message);
-        lastError = err;
+      ], {
+        responseMimeType: 'application/json',
+      });
+      
+    } catch (err: any) {
+      console.error('Gemini API call failed:', err);
+      // Surface API Key or quota errors gracefully
+      if (err.status === 403 || err.message?.includes('API key')) {
+        return NextResponse.json({ error: 'Invalid or missing Gemini API Key.' }, { status: 403 });
       }
+      if (err.status === 429 || err.message?.includes('quota')) {
+        return NextResponse.json({ error: 'Gemini API quota exceeded. Please try again later.' }, { status: 429 });
+      }
+      throw err;
     }
     
     if (!content) {
-      throw lastError || new Error('All Gemini models returned an empty response or failed.');
+      throw new Error('Gemini returned an empty response.');
     }
 
-    // Clean up potential markdown formatting from the response
+    // Clean up potential markdown formatting from the response (just in case, despite responseMimeType)
     let cleanContent = content.trim();
-    if (cleanContent.startsWith('\`\`\`json')) {
-      cleanContent = cleanContent.replace(/^\`\`\`json/, '').replace(/\`\`\`$/, '').trim();
-    } else if (cleanContent.startsWith('\`\`\`')) {
-      cleanContent = cleanContent.replace(/^\`\`\`/, '').replace(/\`\`\`$/, '').trim();
+    if (cleanContent.startsWith('```json')) {
+      cleanContent = cleanContent.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (cleanContent.startsWith('```')) {
+      cleanContent = cleanContent.replace(/^```/, '').replace(/```$/, '').trim();
     }
 
     const parsedJson = JSON.parse(cleanContent);

@@ -17,10 +17,18 @@ interface ResumeState {
   updateProject: (id: string, project: Partial<Project>) => void;
   removeProject: (id: string) => void;
   setResumeData: (data: ResumeData) => void;
+  selectedTemplate: string;
+  setTemplate: (template: string) => void;
+  targetJobKeywords: string;
+  setTargetJobKeywords: (keywords: string) => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
+  selectedTemplate: 'classic',
+  setTemplate: (template) => set({ selectedTemplate: template }),
+  targetJobKeywords: '',
+  setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),
   updatePersonalInfo: (info) =>
     set((state) => ({
       data: {
