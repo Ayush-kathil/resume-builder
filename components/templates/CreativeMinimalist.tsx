@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import { Mail, Phone, MapPin, Globe, Code, Briefcase } from 'lucide-react';
+import { formatResumeDate } from '@/lib/formatDate';
 
 export const CreativeMinimalist = ({ data }: { data: ResumeData }) => {
   return (
@@ -113,7 +114,7 @@ export const CreativeMinimalist = ({ data }: { data: ResumeData }) => {
                           <div className="flex justify-between items-baseline mb-1">
                             <h4 className="font-bold text-gray-900 text-base">{exp.position}</h4>
                             <span className="text-xs text-indigo-600 font-medium whitespace-nowrap bg-indigo-50 px-2 py-1 rounded">
-                              {exp.startDate} - {exp.current ? 'Present' : exp.endDate}
+                              {formatResumeDate(exp.startDate)} - {exp.current ? 'Present' : formatResumeDate(exp.endDate)}
                             </span>
                           </div>
                           <div className="text-sm font-medium text-gray-800 mb-2">{exp.company} | {exp.location}</div>
@@ -166,7 +167,7 @@ export const CreativeMinimalist = ({ data }: { data: ResumeData }) => {
                           <h4 className="font-bold text-gray-900">{edu.degree} in {edu.fieldOfStudy}</h4>
                           <div className="text-sm text-gray-600 flex justify-between mt-1">
                             <span>{edu.institution} {edu.gpa ? `(GPA: ${edu.gpa})` : ''}</span>
-                            <span>{edu.startDate} - {edu.current ? 'Present' : edu.endDate}</span>
+                            <span>{formatResumeDate(edu.startDate)} - {edu.current ? 'Present' : formatResumeDate(edu.endDate)}</span>
                           </div>
                         </div>
                       ))}

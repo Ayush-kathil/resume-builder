@@ -42,7 +42,8 @@ export async function POST(req: Request) {
     
     let textContent = '';
     try {
-       textContent = await extractTextFromPDF(buffer);
+       const rawText = await extractTextFromPDF(buffer);
+       textContent = rawText.replace(/\n{3,}/g, '\n\n').trim();
     } catch (e: any) {
        console.error("PDF Parse error", e);
        return NextResponse.json({ error: `Failed to extract text from PDF: ${e.message || e.toString()}` }, { status: 500 });

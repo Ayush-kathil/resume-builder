@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ResumeData, initialResumeData, PersonalInfo, Experience, Education, Skill, Project } from '@/types/resume';
+import { sanitizeText } from '@/lib/techDictionary';
 
 interface ResumeState {
   data: ResumeData;
@@ -24,6 +25,7 @@ interface ResumeState {
   setSectionOrder: (order: string[]) => void;
   careerGrade: 'Entry' | 'Professional' | 'Executive';
   setCareerGrade: (grade: 'Entry' | 'Professional' | 'Executive') => void;
+  sanitizeData: () => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
@@ -141,4 +143,25 @@ export const useResumeStore = create<ResumeState>((set) => ({
       },
     })),
   setResumeData: (data) => set({ data }),
+  sanitizeData: () => set((state) => {
+    const newData = { ...state.data };
+
+    newData.experience = newData.experience.map(exp => ({
+      ...exp,
+      description: exp.description.map(d => sanitizeText(d))
+    }));
+
+    newData.projects = newData.projects.map(proj => ({
+      ...proj,
+      description: sanitizeText(proj.description),
+      technologies: proj.technologies.map(t => sanitizeText(t))
+    }));
+
+    newData.skills = newData.skills.map(skill => ({
+      ...skill,
+      items: skill.items.map(s => sanitizeText(s))
+    }));
+
+    return { data: newData };
+  }),
 }));

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import { Mail, Phone, MapPin, Globe, Code, Briefcase } from 'lucide-react';
+import { formatResumeDate } from '@/lib/formatDate';
 
 export const ExecutiveAcademic = ({ data }: { data: ResumeData }) => {
   return (
@@ -84,7 +85,7 @@ export const ExecutiveAcademic = ({ data }: { data: ResumeData }) => {
                         <div className="flex justify-between items-baseline mb-1">
                           <h4 className="font-bold text-[16px]">{exp.position}</h4>
                           <span className="text-sm italic">
-                            {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                            {formatResumeDate(exp.startDate)} – {exp.current ? 'Present' : formatResumeDate(exp.endDate)}
                           </span>
                         </div>
                         <div className="flex justify-between items-baseline mb-3 text-sm">
@@ -113,7 +114,7 @@ export const ExecutiveAcademic = ({ data }: { data: ResumeData }) => {
                       <div key={edu.id}>
                         <div className="flex justify-between items-baseline">
                           <h4 className="font-bold text-[15px]">{edu.degree} in {edu.fieldOfStudy}</h4>
-                          <span className="text-sm italic">{edu.startDate} - {edu.current ? 'Present' : edu.endDate}</span>
+                          <span className="text-sm italic">{formatResumeDate(edu.startDate)} - {edu.current ? 'Present' : formatResumeDate(edu.endDate)}</span>
                         </div>
                         <div className="text-[15px] text-gray-800 mt-1">{edu.institution} {edu.gpa ? `(GPA: ${edu.gpa})` : ''}</div>
                       </div>

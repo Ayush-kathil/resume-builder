@@ -25,7 +25,7 @@ export default function BuilderPage() {
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
-  const { data } = useResumeStore();
+  const { data, sanitizeData } = useResumeStore();
   
   // Hook up the enterprise auto-save
   const saveStatus = useAutoSave();
@@ -153,7 +153,10 @@ export default function BuilderPage() {
             transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           >
             <button 
-              onClick={() => setIsExportModalOpen(true)}
+              onClick={() => {
+                sanitizeData();
+                setIsExportModalOpen(true);
+              }}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg shadow-blue-500/20 backdrop-blur-md border border-white/10"
             >
               <Download className="h-4 w-4" />

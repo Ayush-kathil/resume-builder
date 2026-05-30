@@ -1,5 +1,6 @@
 import { ResumeData } from '@/types/resume';
 import { Code, Globe, Mail, MapPin, Phone, Briefcase } from 'lucide-react';
+import { formatResumeDate } from '@/lib/formatDate';
 
 export function TechMinimalist({ data }: { data: ResumeData }) {
   return (
@@ -38,7 +39,7 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
                     <div className="flex justify-between items-baseline mb-1">
                       <h3 className="font-bold text-[13px]">{exp.position}</h3>
                       <span className="text-[11px] text-gray-500 bg-gray-50 px-1 rounded">
-                        {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                        {formatResumeDate(exp.startDate)} – {exp.current ? 'Present' : formatResumeDate(exp.endDate)}
                       </span>
                     </div>
                     <div className="text-[12px] font-semibold text-gray-700 mb-2">{exp.company} • {exp.location}</div>
@@ -122,7 +123,7 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
                     <div className="text-[11px] text-gray-600 mb-1">{edu.fieldOfStudy}</div>
                     <div className="font-semibold text-gray-800 mb-1">{edu.institution}</div>
                     <div className="text-[10px] text-gray-500">
-                      {edu.startDate} – {edu.current ? 'Present' : edu.endDate}
+                      {formatResumeDate(edu.startDate)} – {edu.current ? 'Present' : formatResumeDate(edu.endDate)}
                     </div>
                     {edu.gpa && <div className="text-[10px] font-bold mt-0.5">GPA: {edu.gpa}</div>}
                   </div>

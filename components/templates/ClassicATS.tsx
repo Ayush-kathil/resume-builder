@@ -1,4 +1,5 @@
 import { ResumeData } from '@/types/resume';
+import { formatResumeDate } from '@/lib/formatDate';
 
 export function ClassicATS({ data }: { data: ResumeData }) {
   return (
@@ -14,13 +15,25 @@ export function ClassicATS({ data }: { data: ResumeData }) {
           {data.personalInfo.phone && <span>| {data.personalInfo.phone}</span>}
           {data.personalInfo.location && <span>| {data.personalInfo.location}</span>}
         </div>
-        {(data.projects || []).find(p => p.url) && (
+        {(data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website) && (
           <div className="flex justify-center gap-3 text-[13px] mt-1">
-            {(data.projects || []).filter(p => p.url).map((p, i) => (
-              <a key={i} href={p.url} className="text-black hover:underline" target="_blank" rel="noopener noreferrer">
-                {p.url?.toLowerCase().includes('github') ? 'GitHub' : p.url?.toLowerCase().includes('linkedin') ? 'LinkedIn' : 'Portfolio'}
+            {data.personalInfo.linkedin && (
+              <a href={data.personalInfo.linkedin} className="text-black hover:underline" target="_blank" rel="noopener noreferrer">
+                LinkedIn
               </a>
-            ))}
+            )}
+            {data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website) && <span>•</span>}
+            {data.personalInfo.github && (
+              <a href={data.personalInfo.github} className="text-black hover:underline" target="_blank" rel="noopener noreferrer">
+                GitHub
+              </a>
+            )}
+            {data.personalInfo.github && data.personalInfo.website && <span>•</span>}
+            {data.personalInfo.website && (
+              <a href={data.personalInfo.website} className="text-black hover:underline" target="_blank" rel="noopener noreferrer">
+                Portfolio
+              </a>
+            )}
           </div>
         )}
       </header>
@@ -65,7 +78,7 @@ export function ClassicATS({ data }: { data: ResumeData }) {
                       <div className="flex justify-between items-baseline mb-0.5">
                         <h3 className="text-[14px] font-bold">{exp.position}</h3>
                         <span className="text-[13px] font-bold">
-                          {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                          {formatResumeDate(exp.startDate)} – {exp.current ? 'Present' : formatResumeDate(exp.endDate)}
                         </span>
                       </div>
                       <div className="flex justify-between items-baseline mb-1.5">
@@ -126,7 +139,7 @@ export function ClassicATS({ data }: { data: ResumeData }) {
                       </div>
                       <div className="text-right">
                         <div className="text-[13px] font-bold">
-                          {edu.startDate} – {edu.current ? 'Present' : edu.endDate}
+                          {formatResumeDate(edu.startDate)} – {edu.current ? 'Present' : formatResumeDate(edu.endDate)}
                         </div>
                         <div className="text-[13px] italic">{edu.location}</div>
                       </div>

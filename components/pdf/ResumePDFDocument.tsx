@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 import { ResumeData } from '@/types/resume';
+import { formatResumeDate } from '@/lib/formatDate';
 
 // Register a standard font for a clean, ATS-friendly look.
 // Helvetica (which closely matches Arial) guarantees a >95% ATS Parsing Rate.
@@ -156,13 +157,23 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
             {data.personalInfo.phone && <Text style={styles.contactItem}>| {data.personalInfo.phone}</Text>}
             {data.personalInfo.location && <Text style={styles.contactItem}>| {data.personalInfo.location}</Text>}
           </View>
-          {((data.projects || []).filter(p => p.url).length > 0) && (
+          {(data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website) && (
             <View style={{ ...styles.contactInfo, marginTop: 4 }}>
-              {(data.projects || []).filter(p => p.url).map((p, i) => (
-                <Text key={i} style={styles.contactItem}>
-                  {p.url?.toLowerCase().includes('github') ? 'GitHub' : p.url?.toLowerCase().includes('linkedin') ? 'LinkedIn' : 'Portfolio'}: {p.url}
-                </Text>
-              ))}
+              {data.personalInfo.linkedin && (
+                <Text style={styles.contactItem}>LinkedIn: {data.personalInfo.linkedin}</Text>
+              )}
+              {data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website) && (
+                <Text style={styles.contactItem}>|</Text>
+              )}
+              {data.personalInfo.github && (
+                <Text style={styles.contactItem}>GitHub: {data.personalInfo.github}</Text>
+              )}
+              {data.personalInfo.github && data.personalInfo.website && (
+                <Text style={styles.contactItem}>|</Text>
+              )}
+              {data.personalInfo.website && (
+                <Text style={styles.contactItem}>Portfolio: {data.personalInfo.website}</Text>
+              )}
             </View>
           )}
         </View>
@@ -198,7 +209,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                     <View key={index} style={styles.expBlock} wrap={false}>
                       <View style={styles.expHeaderRow}>
                         <Text style={styles.expTitle}>{exp.position}</Text>
-                        <Text style={styles.expDates}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
+                        <Text style={styles.expDates}>{formatResumeDate(exp.startDate)} – {exp.current ? 'Present' : formatResumeDate(exp.endDate)}</Text>
                       </View>
                       <View style={styles.expSubRow}>
                         <Text style={styles.expCompany}>{exp.company}</Text>
@@ -247,7 +258,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                         <Text style={styles.eduDegree}>{edu.degree} in {edu.fieldOfStudy} {edu.gpa ? `| GPA: ${edu.gpa}` : ''}</Text>
                       </View>
                       <View>
-                        <Text style={styles.eduDates}>{edu.startDate} – {edu.current ? 'Present' : edu.endDate}</Text>
+                        <Text style={styles.eduDates}>{formatResumeDate(edu.startDate)} – {edu.current ? 'Present' : formatResumeDate(edu.endDate)}</Text>
                         <Text style={styles.eduLocation}>{edu.location}</Text>
                       </View>
                     </View>
