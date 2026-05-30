@@ -5,6 +5,7 @@ import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
 import { Mail, Sparkles, KeyRound, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -14,30 +15,29 @@ export default function SignupPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [error, setError] = useState('');
 
   const handleSendOtp = async () => {
     if (!email) {
-      setError('Please enter your email first.');
+      toast.error('Please enter your email first.');
       return;
     }
-    setError('');
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, type: 'signup' })
       });
       if (res.ok) {
         setOtpSent(true);
+        toast.success("Verification code sent!");
       } else {
         const data = await res.json();
-        setError(data.error || 'Failed to send verification code');
+        toast.error(data.error || 'Failed to send verification code');
       }
     } catch (err) {
       console.error('OTP request failed', err);
-      setError('An error occurred while sending the verification code.');
+      toast.error('An error occurred while sending the verification code.');
     } finally {
       setIsSubmitting(false);
     }
@@ -46,15 +46,14 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
-    setError('');
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/auth/signup', {
@@ -66,15 +65,14 @@ export default function SignupPage() {
       const data = await res.json();
       
       if (res.ok) {
-        // Successful signup logs them in directly in the API or we can redirect to login
-        // Let's redirect to login page with a success message
+        toast.success("Account created successfully!");
         window.location.href = '/login?registered=true';
       } else {
-        setError(data.error || 'Signup failed');
+        toast.error(data.error || 'Signup failed');
       }
     } catch (err) {
       console.error('Signup failed', err);
-      setError('An error occurred during signup.');
+      toast.error('An error occurred during signup.');
     } finally {
       setIsSubmitting(false);
     }
@@ -99,12 +97,6 @@ export default function SignupPage() {
             Verify your email and set a secure password.
           </p>
         </div>
-
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 text-sm p-3 rounded-xl mb-6 text-center">
-            {error}
-          </div>
-        )}
 
         <div className="space-y-6">
           <form onSubmit={handleSignup} className="space-y-4">

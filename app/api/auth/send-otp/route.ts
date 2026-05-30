@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
+    const { email, type } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -30,6 +30,19 @@ export async function POST(req: Request) {
         family: 4,
         serverSelectionTimeoutMS: 5000,
       });
+    }
+
+    // Connect to DB via native client for user check
+    const client = await clientPromise;
+    const db = client.db();
+    const existingUser = await db.collection("users").findOne({ email });
+
+    if (type === 'signup' && existingUser) {
+      return NextResponse.json({ error: 'Email already registered. Please login.' }, { status: 400 });
+    }
+
+    if (type === 'reset' && !existingUser) {
+      return NextResponse.json({ error: 'No account found with this email.' }, { status: 400 });
     }
 
     // Generate 6 digit OTP
