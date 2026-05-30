@@ -5,59 +5,12 @@ import { signIn } from 'next-auth/react';
 import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
 import { Mail, Sparkles, KeyRound } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function LoginPage() {
-  const [loginMethod, setLoginMethod] = useState<'otp' | 'password'>('otp');
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
-
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      if (res.ok) {
-        setStep(2);
-      } else {
-        const data = await res.json();
-        console.error('Failed to send OTP:', data.error);
-        alert(data.error || 'Failed to send OTP');
-      }
-    } catch (error) {
-      console.error('OTP request failed', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const res = await signIn('credentials', { 
-        email, 
-        otp, 
-        redirect: false 
-      });
-      
-      if (res?.error) {
-        alert(res.error);
-      } else {
-        window.location.href = '/dashboard';
-      }
-    } catch (error) {
-      console.error('OTP verification failed', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,119 +50,57 @@ export default function LoginPage() {
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Welcome Back</h1>
           <p className="text-gray-400 text-sm text-center">
-            {loginMethod === 'otp' 
-              ? (step === 1 ? 'Enter your email to receive a secure login code.' : 'Enter the 6-digit code sent to your email.')
-              : 'Enter your email and password to log in.'}
+            Enter your email and password to log in.
           </p>
         </div>
 
-        {/* Toggle Login Method */}
-        {step === 1 && (
-          <div className="flex p-1 bg-white/5 rounded-xl mb-8 border border-white/10">
-            <button
-              onClick={() => setLoginMethod('otp')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                loginMethod === 'otp' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              One-Time Code
-            </button>
-            <button
-              onClick={() => setLoginMethod('password')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                loginMethod === 'password' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              Password
-            </button>
-          </div>
-        )}
-
         <div className="space-y-6">
-          {loginMethod === 'otp' ? (
-            step === 1 ? (
-              <form onSubmit={handleSendOtp} className="space-y-4">
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
-                >
-                  {isSubmitting ? 'Sending Code...' : 'Send Login Code'}
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
-                <div className="relative flex justify-center">
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                    placeholder="000000"
-                    className="w-full text-center tracking-[0.5em] text-2xl bg-black/40 border border-white/10 rounded-2xl py-3.5 px-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || otp.length < 6}
-                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
-                >
-                  {isSubmitting ? 'Verifying...' : 'Verify Code'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="w-full text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  Use a different email
-                </button>
-              </form>
-            )
-          ) : (
-            <form onSubmit={handlePasswordLogin} className="space-y-4">
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                />
-              </div>
-              <div className="relative">
-                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isSubmitting || !email || !password}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25 mt-2"
-              >
-                {isSubmitting ? 'Logging in...' : 'Log In'}
-              </button>
-            </form>
-          )}
+          <form onSubmit={handlePasswordLogin} className="space-y-4">
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              />
+            </div>
+            <div className="relative">
+              <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting || !email || !password}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25 mt-2"
+            >
+              {isSubmitting ? 'Logging in...' : 'Log In'}
+            </button>
+            
+            <div className="text-right mt-2">
+              <Link href="/forgot-password" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+          </form>
+          
+          <div className="text-center mt-6">
+            <p className="text-gray-400 text-sm">
+              Don't have an account?{' '}
+              <Link href="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+                Sign up
+              </Link>
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>
