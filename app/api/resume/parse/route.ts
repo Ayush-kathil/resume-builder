@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { generateContentWithFallback } from '@/lib/gemini';
 import PDFParser from 'pdf2json';
 
 export const dynamic = 'force-dynamic';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
-});
 
 // Advanced, bulletproof PDF extraction utilizing pdf2json (Pure Node.js, no DOM required)
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
@@ -96,16 +92,9 @@ export async function POST(req: Request) {
       ]
     }`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Parse the following resume text:\n\n${textContent}` }
-      ],
-      temperature: 0.1, // Low temperature for high deterministic accuracy
-    });
+    const prompt = `${systemPrompt}\n\nParse the following resume text:\n\n${textContent}`;
 
-    const rawContent = completion.choices[0].message.content || '{}';
+    const rawContent = await generateContentWithFallback(prompt, { temperature: 0.1 });
     
     // Safely parse JSON (strip markdown if model accidentally includes it)
     const cleanedContent = rawContent.replace(/```json\n?|\n?```/g, '').trim();

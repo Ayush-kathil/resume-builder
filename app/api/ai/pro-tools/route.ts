@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { generateContentWithFallback } from '@/lib/gemini';
 
 export const dynamic = 'force-dynamic';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
-});
 
 export async function POST(req: Request) {
   try {
@@ -40,16 +36,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content }
-      ],
-      temperature: 0.7,
-    });
+    const prompt = `${systemPrompt}\n\nUser Content:\n${content}`;
 
-    return NextResponse.json({ success: true, result: completion.choices[0].message.content?.trim() });
+    const rawContent = await generateContentWithFallback(prompt, { temperature: 0.7 });
+
+    return NextResponse.json({ success: true, result: rawContent.trim() });
 
   } catch (error: any) {
     console.error('AI Pro Tool Error:', error);
