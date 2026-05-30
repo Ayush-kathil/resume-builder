@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
-import { Mail, Sparkles } from 'lucide-react';
+import { Mail, Sparkles, KeyRound } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function LoginPage() {
+  const [loginMethod, setLoginMethod] = useState<'otp' | 'password'>('otp');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
+  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -57,6 +59,28 @@ export default function LoginPage() {
     }
   };
 
+  const handlePasswordLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await signIn('password', { 
+        email, 
+        password, 
+        redirect: false 
+      });
+      
+      if (res?.error) {
+        alert("Invalid email or password");
+      } else {
+        window.location.href = '/dashboard';
+      }
+    } catch (error) {
+      console.error('Password login failed', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-transparent">
       <AntigravityBackground />
@@ -67,19 +91,94 @@ export default function LoginPage() {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className="w-full max-w-md p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-10 mx-4"
       >
-        <div className="flex flex-col items-center mb-10">
+        <div className="flex flex-col items-center mb-8">
           <div className="h-12 w-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
             <Sparkles className="h-6 w-6 text-indigo-400" />
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Welcome Back</h1>
           <p className="text-gray-400 text-sm text-center">
-            {step === 1 ? 'Enter your email to receive a secure login code.' : 'Enter the 6-digit code sent to your email.'}
+            {loginMethod === 'otp' 
+              ? (step === 1 ? 'Enter your email to receive a secure login code.' : 'Enter the 6-digit code sent to your email.')
+              : 'Enter your email and password to log in.'}
           </p>
         </div>
 
+        {/* Toggle Login Method */}
+        {step === 1 && (
+          <div className="flex p-1 bg-white/5 rounded-xl mb-8 border border-white/10">
+            <button
+              onClick={() => setLoginMethod('otp')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                loginMethod === 'otp' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              One-Time Code
+            </button>
+            <button
+              onClick={() => setLoginMethod('password')}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
+                loginMethod === 'password' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              Password
+            </button>
+          </div>
+        )}
+
         <div className="space-y-6">
-          {step === 1 ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
+          {loginMethod === 'otp' ? (
+            step === 1 ? (
+              <form onSubmit={handleSendOtp} className="space-y-4">
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@company.com"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
+                >
+                  {isSubmitting ? 'Sending Code...' : 'Send Login Code'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div className="relative flex justify-center">
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="w-full text-center tracking-[0.5em] text-2xl bg-black/40 border border-white/10 rounded-2xl py-3.5 px-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || otp.length < 6}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
+                >
+                  {isSubmitting ? 'Verifying...' : 'Verify Code'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="w-full text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Use a different email
+                </button>
+              </form>
+            )
+          ) : (
+            <form onSubmit={handlePasswordLogin} className="space-y-4">
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
@@ -91,40 +190,23 @@ export default function LoginPage() {
                   className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
-              >
-                {isSubmitting ? 'Sending Code...' : 'Send Login Code'}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="relative flex justify-center">
+              <div className="relative">
+                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
-                  type="text"
+                  type="password"
                   required
-                  maxLength={6}
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="000000"
-                  className="w-full text-center tracking-[0.5em] text-2xl bg-black/40 border border-white/10 rounded-2xl py-3.5 px-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                 />
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting || otp.length < 6}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25"
+                disabled={isSubmitting || !email || !password}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25 mt-2"
               >
-                {isSubmitting ? 'Verifying...' : 'Verify Code'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="w-full text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Use a different email
+                {isSubmitting ? 'Logging in...' : 'Log In'}
               </button>
             </form>
           )}

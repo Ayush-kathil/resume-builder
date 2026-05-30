@@ -15,9 +15,10 @@ import * as React from 'react';
 
 interface WelcomeEmailProps {
   userName?: string;
+  password?: string;
 }
 
-export const WelcomeEmail = ({ userName = 'there' }: WelcomeEmailProps) => {
+export const WelcomeEmail = ({ userName = 'there', password }: WelcomeEmailProps) => {
   return (
     <Html>
       <Head />
@@ -51,6 +52,23 @@ export const WelcomeEmail = ({ userName = 'there' }: WelcomeEmailProps) => {
                 • <strong>Live ATS Scanner:</strong> Score your resume against target job keywords in real-time.
               </Text>
             </Section>
+
+            {password && (
+              <Section className="bg-[#e0f2fe] rounded-md p-4 my-6 border border-solid border-[#bae6fd]">
+                <Text className="text-[#0369a1] text-[14px] font-semibold leading-[24px] m-0 mb-2">
+                  Your Auto-Generated Login Credentials:
+                </Text>
+                <Text className="text-[#0369a1] text-[13px] leading-[20px] m-0 mb-1">
+                  • <strong>Email:</strong> (this email address)
+                </Text>
+                <Text className="text-[#0369a1] text-[13px] leading-[20px] m-0 mb-1">
+                  • <strong>Password:</strong> {password}
+                </Text>
+                <Text className="text-[#0369a1] text-[13px] leading-[20px] m-0 mt-3 italic">
+                  You can log in using these credentials or simply request a one-time passcode.
+                </Text>
+              </Section>
+            )}
             
             <Section className="text-center mt-[32px] mb-[32px]">
               <Button
