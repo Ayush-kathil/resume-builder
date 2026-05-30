@@ -1,13 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-
-// Polyfill DOMMatrix and Path2D for pdf-parse (pdfjs-dist) in Node 18+
-if (typeof globalThis.DOMMatrix === 'undefined') {
-  (globalThis as any).DOMMatrix = class DOMMatrix {};
-}
-if (typeof globalThis.Path2D === 'undefined') {
-  (globalThis as any).Path2D = class Path2D {};
-}
+import PDFParser from 'pdf2json';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +8,23 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_build',
 });
 
+// Advanced, bulletproof PDF extraction utilizing pdf2json (Pure Node.js, no DOM required)
+async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+  return new Promise((resolve, reject) => {
+    // @ts-ignore: the type definitions incorrectly expect a boolean, but pdf2json supports 1 for text parsing
+    const pdfParser = new PDFParser(null, 1);
+    
+    pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+    pdfParser.on("pdfParser_dataReady", () => {
+      resolve(pdfParser.getRawTextContent());
+    });
+    
+    pdfParser.parseBuffer(buffer);
+  });
+}
+
 export async function POST(req: Request) {
   try {
-    const pdfParse = require('pdf-parse');
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const setupDataString = formData.get('setupData') as string | null;
@@ -37,13 +44,9 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     
-    // Fallback simple PDF text extraction (Note: For true Layout-Aware Vision OCR, 
-    // we would convert PDF pages to images and send to gpt-4o's vision model.
-    // For this demonstration, we use pdf-parse combined with gpt-4o's advanced semantic extraction).
     let textContent = '';
     try {
-       const pdfData = await pdfParse(buffer);
-       textContent = pdfData.text;
+       textContent = await extractTextFromPDF(buffer);
     } catch (e: any) {
        console.error("PDF Parse error", e);
        return NextResponse.json({ error: `Failed to extract text from PDF: ${e.message || e.toString()}` }, { status: 500 });
