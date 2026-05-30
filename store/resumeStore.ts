@@ -26,12 +26,16 @@ interface ResumeState {
   careerGrade: 'Entry' | 'Professional' | 'Executive';
   setCareerGrade: (grade: 'Entry' | 'Professional' | 'Executive') => void;
   sanitizeData: () => void;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
   selectedTemplate: 'classic',
   careerGrade: 'Professional',
+  isEditing: false,
+  setIsEditing: (isEditing) => set({ isEditing }),
   setCareerGrade: (grade) => set({ careerGrade: grade }),
   setTemplate: (template) => set({ selectedTemplate: template }),
   targetJobKeywords: '',

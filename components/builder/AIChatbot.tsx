@@ -20,7 +20,7 @@ export function AIChatbot() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   
-  const { data, setResumeData } = useResumeStore();
+  const { data, setResumeData, setIsEditing } = useResumeStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -42,6 +42,7 @@ export function AIChatbot() {
     const newMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
     setMessages(prev => [...prev, newMsg]);
     setIsTyping(true);
+    setIsEditing(true);
 
     try {
       const res = await fetch('/api/ai/chat-edit', {
@@ -75,6 +76,7 @@ export function AIChatbot() {
       toast.error('AI Edit Failed', { id: 'chat-edit' });
     } finally {
       setIsTyping(false);
+      setIsEditing(false);
     }
   };
 

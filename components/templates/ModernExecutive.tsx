@@ -7,7 +7,7 @@ export function ModernExecutive({ data }: { data: ResumeData }) {
       className="w-full h-fit min-h-[1123px] bg-white text-gray-800 p-10 shadow-2xl font-sans"
     >
       <header className="pb-6 mb-6 text-left border-b-2 border-indigo-600">
-        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-2">
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
           {data.personalInfo.fullName || "Your Name"}
         </h1>
         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 font-medium">

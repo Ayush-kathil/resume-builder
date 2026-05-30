@@ -13,8 +13,6 @@ import { ATSWidget } from '@/components/ui/ATSWidget';
 import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
-import { pdf } from '@react-pdf/renderer';
-import { ResumePDFDocument } from '@/components/pdf/ResumePDFDocument';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { AIChatbot } from '@/components/builder/AIChatbot';
 
@@ -33,13 +31,22 @@ export default function BuilderPage() {
   const handleExportPDF = async () => {
     setIsExportingPDF(true);
     try {
-      const blob = await pdf(<ResumePDFDocument data={data} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
+      const element = document.getElementById('resume-preview');
+      if (!element) throw new Error("Preview element not found");
+
+      // Dynamically import html2pdf to prevent server-side errors
+      const html2pdfModule = await import('html2pdf.js');
+      const html2pdf = html2pdfModule.default;
+
+      const opt = {
+        margin: 0,
+        filename: `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      await html2pdf().set(opt).from(element).save();
       setIsExportModalOpen(false);
     } catch (err) {
       console.error("PDF Export failed:", err);

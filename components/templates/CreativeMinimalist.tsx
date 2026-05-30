@@ -9,8 +9,8 @@ export const CreativeMinimalist = ({ data }: { data: ResumeData }) => {
       <div className="flex flex-col md:flex-row min-h-full">
         {/* Sidebar */}
         <div className="w-full md:w-1/3 bg-gray-50 p-8 border-r border-gray-100 flex flex-col gap-8">
-          <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight leading-none mb-2">
+          <div className="flex-1 mb-4">
+            <h1 className="text-5xl font-black uppercase tracking-tighter leading-none text-gray-900">
               {data.personalInfo.fullName.split(' ')[0]}
               <br />
               {data.personalInfo.fullName.split(' ').slice(1).join(' ')}

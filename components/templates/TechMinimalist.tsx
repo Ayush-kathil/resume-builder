@@ -6,8 +6,8 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
   return (
     <div className="w-full h-fit min-h-[1123px] bg-white text-gray-900 p-8 shadow-2xl font-mono text-[11px]" style={{ maxWidth: '816px', margin: '0 auto' }}>
       <header className="mb-6 flex justify-between items-end border-b-2 border-gray-900 pb-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-1 uppercase">
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold uppercase tracking-widest text-black mb-4">
             {data.personalInfo.fullName || "Your Name"}
           </h1>
           <div className="text-[13px] font-semibold text-gray-600">Software Engineer</div>

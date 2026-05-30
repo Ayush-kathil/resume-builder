@@ -9,7 +9,7 @@ export const ExecutiveAcademic = ({ data }: { data: ResumeData }) => {
       
       {/* Header */}
       <header className="border-b-2 border-gray-900 pb-6 mb-6 text-center">
-        <h1 className="text-4xl font-bold uppercase tracking-wider mb-2">{data.personalInfo.fullName}</h1>
+        <h1 className="text-4xl font-bold uppercase tracking-wider mb-4">{data.personalInfo.fullName}</h1>
         {data.personalInfo.summary && <h2 className="text-xl italic text-gray-700 mb-4">{data.personalInfo.summary.substring(0, 50)}...</h2>}
         
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-700">

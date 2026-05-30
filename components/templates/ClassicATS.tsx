@@ -7,7 +7,7 @@ export function ClassicATS({ data }: { data: ResumeData }) {
       className="w-full h-fit min-h-[1123px] bg-white text-black p-10 shadow-2xl font-serif"
     >
       <header className="border-b-[1.5px] border-black pb-4 mb-4 text-center">
-        <h1 className="text-[28px] font-bold uppercase mb-2">
+        <h1 className="text-3xl font-bold uppercase tracking-widest text-center mb-4 text-black">
           {data.personalInfo.fullName || "Your Name"}
         </h1>
         <div className="flex flex-wrap justify-center items-center gap-2 text-[13px]">
