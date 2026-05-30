@@ -9,6 +9,11 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
+    // Polyfill DOMMatrix for pdf-parse (pdfjs-dist) in Node 18+
+    if (typeof globalThis.DOMMatrix === 'undefined') {
+      (globalThis as any).DOMMatrix = class DOMMatrix {};
+    }
+
     const pdfParse = require('pdf-parse');
     const formData = await req.formData();
     const file = formData.get('file') as File;
