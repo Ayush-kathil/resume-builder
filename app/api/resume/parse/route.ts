@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     CRITICAL INSTRUCTIONS:
     1. **Semantic Entity Extraction**: Extract tools/skills accurately. Weave the user's "New Skills" into the skills array.
     2. **Temporal Chronology Mapping**: Order experience chronologically, newest first. If the user mentioned "Gaps to explain", add a synthesized experience entry bridging that gap if appropriate.
-    3. **Augmentation**: Rewrite and augment the passive bullet points using the user's "Metrics to Add", "New Achievements", and "Business Outcomes". Make the resume fit the requested "${setupData.tone}" Tone.
+    3. **Augmentation**: Rewrite and augment the passive bullet points using the user's "Metrics to Add", "New Achievements", and "Business Outcomes". Make the resume fit the requested "${setupData.tone}" Tone. AVOID overblown, dramatic language like "dazzling", "unleashed", or "conquered". Use a strictly objective, highly professional corporate tone. Rely on raw technical achievements without fluff.
     4. **Automatic Taxonomical Standardization**: Standardize quirky job titles to global industry equivalents.
     5. **Omissions**: If they requested to omit certain sections, leave those arrays empty.
 
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
         "email": "...",
         "phone": "...",
         "location": "...",
-        "summary": "..." // Generate a brand new, highly targeted summary incorporating the Target Role, Tone, and JD keywords.
+        "summary": "..." // Generate a brand new, highly targeted summary incorporating the Target Role, Tone, and JD keywords. Max 2 highly scannable, punchy lines.
       },
       "experience": [
         { "id": "uuid", "company": "...", "position": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "description": ["augmented bullet 1", "augmented bullet 2"] }

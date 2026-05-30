@@ -7,8 +7,8 @@ export async function POST(req: NextRequest) {
 
     const prompt = `
       You are an expert executive resume writer. 
-      Based on the following experience and education, write a powerful, 3-sentence executive summary.
-      Make it impactful, action-oriented, and highlight key achievements.
+      Based on the following experience and education, write a highly scannable, punchy 2-line executive summary.
+      Make it impactful, action-oriented, and highlight key achievements. AVOID overblown, dramatic language like "dazzling", "unleashed", or "conquered". Use a strictly objective, highly professional corporate tone. Rely on raw technical achievements without fluff.
       Return ONLY the summary text, no quotes or additional formatting.
 
       Experience:

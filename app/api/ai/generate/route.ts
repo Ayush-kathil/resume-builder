@@ -32,7 +32,7 @@ CRITICAL SETUP CONTEXT PROVIDED BY USER:
 11. Sections to completely omit/hide: ${sectionsToRemove ? sectionsToRemove : 'None provided.'}
 
 INSTRUCTIONS:
-- The goal is to give the user a massive headstart. Fill in the JSON structure with high-quality, ATS-optimized placeholder content that a top-tier ${targetRole} would have, while weaving in ALL the context provided above.
+- The goal is to give the user a massive headstart. Fill in the JSON structure with high-quality, ATS-optimized placeholder content that a top-tier ${targetRole} would have, while weaving in ALL the context provided above. AVOID overblown, dramatic language like "dazzling", "unleashed", or "conquered". Use a strictly objective, highly professional corporate tone. Rely on raw technical achievements without fluff.
 - If they provided metrics, aggressively embed them into the experience bullets using the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]).
 - If they requested a specific Tone (e.g. Creative or Academic), adjust the professional summary and bullet framing accordingly.
 - If they asked to omit certain sections (like 'Projects' or 'Education'), return those arrays as empty [].
@@ -44,7 +44,7 @@ The JSON MUST exactly match this TypeScript interface structure:
     email: string;
     phone: string;
     location: string;
-    summary: string; // A highly targeted, 3-sentence professional summary for a ${targetRole}, matching the requested ${tone} tone.
+    summary: string; // A highly targeted, punchy 2-line professional summary for a ${targetRole}, matching the requested ${tone} tone.
   };
   experience: Array<{
     id: string; // generate a random UUID
