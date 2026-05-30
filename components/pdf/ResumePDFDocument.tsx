@@ -173,14 +173,14 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
           switch (sectionId) {
             case 'summary':
               return data.personalInfo.summary ? (
-                <View key="summary" style={styles.section}>
+                <View key="summary" style={styles.section} wrap={false}>
                   <Text style={styles.summaryText}>{data.personalInfo.summary}</Text>
                 </View>
               ) : null;
 
             case 'skills':
               return (data.skills || []).length > 0 ? (
-                <View key="skills" style={styles.section}>
+                <View key="skills" style={styles.section} wrap={false}>
                   <Text style={styles.sectionTitle}>Skills</Text>
                   {(data.skills || []).map((skill, index) => (
                     <View key={index} style={styles.skillRow}>
@@ -196,7 +196,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                 <View key="experience" style={styles.section}>
                   <Text style={styles.sectionTitle}>Experience</Text>
                   {(data.experience || []).map((exp, index) => (
-                    <View key={index} style={styles.expBlock}>
+                    <View key={index} style={styles.expBlock} wrap={false}>
                       <View style={styles.expHeaderRow}>
                         <Text style={styles.expTitle}>{exp.position}</Text>
                         <Text style={styles.expDates}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
@@ -221,7 +221,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                 <View key="projects" style={styles.section}>
                   <Text style={styles.sectionTitle}>Projects</Text>
                   {(data.projects || []).map((proj, index) => (
-                    <View key={index} style={styles.expBlock}>
+                    <View key={index} style={styles.expBlock} wrap={false}>
                       <View style={styles.projHeader}>
                         <Text style={styles.projTitle}>{proj.name}</Text>
                         {((proj.technologies || []).length > 0) && (
@@ -242,7 +242,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                 <View key="education" style={styles.section}>
                   <Text style={styles.sectionTitle}>Education</Text>
                   {(data.education || []).map((edu, index) => (
-                    <View key={index} style={styles.eduBlock}>
+                    <View key={index} style={styles.eduBlock} wrap={false}>
                       <View>
                         <Text style={styles.eduInst}>{edu.institution}</Text>
                         <Text style={styles.eduDegree}>{edu.degree} in {edu.fieldOfStudy} {edu.gpa ? `| GPA: ${edu.gpa}` : ''}</Text>

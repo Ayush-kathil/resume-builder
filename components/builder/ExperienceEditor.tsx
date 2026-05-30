@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { SmartBulletInput } from './SmartBulletInput';
 
 export function ExperienceEditor() {
-  const { data, addExperience, updateExperience, removeExperience } = useResumeStore();
+  const { data, addExperience, updateExperience, removeExperience, careerGrade } = useResumeStore();
 
   return (
     <section className="space-y-4">
@@ -113,18 +113,20 @@ export function ExperienceEditor() {
                         updateExperience(exp.id, { description: newDesc });
                       }}
                       onRewrite={async () => {
-                        toast.loading('Rewriting bullet...', { id: `rewrite-${exp.id}-${i}` });
+                        const action = careerGrade === 'Executive' ? 'legacy-filter' : 'xyz-formula';
+                        const loadingMsg = careerGrade === 'Executive' ? 'Applying Legacy Filter...' : 'Applying XYZ Formula...';
+                        toast.loading(loadingMsg, { id: `rewrite-${exp.id}-${i}` });
                         try {
-                          const res = await fetch('/api/ai/rewrite-bullet', {
+                          const res = await fetch('/api/ai/pro-tools', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ bullet, company: exp.company, position: exp.position })
+                            body: JSON.stringify({ action, content: bullet })
                           });
                           const result = await res.json();
                           if (!res.ok) throw new Error(result.error);
                           
                           const newDesc = [...exp.description];
-                          newDesc[i] = result.bullet;
+                          newDesc[i] = result.result; // Changed from result.bullet
                           updateExperience(exp.id, { description: newDesc });
                           toast.success('Bullet rewritten!', { id: `rewrite-${exp.id}-${i}` });
                         } catch (e: any) {

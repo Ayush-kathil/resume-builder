@@ -1,13 +1,14 @@
 'use client';
 
 import { useResumeStore } from '@/store/resumeStore';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Sparkles } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'sonner';
 
 import { motion } from 'framer-motion';
 
 export function EducationEditor() {
-  const { data, addEducation, updateEducation, removeEducation } = useResumeStore();
+  const { data, addEducation, updateEducation, removeEducation, careerGrade, addExperience } = useResumeStore();
 
   return (
     <section className="space-y-4">
@@ -115,6 +116,44 @@ export function EducationEditor() {
                   />
                 </div>
               </div>
+
+              {careerGrade === 'Entry' && (
+                <div className="pt-2 border-t border-white/10">
+                  <button
+                    onClick={async () => {
+                      toast.loading('Translating academic experience...', { id: `translate-${edu.id}` });
+                      try {
+                        const content = `${edu.degree} in ${edu.fieldOfStudy} at ${edu.institution}`;
+                        const res = await fetch('/api/ai/pro-tools', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ action: 'academic-translate', content })
+                        });
+                        const result = await res.json();
+                        if (!res.ok) throw new Error(result.error);
+                        
+                        addExperience({
+                          id: uuidv4(),
+                          company: edu.institution,
+                          position: 'Academic Researcher / Project Lead',
+                          startDate: edu.startDate,
+                          endDate: edu.endDate,
+                          current: false,
+                          location: edu.location,
+                          description: [result.result]
+                        });
+                        toast.success('Added to Experience section!', { id: `translate-${edu.id}` });
+                      } catch (e: any) {
+                        toast.error(e.message || 'Translation failed', { id: `translate-${edu.id}` });
+                      }
+                    }}
+                    className="flex items-center gap-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-400/10 hover:bg-emerald-400/20 px-3 py-1.5 rounded-lg transition-colors w-full justify-center"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Translate to Professional Experience
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}

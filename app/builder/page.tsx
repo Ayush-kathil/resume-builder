@@ -10,12 +10,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
 import { exportDocx } from '@/lib/exportDocx';
 import { ATSWidget } from '@/components/ui/ATSWidget';
+import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
+import { ShareModal } from '@/components/builder/ShareModal';
+import { SyncModal } from '@/components/builder/SyncModal';
 import { pdf } from '@react-pdf/renderer';
 import { ResumePDFDocument } from '@/components/pdf/ResumePDFDocument';
 import { useAutoSave } from '@/hooks/useAutoSave';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
@@ -123,6 +128,17 @@ export default function BuilderPage() {
           </div>
 
           <motion.button 
+            onClick={() => setIsSyncModalOpen(true)}
+            animate={{ y: [0, -3, 0] }}
+            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.2 }}
+            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-sm font-medium text-white hover:bg-white/5 transition-all backdrop-blur-md"
+          >
+            <Cloud className="h-4 w-4" />
+            Sync Job Board
+          </motion.button>
+          
+          <motion.button 
+            onClick={() => setIsShareModalOpen(true)}
             animate={{ y: [0, -3, 0] }}
             transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}
             className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 text-sm font-medium text-white hover:bg-white/5 transition-all backdrop-blur-md"
@@ -198,92 +214,20 @@ export default function BuilderPage() {
       
       <ATSWidget />
 
-      {/* Antigravity Export Modal */}
-      <AnimatePresence>
-        {isExportModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-            {/* Glassmorphic Backdrop */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-md"
-              onClick={() => setIsExportModalOpen(false)}
-            />
-
-            {/* Modal Container */}
-            <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={springTransition}
-              className="relative w-full max-w-2xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl shadow-purple-500/10"
-            >
-              <button 
-                onClick={() => setIsExportModalOpen(false)}
-                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Export Your Resume</h2>
-                <p className="text-gray-400">Choose the format that best fits your application needs.</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* PDF Card */}
-                <motion.button
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={springTransition}
-                  onClick={handleExportPDF}
-                  disabled={isExportingPDF}
-                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-purple-500/50 transition-colors group text-left w-full h-full disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="h-16 w-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <FileText className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">PDF Document</h3>
-                  <p className="text-sm text-gray-400 text-center leading-relaxed">
-                    Best for sharing & printing. High-quality vector text.
-                  </p>
-                  
-                  {isExportingPDF && (
-                    <div className="mt-4 text-xs font-medium text-red-400 animate-pulse">
-                      Generating Vector PDF...
-                    </div>
-                  )}
-                </motion.button>
-
-                {/* Word Card */}
-                <motion.button
-                  whileHover={{ scale: 1.02, y: -5 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={springTransition}
-                  onClick={handleExportDocx}
-                  disabled={isExportingDocx}
-                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-blue-500/50 transition-colors group text-left w-full h-full disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="h-16 w-16 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <FileDown className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Word Document (.docx)</h3>
-                  <p className="text-sm text-gray-400 text-center leading-relaxed">
-                    Best for ATS systems & manual editing.
-                  </p>
-                  
-                  {isExportingDocx && (
-                    <div className="mt-4 text-xs font-medium text-blue-400 animate-pulse">
-                      Compiling document...
-                    </div>
-                  )}
-                </motion.button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Modals */}
+      <ATSCheckerModal 
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        data={data}
+      />
+      <ShareModal 
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
+      <SyncModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+      />
     </div>
   );
 }

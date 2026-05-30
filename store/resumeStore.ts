@@ -22,11 +22,15 @@ interface ResumeState {
   targetJobKeywords: string;
   setTargetJobKeywords: (keywords: string) => void;
   setSectionOrder: (order: string[]) => void;
+  careerGrade: 'Entry' | 'Professional' | 'Executive';
+  setCareerGrade: (grade: 'Entry' | 'Professional' | 'Executive') => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
   selectedTemplate: 'classic',
+  careerGrade: 'Professional',
+  setCareerGrade: (grade) => set({ careerGrade: grade }),
   setTemplate: (template) => set({ selectedTemplate: template }),
   targetJobKeywords: '',
   setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),

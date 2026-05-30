@@ -5,6 +5,8 @@ import { useRef } from 'react';
 import { ClassicATS } from '../templates/ClassicATS';
 import { ModernExecutive } from '../templates/ModernExecutive';
 import { TechMinimalist } from '../templates/TechMinimalist';
+import { CreativeMinimalist } from '../templates/CreativeMinimalist';
+import { ExecutiveAcademic } from '../templates/ExecutiveAcademic';
 
 export function PreviewPane() {
   const { data, selectedTemplate } = useResumeStore();
@@ -16,6 +18,10 @@ export function PreviewPane() {
         return <ModernExecutive data={data} />;
       case 'minimalist':
         return <TechMinimalist data={data} />;
+      case 'creative':
+        return <CreativeMinimalist data={data} />;
+      case 'academic':
+        return <ExecutiveAcademic data={data} />;
       case 'classic':
       default:
         return <ClassicATS data={data} />;
