@@ -18,6 +18,7 @@ export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   const { data } = useResumeStore();
   
   // Hook up the enterprise auto-save
@@ -149,14 +150,51 @@ export default function BuilderPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Document Editor & Preview container */}
         <div className="flex-1 flex overflow-hidden relative">
-          <div className="w-1/2 h-full z-10">
+          <div className="w-full md:w-1/2 h-full z-10">
             <EditorPane />
           </div>
-          <div className="w-1/2 h-full z-10 shadow-2xl">
+          <div className="hidden md:block md:w-1/2 h-full z-10 shadow-2xl">
             <PreviewPane />
           </div>
         </div>
       </div>
+
+      {/* Mobile Floating Action Button */}
+      <div className="md:hidden fixed bottom-6 right-6 z-40">
+        <button
+          onClick={() => setShowMobilePreview(true)}
+          className="flex items-center gap-2 px-5 py-3 rounded-full bg-black/40 text-white text-sm font-semibold hover:bg-black/60 transition-all shadow-lg backdrop-blur-xl border border-white/20"
+        >
+          <FileText className="h-4 w-4" />
+          Preview
+        </button>
+      </div>
+
+      {/* Mobile Slide-Over Preview */}
+      <AnimatePresence>
+        {showMobilePreview && (
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="md:hidden fixed inset-0 z-50 bg-[#09090b] flex flex-col pt-4"
+          >
+            <div className="px-4 pb-2 flex justify-between items-center border-b border-white/10">
+              <h2 className="text-white font-medium">Resume Preview</h2>
+              <button
+                onClick={() => setShowMobilePreview(false)}
+                className="p-2 bg-white/10 rounded-full text-white hover:bg-white/20 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <PreviewPane />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <ATSWidget />
 

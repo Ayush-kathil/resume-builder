@@ -6,7 +6,8 @@ export type SaveStatus = 'saved' | 'saving' | 'error';
 
 export function useAutoSave() {
   const data = useResumeStore((state) => state.data);
-  const { data: session } = useSession();
+  const sessionContext = useSession();
+  const session = sessionContext?.data;
   const [status, setStatus] = useState<SaveStatus>('saved');
   const [resumeId, setResumeId] = useState<string | null>(null);
 

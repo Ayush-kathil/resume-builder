@@ -24,6 +24,9 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import PromptIDE from "./PromptIDE";
+import CostControls from "./CostControls";
+import HumanReview from "./HumanReview";
 
 type User = {
   _id: string;
@@ -92,11 +95,11 @@ export default function AdminDashboardClient({
 
   const tabs = [
     { id: "users", name: "User Directory", icon: Users },
-    { id: "billing", name: "Subscription & Billing", icon: CreditCard },
-    { id: "ai", name: "AI Configuration", icon: Bot },
+    { id: "security", name: "Security & Abuse", icon: ShieldCheck },
+    { id: "cost_controls", name: "Cost Controls", icon: CreditCard },
+    { id: "prompt_ide", name: "Prompt IDE", icon: Bot },
+    { id: "human_review", name: "Human Review", icon: AlertCircle },
     { id: "analytics", name: "Analytics & Insights", icon: BarChart3 },
-    { id: "content", name: "Content Library", icon: Library },
-    { id: "support", name: "System & Support", icon: LifeBuoy },
     { id: "settings", name: "Settings", icon: Settings },
   ];
 
@@ -311,8 +314,29 @@ export default function AdminDashboardClient({
             </div>
           )}
 
+          {/* Tab Content: Prompt IDE */}
+          {activeTab === "prompt_ide" && (
+            <div className="h-[calc(100vh-140px)]">
+              <PromptIDE />
+            </div>
+          )}
+
+          {/* Tab Content: Cost Controls */}
+          {activeTab === "cost_controls" && (
+            <div className="h-[calc(100vh-140px)]">
+              <CostControls />
+            </div>
+          )}
+
+          {/* Tab Content: Human Review */}
+          {activeTab === "human_review" && (
+            <div className="h-[calc(100vh-140px)]">
+              <HumanReview />
+            </div>
+          )}
+
           {/* Tab Content: Mocked/Coming Soon Tabs */}
-          {activeTab !== "users" && (
+          {activeTab !== "users" && activeTab !== "prompt_ide" && activeTab !== "cost_controls" && activeTab !== "human_review" && (
             <div className="bg-[#18181b] border border-[#27272a] rounded-xl p-12 text-center shadow-lg relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
               <div className="mx-auto w-16 h-16 bg-[#27272a] rounded-2xl flex items-center justify-center border border-[#3f3f46] mb-4 shadow-inner">

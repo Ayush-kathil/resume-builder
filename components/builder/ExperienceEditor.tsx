@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
 import { motion } from 'framer-motion';
+import { SmartBulletInput } from './SmartBulletInput';
 
 export function ExperienceEditor() {
   const { data, addExperience, updateExperience, removeExperience } = useResumeStore();
@@ -98,54 +99,39 @@ export function ExperienceEditor() {
                 <label className="block text-xs font-medium text-gray-400 mb-2">Description (Bullet Points)</label>
                 <div className="space-y-2">
                   {exp.description.map((bullet, i) => (
-                    <div key={i} className="relative group/bullet flex items-start gap-2">
-                      <span className="text-gray-500 mt-2 text-xs">•</span>
-                      <textarea
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[60px]"
-                        value={bullet}
-                        onChange={(e) => {
+                    <SmartBulletInput
+                      key={i}
+                      value={bullet}
+                      onChange={(newVal) => {
+                        const newDesc = [...exp.description];
+                        newDesc[i] = newVal;
+                        updateExperience(exp.id, { description: newDesc });
+                      }}
+                      onRemove={() => {
+                        const newDesc = [...exp.description];
+                        newDesc.splice(i, 1);
+                        updateExperience(exp.id, { description: newDesc });
+                      }}
+                      onRewrite={async () => {
+                        toast.loading('Rewriting bullet...', { id: `rewrite-${exp.id}-${i}` });
+                        try {
+                          const res = await fetch('/api/ai/rewrite-bullet', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ bullet, company: exp.company, position: exp.position })
+                          });
+                          const result = await res.json();
+                          if (!res.ok) throw new Error(result.error);
+                          
                           const newDesc = [...exp.description];
-                          newDesc[i] = e.target.value;
+                          newDesc[i] = result.bullet;
                           updateExperience(exp.id, { description: newDesc });
-                        }}
-                      />
-                      <button
-                        onClick={() => {
-                          const newDesc = [...exp.description];
-                          newDesc.splice(i, 1);
-                          updateExperience(exp.id, { description: newDesc });
-                        }}
-                        className="absolute right-10 top-2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover/bullet:opacity-100 transition-opacity"
-                        title="Remove bullet"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={async () => {
-                          toast.loading('Rewriting bullet...', { id: `rewrite-${exp.id}-${i}` });
-                          try {
-                            const res = await fetch('/api/ai/rewrite-bullet', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ bullet, company: exp.company, position: exp.position })
-                            });
-                            const result = await res.json();
-                            if (!res.ok) throw new Error(result.error);
-                            
-                            const newDesc = [...exp.description];
-                            newDesc[i] = result.bullet;
-                            updateExperience(exp.id, { description: newDesc });
-                            toast.success('Bullet rewritten!', { id: `rewrite-${exp.id}-${i}` });
-                          } catch (e: any) {
-                            toast.error(e.message || 'Failed to rewrite bullet', { id: `rewrite-${exp.id}-${i}` });
-                          }
-                        }}
-                        className="absolute right-2 top-2 p-1 bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-md opacity-0 group-hover/bullet:opacity-100 transition-opacity shadow-lg"
-                        title="AI Rewrite"
-                      >
-                        <Sparkles className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                          toast.success('Bullet rewritten!', { id: `rewrite-${exp.id}-${i}` });
+                        } catch (e: any) {
+                          toast.error(e.message || 'Failed to rewrite bullet', { id: `rewrite-${exp.id}-${i}` });
+                        }
+                      }}
+                    />
                   ))}
                   <button
                     onClick={() => updateExperience(exp.id, { description: [...exp.description, ''] })}

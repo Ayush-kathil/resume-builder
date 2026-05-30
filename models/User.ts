@@ -4,6 +4,9 @@ export interface IUser extends Document {
   email: string;
   name?: string;
   resumeIds: mongoose.Types.ObjectId[];
+  tier: 'freemium' | 'premium' | 'enterprise';
+  tokenBalance: number;
+  monthlyLimit: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +30,19 @@ const UserSchema = new Schema<IUser>(
         ref: 'Resume',
       },
     ],
+    tier: {
+      type: String,
+      enum: ['freemium', 'premium', 'enterprise'],
+      default: 'freemium',
+    },
+    tokenBalance: {
+      type: Number,
+      default: 0,
+    },
+    monthlyLimit: {
+      type: Number,
+      default: 50000, // Default 50k tokens for freemium
+    },
   },
   {
     timestamps: true,
