@@ -9,7 +9,7 @@ import { formatResumeDate } from '@/lib/formatDate';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
+    padding: 30,
     fontFamily: 'Helvetica',
     fontSize: 11,
     color: '#000000',
@@ -31,9 +31,7 @@ const styles = StyleSheet.create({
   contactInfo: {
     flexDirection: 'row',
     justifyContent: 'center',
-    flexWrap: 'wrap',
     fontSize: 10,
-    gap: 5,
   },
   contactItem: {
     marginHorizontal: 3,
@@ -147,7 +145,7 @@ const styles = StyleSheet.create({
 export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
   return (
     <Document>
-      <Page size={[595.28, 3000]} style={styles.page}>
+      <Page size="A4" style={styles.page}>
         
         {/* Header */}
         <View style={styles.header}>

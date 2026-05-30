@@ -5,8 +5,11 @@ import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
 import { Sparkles, LayoutTemplate } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useResumeStore } from '@/store/resumeStore';
 
 export default function TemplatesPage() {
+  const router = useRouter();
   const templates = [
     {
       id: 'classic',
@@ -131,7 +134,13 @@ export default function TemplatesPage() {
                     {tpl.description}
                   </p>
                 </div>
-                <button className="w-full py-2.5 rounded-xl text-sm font-medium bg-white/10 text-white hover:bg-white hover:text-black transition-colors border border-white/10 mt-auto">
+                <button 
+                  onClick={() => {
+                    useResumeStore.getState().setTemplate(tpl.id);
+                    router.push('/builder');
+                  }}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium bg-white/10 text-white hover:bg-white hover:text-black transition-colors border border-white/10 mt-auto"
+                >
                   Select Template
                 </button>
               </div>
