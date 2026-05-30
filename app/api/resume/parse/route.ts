@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const pdfParse = require('pdf-parse');
-
 export const dynamic = 'force-dynamic';
 
 const openai = new OpenAI({
@@ -11,6 +9,7 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
+    const pdfParse = require('pdf-parse');
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
