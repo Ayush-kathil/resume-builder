@@ -3,21 +3,39 @@ import { generateContentWithFallback } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
-    const { targetRole, department, tone } = await req.json();
+    const data = await req.json();
+    const { 
+      targetRole, targetJD, industryKeywords,
+      achievements, newSkills, gaps,
+      metrics, businessOutcomes, peopleBudgets,
+      tone, layout, sectionsToRemove
+    } = data;
 
     if (!targetRole) {
       return NextResponse.json({ error: 'Target role is required' }, { status: 400 });
     }
 
     const prompt = `
-You are an expert ATS resume writer. Your task is to generate a complete boilerplate resume tailored exactly for the role of "${targetRole}"${department ? ` in the ${department} department/industry` : ''}.
-${tone ? `CRITICAL INSTRUCTION: Emphasize the following features/tone throughout the resume: ${tone}.` : ''}
+You are an expert FAANG-tier ATS resume writer. Your task is to generate a complete boilerplate resume tailored exactly for the role of "${targetRole}".
 
-The goal is to give the user a massive headstart. Fill in the JSON structure with high-quality, ATS-optimized placeholder content that a ${targetRole} would typically have.
-Include strong action verbs, industry-standard keywords, and ensure high impact.
-Use the XYZ formula for bullet points where possible (Accomplished [X] as measured by [Y], by doing [Z]).
+CRITICAL SETUP CONTEXT PROVIDED BY USER:
+1. Target Job Description Context: ${targetJD ? targetJD : 'None provided.'}
+2. Industry Keywords to heavily inject: ${industryKeywords ? industryKeywords : 'None provided.'}
+3. New Achievements since last update: ${achievements ? achievements : 'None provided.'}
+4. New Skills/Tools learned: ${newSkills ? newSkills : 'None provided.'}
+5. Gaps to explain smoothly: ${gaps ? gaps : 'None provided.'}
+6. Metrics/Dollars/Percentages to use: ${metrics ? metrics : 'None provided.'}
+7. Business Outcomes to highlight: ${businessOutcomes ? businessOutcomes : 'None provided.'}
+8. People/Budgets Managed: ${peopleBudgets ? peopleBudgets : 'None provided.'}
+9. Resume Tone requested: ${tone ? tone : 'Corporate/Professional'}
+10. Target Layout Density: ${layout ? layout : '1-page'}
+11. Sections to completely omit/hide: ${sectionsToRemove ? sectionsToRemove : 'None provided.'}
 
-Generate exactly 2 placeholder experiences and 1 education.
+INSTRUCTIONS:
+- The goal is to give the user a massive headstart. Fill in the JSON structure with high-quality, ATS-optimized placeholder content that a top-tier ${targetRole} would have, while weaving in ALL the context provided above.
+- If they provided metrics, aggressively embed them into the experience bullets using the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]).
+- If they requested a specific Tone (e.g. Creative or Academic), adjust the professional summary and bullet framing accordingly.
+- If they asked to omit certain sections (like 'Projects' or 'Education'), return those arrays as empty [].
 
 The JSON MUST exactly match this TypeScript interface structure:
 {
@@ -26,7 +44,7 @@ The JSON MUST exactly match this TypeScript interface structure:
     email: string;
     phone: string;
     location: string;
-    summary: string; // A highly targeted, 3-sentence professional summary for a ${targetRole}
+    summary: string; // A highly targeted, 3-sentence professional summary for a ${targetRole}, matching the requested ${tone} tone.
   };
   experience: Array<{
     id: string; // generate a random UUID
@@ -36,7 +54,7 @@ The JSON MUST exactly match this TypeScript interface structure:
     endDate: string; // e.g. "Present"
     current: boolean;
     location: string;
-    description: string[]; // 3-4 highly tailored bullet points
+    description: string[]; // 3-4 highly tailored bullet points embedding metrics and keywords.
   }>;
   education: Array<{
     id: string; // generate a random UUID
@@ -52,7 +70,7 @@ The JSON MUST exactly match this TypeScript interface structure:
   skills: Array<{
     id: string; // generate a random UUID
     category: string; // e.g. "Technical Skills", "Soft Skills"
-    items: string[]; // Array of relevant skills for ${targetRole}
+    items: string[]; // Array of relevant skills for ${targetRole}, definitely include ${newSkills}
   }>;
   projects: Array<{
     id: string; // generate a random UUID

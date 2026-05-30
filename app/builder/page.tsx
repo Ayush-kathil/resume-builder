@@ -16,6 +16,7 @@ import { SyncModal } from '@/components/builder/SyncModal';
 import { pdf } from '@react-pdf/renderer';
 import { ResumePDFDocument } from '@/components/pdf/ResumePDFDocument';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { AIChatbot } from '@/components/builder/AIChatbot';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -213,6 +214,7 @@ export default function BuilderPage() {
       </AnimatePresence>
       
       <ATSWidget />
+      <AIChatbot />
 
       {/* Modals */}
       <ATSCheckerModal 

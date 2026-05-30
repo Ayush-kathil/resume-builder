@@ -12,9 +12,19 @@ export async function POST(req: Request) {
     const pdfParse = require('pdf-parse');
     const formData = await req.formData();
     const file = formData.get('file') as File;
+    const setupDataString = formData.get('setupData') as string | null;
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    }
+
+    let setupData: any = {};
+    if (setupDataString) {
+      try {
+        setupData = JSON.parse(setupDataString);
+      } catch (e) {
+        console.error("Failed to parse setupData");
+      }
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -31,13 +41,26 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: 'Failed to extract text from PDF' }, { status: 500 });
     }
 
-    const systemPrompt = `You are a world-class AI Resume Parser designed to ingest raw, potentially chaotic resume text (often from multi-column PDFs) and output a perfectly structured JSON object matching the \`ResumeData\` schema.
+    const systemPrompt = `You are a world-class AI Resume Parser designed to ingest raw, potentially chaotic resume text and output a perfectly structured JSON object matching the \`ResumeData\` schema.
+
+    The user has also provided specific SETUP CONTEXT to upgrade their resume during this parse step:
+    - Target Role: ${setupData.targetRole || 'None provided'}
+    - Target JD: ${setupData.targetJD || 'None provided'}
+    - Industry Keywords: ${setupData.industryKeywords || 'None provided'}
+    - New Achievements: ${setupData.achievements || 'None provided'}
+    - New Skills: ${setupData.newSkills || 'None provided'}
+    - Explaining Gaps: ${setupData.gaps || 'None provided'}
+    - Metrics to Add: ${setupData.metrics || 'None provided'}
+    - Business Outcomes: ${setupData.businessOutcomes || 'None provided'}
+    - Tone: ${setupData.tone || 'Professional'}
+    - Sections to Omit: ${setupData.sectionsToRemove || 'None provided'}
 
     CRITICAL INSTRUCTIONS:
-    1. **Semantic Entity Extraction**: Accurately differentiate between tools used at jobs vs general skills.
-    2. **Temporal Chronology Mapping**: Ensure dates are correctly formatted (e.g., 'Jan 2020 - Present'). Order experience chronologically, newest first.
-    3. **Implicit Skill Synthesis**: Read passive bullet points and infer core competencies. Populate the \`skills\` array with these synthesized technical/soft skills categorized logically (e.g., "Languages", "Frameworks", "Soft Skills").
-    4. **Automatic Taxonomical Standardization**: Standardize quirky job titles to their global industry equivalents (e.g., 'Code Ninja' -> 'Software Engineer').
+    1. **Semantic Entity Extraction**: Extract tools/skills accurately. Weave the user's "New Skills" into the skills array.
+    2. **Temporal Chronology Mapping**: Order experience chronologically, newest first. If the user mentioned "Gaps to explain", add a synthesized experience entry bridging that gap if appropriate.
+    3. **Augmentation**: Rewrite and augment the passive bullet points using the user's "Metrics to Add", "New Achievements", and "Business Outcomes". Make the resume fit the requested "${setupData.tone}" Tone.
+    4. **Automatic Taxonomical Standardization**: Standardize quirky job titles to global industry equivalents.
+    5. **Omissions**: If they requested to omit certain sections, leave those arrays empty.
 
     You MUST return ONLY valid JSON matching this structure exactly (no markdown formatting, no \`\`\`json tags):
     {
@@ -46,13 +69,10 @@ export async function POST(req: Request) {
         "email": "...",
         "phone": "...",
         "location": "...",
-        "website": "...",
-        "linkedin": "...",
-        "github": "...",
-        "summary": "..."
+        "summary": "..." // Generate a brand new, highly targeted summary incorporating the Target Role, Tone, and JD keywords.
       },
       "experience": [
-        { "id": "uuid", "company": "...", "position": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "description": ["bullet 1", "bullet 2"] }
+        { "id": "uuid", "company": "...", "position": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "description": ["augmented bullet 1", "augmented bullet 2"] }
       ],
       "education": [
         { "id": "uuid", "institution": "...", "degree": "...", "fieldOfStudy": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "gpa": "..." }

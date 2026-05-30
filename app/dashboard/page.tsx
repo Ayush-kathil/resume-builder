@@ -14,156 +14,68 @@ export default function Dashboard() {
   const router = useRouter();
   const { setResumeData } = useResumeStore();
   
-  const [isUploading, setIsUploading] = useState(false);
-  const [loadingText, setLoadingText] = useState('Extracting text...');
-  const [targetRole, setTargetRole] = useState('');
-  const [showFreshModal, setShowFreshModal] = useState(false);
-  const [freshRole, setFreshRole] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf' && !file.name.endsWith('.docx')) {
-      toast.error('Invalid file type. Please upload a PDF or DOCX.');
-      return;
-    }
-
-    setIsUploading(true);
-    setLoadingText('Extracting text...');
-
-    const formData = new FormData();
-    formData.append('file', file);
-    if (targetRole.trim()) {
-      formData.append('targetRole', targetRole.trim());
-    }
-
-    try {
-      // Simulate phases for UI feel
-      setTimeout(() => setLoadingText('Analyzing experience...'), 2000);
-      setTimeout(() => setLoadingText('Formatting to FAANG standards...'), 4500);
-
-      const res = await fetch('/api/parse-cv', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to parse resume');
-      }
-
-      setResumeData(data);
-      toast.success('Resume parsed successfully!');
-      router.push('/builder');
-
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || 'An unexpected error occurred during parsing.');
-      setIsUploading(false);
-    }
-  };
-
-  // Fresh resume generation is now handled inside SmartSetupModal
+  const [setupMode, setSetupMode] = useState<'fresh' | 'upload' | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#050505] p-8 md:p-16 relative">
-      <AnimatePresence>
-        {isUploading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center"
-          >
-            <Loading3D />
-            <motion.p
-              key={loadingText}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-xl font-medium text-white tracking-wide"
-            >
-              {loadingText}
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="max-w-6xl mx-auto space-y-12 relative z-10">
-        <header className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard</h1>
-          <Link href="/">
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Back to Home
-            </motion.button>
-          </Link>
+    <div className="min-h-screen bg-[#050505] p-8 md:p-16 flex flex-col items-center justify-center relative">
+      
+      <div className="max-w-4xl w-full mx-auto space-y-12 relative z-10 flex flex-col items-center">
+        <header className="flex flex-col items-center text-center space-y-4 mb-8">
+          <h1 className="text-4xl font-bold text-white tracking-tight">Create Your Resume</h1>
+          <p className="text-gray-400 max-w-lg">How would you like to start? Generate a tailored resume from scratch, or let our AI enhance your existing one.</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div onClick={() => setShowFreshModal(true)}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl">
+          <div onClick={() => setSetupMode('fresh')}>
             <motion.div
               whileHover={{ y: -8, boxShadow: "0 20px 40px -10px rgba(255,255,255,0.05)" }}
-              className="h-64 rounded-2xl border border-white/10 bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group relative overflow-hidden"
+              className="h-72 rounded-3xl border border-white/10 bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white text-white group-hover:text-black transition-all">
-                <FileText className="h-8 w-8" />
+              <div className="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-white text-white group-hover:text-black transition-all">
+                <FileText className="h-10 w-10" />
               </div>
-              <h2 className="text-xl font-medium text-white z-10">Start Fresh Resume</h2>
-              <p className="text-gray-400 text-sm mt-2 z-10">Build from scratch with AI boilerplate</p>
+              <h2 className="text-2xl font-semibold text-white z-10">Start Fresh</h2>
+              <p className="text-gray-400 text-sm mt-3 z-10 text-center px-6">Build from scratch with AI boilerplate</p>
             </motion.div>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div onClick={() => setSetupMode('upload')}>
             <motion.div
               whileHover={{ y: -8, boxShadow: "0 20px 40px -10px rgba(255,255,255,0.05)" }}
-              className="h-64 rounded-2xl border border-white/10 bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group relative overflow-hidden"
+              className="h-72 rounded-3xl border border-white/10 bg-white/5 flex flex-col items-center justify-center cursor-pointer transition-all group relative overflow-hidden"
             >
-              <input 
-                type="file" 
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                accept=".pdf,.docx" 
-                onChange={handleFileUpload}
-                disabled={isUploading}
-              />
-              <div className="h-16 w-16 rounded-full bg-white/10 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white text-white group-hover:text-black transition-all">
-                <Upload className="h-8 w-8" />
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-white text-white group-hover:text-black transition-all">
+                <Upload className="h-10 w-10" />
               </div>
-              <h2 className="text-xl font-medium text-white text-center px-4">Use Old Resume</h2>
-              <p className="text-gray-400 text-sm mt-2 text-center px-4">Let AI parse and improve it</p>
+              <h2 className="text-2xl font-semibold text-white z-10">Use Old Resume</h2>
+              <p className="text-gray-400 text-sm mt-3 z-10 text-center px-6">Let AI parse and drastically improve it</p>
             </motion.div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-400 ml-1">Target Role (Optional)</label>
-              <input
-                type="text"
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-gray-600"
-                placeholder="e.g. Software Engineer, Insurance Agent"
-                value={targetRole}
-                onChange={(e) => setTargetRole(e.target.value)}
-                disabled={isUploading}
-              />
-            </div>
           </div>
         </div>
+        
+        <Link href="/">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-8 px-6 py-2 rounded-full border border-white/10 text-sm text-gray-400 hover:text-white transition-colors backdrop-blur-md"
+          >
+            Back to Home
+          </motion.button>
+        </Link>
       </div>
 
       {/* Footer Branding */}
-      <div className="absolute bottom-4 left-0 w-full text-center text-xs text-gray-500 font-medium tracking-wide z-10">
+      <div className="absolute bottom-6 left-0 w-full text-center text-xs text-gray-500 font-medium tracking-wide z-10">
         Powered by <span className="text-white/80">Kathil Softwares Limited</span> • Created by <span className="text-white/80">Ayush Kathil</span>
       </div>
 
-      {/* Fresh Resume Modal */}
+      {/* Unified Resume Modal */}
       <SmartSetupModal 
-        isOpen={showFreshModal} 
-        onClose={() => setShowFreshModal(false)} 
+        isOpen={setupMode !== null} 
+        mode={setupMode}
+        onClose={() => setSetupMode(null)} 
       />
     </div>
   );
