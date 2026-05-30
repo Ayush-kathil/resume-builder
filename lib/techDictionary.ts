@@ -52,7 +52,7 @@ export const techDictionary: Record<string, string> = {
  * Replaces tech words in a given string with their proper casing according to the dictionary.
  */
 export function sanitizeText(text: string): string {
-  if (!text) return text;
+  if (!text || typeof text !== 'string') return text;
   
   let sanitized = text;
   // Iterate through dictionary, sorting by longest keys first to avoid partial word replacement

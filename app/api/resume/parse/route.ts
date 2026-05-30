@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 // Advanced, bulletproof PDF extraction utilizing pdf2json (Pure Node.js, no DOM required)
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
-    // @ts-ignore: the type definitions incorrectly expect a boolean, but pdf2json supports 1 for text parsing
+    // @ts-expect-error: the type definitions incorrectly expect a boolean, but pdf2json supports 1 for text parsing
     const pdfParser = new PDFParser(null, 1);
     
     pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));

@@ -14,7 +14,6 @@ import { motion, Reorder } from 'framer-motion';
 
 export function EditorPane() {
   const { data, selectedTemplate, setTemplate, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
-  const [isShortening, setIsShortening] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -51,32 +50,6 @@ export function EditorPane() {
     }
   };
 
-  const handleShorten = async () => {
-    setIsShortening(true);
-    toast.loading('AI is aggressively shortening your resume...', { id: 'shorten' });
-
-    try {
-      const res = await fetch('/api/ai/shorten', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeData: data }),
-      });
-
-      const result = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(result.error || 'Failed to shorten resume');
-      }
-
-      setResumeData(result);
-      toast.success('Resume shortened to 1 page!', { id: 'shorten' });
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to shorten resume', { id: 'shorten' });
-    } finally {
-      setIsShortening(false);
-    }
-  };
 
   return (
     <div className="w-full h-full bg-slate-900/40 backdrop-blur-xl border-r border-white/10 p-6 overflow-y-auto">
@@ -119,19 +92,7 @@ export function EditorPane() {
             Import PDF
           </button>
           
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          >
-            <button
-              onClick={handleShorten}
-              disabled={isShortening}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-xs font-semibold px-4 py-2 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              {isShortening ? 'Shortening...' : 'AI Shorten to 1 Page'}
-            </button>
-          </motion.div>
+
         </div>
       </div>
       

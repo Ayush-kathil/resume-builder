@@ -146,20 +146,20 @@ export const useResumeStore = create<ResumeState>((set) => ({
   sanitizeData: () => set((state) => {
     const newData = { ...state.data };
 
-    newData.experience = newData.experience.map(exp => ({
+    newData.experience = (newData.experience || []).map(exp => ({
       ...exp,
-      description: exp.description.map(d => sanitizeText(d))
+      description: (exp.description || []).map(d => sanitizeText(d))
     }));
 
-    newData.projects = newData.projects.map(proj => ({
+    newData.projects = (newData.projects || []).map(proj => ({
       ...proj,
       description: sanitizeText(proj.description),
-      technologies: proj.technologies.map(t => sanitizeText(t))
+      technologies: (proj.technologies || []).map(t => sanitizeText(t))
     }));
 
-    newData.skills = newData.skills.map(skill => ({
+    newData.skills = (newData.skills || []).map(skill => ({
       ...skill,
-      items: skill.items.map(s => sanitizeText(s))
+      items: (skill.items || []).map(s => sanitizeText(s))
     }));
 
     return { data: newData };
