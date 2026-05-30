@@ -10,18 +10,31 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
 import { exportDocx } from '@/lib/exportDocx';
 import { ATSWidget } from '@/components/ui/ATSWidget';
+import { pdf } from '@react-pdf/renderer';
+import { ResumePDFDocument } from '@/components/pdf/ResumePDFDocument';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
   const { data } = useResumeStore();
 
-  const handleExportPDF = () => {
-    setIsExportModalOpen(false);
-    // Give modal time to close before printing so it doesn't show in the print view
-    setTimeout(() => {
-      window.print();
-    }, 300);
+  const handleExportPDF = async () => {
+    setIsExportingPDF(true);
+    try {
+      const blob = await pdf(<ResumePDFDocument data={data} />).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setIsExportModalOpen(false);
+    } catch (err) {
+      console.error("PDF Export failed:", err);
+    } finally {
+      setIsExportingPDF(false);
+    }
   };
 
   const handleExportDocx = async () => {
@@ -37,7 +50,7 @@ export default function BuilderPage() {
   };
 
   const springTransition = {
-    type: "spring",
+    type: "spring" as const,
     stiffness: 300,
     damping: 30
   };
@@ -141,7 +154,8 @@ export default function BuilderPage() {
                   whileTap={{ scale: 0.98 }}
                   transition={springTransition}
                   onClick={handleExportPDF}
-                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-purple-500/50 transition-colors group text-left w-full h-full"
+                  disabled={isExportingPDF}
+                  className="flex flex-col items-center p-8 bg-black/40 border border-white/10 rounded-2xl hover:bg-white/5 hover:border-purple-500/50 transition-colors group text-left w-full h-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="h-16 w-16 bg-red-500/20 text-red-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <FileText className="h-8 w-8" />
@@ -150,6 +164,12 @@ export default function BuilderPage() {
                   <p className="text-sm text-gray-400 text-center leading-relaxed">
                     Best for sharing & printing. High-quality vector text.
                   </p>
+                  
+                  {isExportingPDF && (
+                    <div className="mt-4 text-xs font-medium text-red-400 animate-pulse">
+                      Generating Vector PDF...
+                    </div>
+                  )}
                 </motion.button>
 
                 {/* Word Card */}

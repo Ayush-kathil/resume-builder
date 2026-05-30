@@ -1,20 +1,18 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-// Use the exact key name requested by the user
-const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+import { generateContentWithFallback } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
-    const { targetRole } = await req.json();
+    const { targetRole, department, tone } = await req.json();
 
     if (!targetRole) {
       return NextResponse.json({ error: 'Target role is required' }, { status: 400 });
     }
 
     const prompt = `
-You are an expert ATS resume writer. Your task is to generate a complete boilerplate resume tailored exactly for the role of "${targetRole}". 
+You are an expert ATS resume writer. Your task is to generate a complete boilerplate resume tailored exactly for the role of "${targetRole}"${department ? ` in the ${department} department/industry` : ''}.
+${tone ? `CRITICAL INSTRUCTION: Emphasize the following features/tone throughout the resume: ${tone}.` : ''}
+
 The goal is to give the user a massive headstart. Fill in the JSON structure with high-quality, ATS-optimized placeholder content that a ${targetRole} would typically have.
 Include strong action verbs, industry-standard keywords, and ensure high impact.
 Use the XYZ formula for bullet points where possible (Accomplished [X] as measured by [Y], by doing [Z]).
@@ -68,10 +66,9 @@ The JSON MUST exactly match this TypeScript interface structure:
 RETURN ONLY VALID JSON. NO MARKDOWN FORMATTING OR BACKTICKS.
 `;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-    const result = await model.generateContent(prompt);
+    const content = await generateContentWithFallback(prompt, { temperature: 0.7 });
     
-    let text = result.response.text();
+    let text = content.trim();
     text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
     const parsedData = JSON.parse(text);

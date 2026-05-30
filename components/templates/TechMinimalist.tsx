@@ -3,8 +3,7 @@ import { ResumeData } from '@/types/resume';
 export function TechMinimalist({ data }: { data: ResumeData }) {
   return (
     <div 
-      className="w-full h-fit min-h-[1123px] bg-white text-gray-900 p-8 shadow-2xl"
-      style={{ fontFamily: "Inter, Roboto, sans-serif" }}
+      className="w-full h-fit min-h-[1123px] bg-white text-gray-900 p-8 shadow-2xl font-mono"
     >
       <header className="mb-4">
         <h1 className="text-3xl font-bold tracking-tight mb-1">
@@ -14,7 +13,7 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
           {data.personalInfo.email && <span className="font-mono">{data.personalInfo.email}</span>}
           {data.personalInfo.phone && <span className="font-mono">• {data.personalInfo.phone}</span>}
           {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
-          {data.projects.find(p => p.url) && data.projects.filter(p => p.url).map((p, i) => (
+          {(data.projects || []).find(p => p.url) && (data.projects || []).filter(p => p.url).map((p, i) => (
             <a key={i} href={p.url} className="text-blue-600 hover:underline font-mono" target="_blank" rel="noopener noreferrer">
               • {p.url?.toLowerCase().includes('github') ? 'github' : p.url?.toLowerCase().includes('linkedin') ? 'linkedin' : 'link'}
             </a>
@@ -30,29 +29,29 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
         </section>
       )}
 
-      {data.skills.length > 0 && (
+      {(data.skills || []).length > 0 && (
         <section className="mb-3">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
             Skills
           </h2>
           <div className="text-xs space-y-0.5">
-            {data.skills.map((skill, index) => (
+            {(data.skills || []).map((skill, index) => (
               <div key={index} className="flex">
                 <span className="font-bold w-[120px] flex-shrink-0">{skill.category}:</span>
-                <span className="font-mono text-[11px] text-gray-700">{skill.items.join(', ')}</span>
+                <span className="font-mono text-[11px] text-gray-700">{(skill.items || []).join(', ')}</span>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {data.experience.length > 0 && (
+      {(data.experience || []).length > 0 && (
         <section className="mb-3">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
             Experience
           </h2>
           <div className="space-y-2.5">
-            {data.experience.map((exp, index) => (
+            {(data.experience || []).map((exp, index) => (
               <div key={index}>
                 <div className="flex justify-between items-baseline">
                   <div>
@@ -64,7 +63,7 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
                   </span>
                 </div>
                 <ul className="list-disc list-outside ml-4 mt-0.5 text-[12px] space-y-0.5">
-                  {exp.description.map((item, i) => (
+                  {(exp.description || []).map((item, i) => (
                     <li key={i} className="leading-snug pl-0.5">{item}</li>
                   ))}
                 </ul>
@@ -74,19 +73,19 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
         </section>
       )}
 
-      {data.projects.length > 0 && (
+      {(data.projects || []).length > 0 && (
         <section className="mb-3">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
             Projects
           </h2>
           <div className="space-y-2">
-            {data.projects.map((proj, index) => (
+            {(data.projects || []).map((proj, index) => (
               <div key={index}>
                 <div className="flex items-baseline">
                   <span className="text-[13px] font-bold">{proj.name}</span>
-                  {proj.technologies.length > 0 && (
+                  {(proj.technologies || []).length > 0 && (
                     <span className="text-[11px] font-mono text-gray-500 ml-2">
-                      [{proj.technologies.join(', ')}]
+                      [{(proj.technologies || []).join(', ')}]
                     </span>
                   )}
                 </div>
@@ -99,13 +98,13 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
         </section>
       )}
 
-      {data.education.length > 0 && (
+      {(data.education || []).length > 0 && (
         <section className="mb-3">
           <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
             Education
           </h2>
           <div className="space-y-1.5">
-            {data.education.map((edu, index) => (
+            {(data.education || []).map((edu, index) => (
               <div key={index} className="flex justify-between items-baseline">
                 <div>
                   <span className="text-[13px] font-bold">{edu.institution}</span>

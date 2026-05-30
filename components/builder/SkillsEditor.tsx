@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { motion } from 'framer-motion';
 
 export function SkillsEditor() {
-  const { data, addSkillCategory, updateSkillCategory, removeSkillCategory } = useResumeStore();
+  const { data, addSkill, updateSkill, removeSkill } = useResumeStore();
 
   return (
     <section className="space-y-4">
@@ -17,7 +17,7 @@ export function SkillsEditor() {
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.6 }}
         >
           <button 
-            onClick={() => addSkillCategory({ id: uuidv4(), category: '', items: [] })}
+            onClick={() => addSkill({ id: uuidv4(), category: '', items: [] })}
             className="text-xs flex items-center gap-1 bg-white/5 border border-white/10 text-blue-400 hover:text-blue-300 hover:bg-white/10 px-3 py-1.5 rounded-full transition-all shadow-lg shadow-black/20"
           >
             <Plus className="h-3.5 w-3.5" /> Add Section

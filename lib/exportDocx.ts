@@ -9,7 +9,7 @@ const createHeading = (text: string): Paragraph => {
     alignment: AlignmentType.LEFT,
     spacing: { before: 200, after: 100 },
     border: {
-      bottom: { color: "000000", space: 1, value: BorderStyle.SINGLE, size: 6 }
+      bottom: { color: "000000", space: 1, style: BorderStyle.SINGLE, size: 6 }
     }
   });
 };

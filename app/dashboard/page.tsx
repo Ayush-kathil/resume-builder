@@ -7,6 +7,7 @@ import { Plus, Upload, FileText, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useResumeStore } from '@/store/resumeStore';
+import { SmartSetupModal } from '@/components/modals/SmartSetupModal';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -64,39 +65,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleStartFresh = async () => {
-    if (!freshRole.trim()) {
-      toast.error('Please enter a target role');
-      return;
-    }
-
-    setIsGenerating(true);
-    toast.loading('Generating AI boilerplate...', { id: 'generate' });
-
-    try {
-      const res = await fetch('/api/ai/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ targetRole: freshRole.trim() }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to generate resume');
-      }
-
-      setResumeData(data);
-      toast.success('Boilerplate generated!', { id: 'generate' });
-      router.push('/builder');
-    } catch (error: any) {
-      console.error('Generate Error:', error);
-      toast.error(error.message, { id: 'generate' });
-    } finally {
-      setIsGenerating(false);
-      setShowFreshModal(false);
-    }
-  };
+  // Fresh resume generation is now handled inside SmartSetupModal
 
   return (
     <div className="min-h-screen bg-[#050505] p-8 md:p-16 relative">
@@ -191,47 +160,10 @@ export default function Dashboard() {
       </div>
 
       {/* Fresh Resume Modal */}
-      {showFreshModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#111] border border-white/10 rounded-2xl p-6 w-full max-w-md shadow-2xl"
-          >
-            <h3 className="text-xl font-semibold text-white mb-2">What role are you targeting?</h3>
-            <p className="text-sm text-gray-400 mb-6">
-              Our AI will instantly generate a tailored boilerplate (Summary, Skills, and Bullet Points) for this specific role so you don't have to start from a blank page.
-            </p>
-            
-            <input
-              type="text"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-gray-600 mb-6"
-              placeholder="e.g. Full Stack Developer, Marketing Manager"
-              value={freshRole}
-              onChange={(e) => setFreshRole(e.target.value)}
-              disabled={isGenerating}
-              autoFocus
-            />
-
-            <div className="flex justify-end gap-3">
-              <button 
-                onClick={() => setShowFreshModal(false)}
-                disabled={isGenerating}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleStartFresh}
-                disabled={isGenerating}
-                className="px-4 py-2 rounded-xl text-sm font-medium bg-white text-black hover:bg-gray-200 transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                {isGenerating ? 'Generating...' : 'Generate Resume'}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+      <SmartSetupModal 
+        isOpen={showFreshModal} 
+        onClose={() => setShowFreshModal(false)} 
+      />
     </div>
   );
 }

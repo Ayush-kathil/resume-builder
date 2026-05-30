@@ -66,7 +66,7 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="mt-10 flex flex-col sm:flex-row gap-4"
         >
-          <Link href="/dashboard">
+          <Link href="/login">
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -79,8 +79,6 @@ export default function Home() {
               <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-gray-200 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.button>
           </Link>
-          
-
         </motion.div>
 
         {/* Feature Cards with Floating Effects */}

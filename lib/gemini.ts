@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, Part, GenerationConfig } from '@google/generative-ai';
 
 // Initialize the API with the key
-const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
+const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // Fallback models in order of preference
@@ -18,7 +18,7 @@ export async function generateContentWithFallback(
   config: GenerationConfig = {}
 ) {
   if (!apiKey) {
-    throw new Error('Missing Gemini API Key. Please add GEMINI-API-KEY to your .env file.');
+    throw new Error('Missing Gemini API Key. Please add GEMINIAPIKEY to your .env file.');
   }
 
   let lastError: any;

@@ -1,15 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
-const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+import { generateContentWithFallback } from '@/lib/gemini';
 
 export async function POST(req: Request) {
   try {
-    if (!apiKey) {
-      return NextResponse.json({ error: 'Missing Gemini API Key. Please add GEMINI-API-KEY to your .env file.' }, { status: 401 });
-    }
-
     const { position, type } = await req.json();
 
     if (!position || !type) {
@@ -26,11 +19,19 @@ export async function POST(req: Request) {
       Example: ["bullet 1", "bullet 2", "bullet 3"]
     `;
 
+    const content = await generateContentWithFallback(prompt, { temperature: 0.7 });
 
-    return NextResponse.json({ suggestion: responseText.trim() });
+    let cleanContent = content.trim();
+    if (cleanContent.startsWith('```json')) {
+      cleanContent = cleanContent.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (cleanContent.startsWith('```')) {
+      cleanContent = cleanContent.replace(/^```/, '').replace(/```$/, '').trim();
+    }
+
+    const suggestions = JSON.parse(cleanContent);
+    return NextResponse.json({ suggestions });
   } catch (error) {
     console.error('Error generating suggestion:', error);
     return NextResponse.json({ error: 'Failed to generate suggestion' }, { status: 500 });
   }
 }
-

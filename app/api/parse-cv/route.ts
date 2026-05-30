@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 
 // Use the exact key name requested by the user
-const apiKey = process.env['GEMINI-API-KEY'] || process.env.GEMINI_API_KEY || '';
+const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
 
 export async function POST(req: Request) {
   try {
     if (!apiKey) {
-      return NextResponse.json({ error: 'Missing Gemini API Key. Please add GEMINI-API-KEY to your .env file.' }, { status: 401 });
+      return NextResponse.json({ error: 'Missing Gemini API Key. Please add GEMINIAPIKEY to your .env file.' }, { status: 401 });
     }
 
     const formData = await req.formData();

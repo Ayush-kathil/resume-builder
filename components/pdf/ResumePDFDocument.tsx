@@ -1,0 +1,259 @@
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { ResumeData } from '@/types/resume';
+
+// Register a standard font for a clean, ATS-friendly look (Times-Roman is built-in)
+// but for a better look we can use standard fonts or just rely on the defaults.
+// Default fonts in react-pdf: Helvetica, Times-Roman, Courier.
+// We will use Times-Roman to mimic the ClassicATS look.
+
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontFamily: 'Times-Roman',
+    fontSize: 11,
+    color: '#000000',
+    lineHeight: 1.3,
+  },
+  header: {
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+    paddingBottom: 10,
+    textAlign: 'center',
+  },
+  name: {
+    fontSize: 24,
+    fontFamily: 'Times-Bold',
+    textTransform: 'uppercase',
+    marginBottom: 5,
+  },
+  contactInfo: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    fontSize: 10,
+    gap: 5,
+  },
+  contactItem: {
+    marginHorizontal: 3,
+  },
+  section: {
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontFamily: 'Times-Bold',
+    textTransform: 'uppercase',
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+    paddingBottom: 2,
+    marginBottom: 6,
+  },
+  summaryText: {
+    textAlign: 'justify',
+  },
+  skillRow: {
+    flexDirection: 'row',
+    marginBottom: 2,
+  },
+  skillCategory: {
+    fontFamily: 'Times-Bold',
+    width: '15%',
+  },
+  skillItems: {
+    width: '85%',
+  },
+  expBlock: {
+    marginBottom: 8,
+  },
+  expHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  expTitle: {
+    fontFamily: 'Times-Bold',
+    fontSize: 11,
+  },
+  expDates: {
+    fontFamily: 'Times-Bold',
+    fontSize: 10,
+  },
+  expSubRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  expCompany: {
+    fontFamily: 'Times-Italic',
+    fontSize: 10,
+  },
+  expLocation: {
+    fontFamily: 'Times-Italic',
+    fontSize: 10,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    marginBottom: 2,
+    paddingLeft: 10,
+    paddingRight: 15,
+  },
+  bulletPoint: {
+    width: 10,
+    fontSize: 10,
+  },
+  bulletContent: {
+    flex: 1,
+    textAlign: 'justify',
+  },
+  eduBlock: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  eduInst: {
+    fontFamily: 'Times-Bold',
+    fontSize: 11,
+  },
+  eduDegree: {
+    fontSize: 10,
+  },
+  eduDates: {
+    fontFamily: 'Times-Bold',
+    fontSize: 10,
+    textAlign: 'right',
+  },
+  eduLocation: {
+    fontFamily: 'Times-Italic',
+    fontSize: 10,
+    textAlign: 'right',
+  },
+  projHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  projTitle: {
+    fontFamily: 'Times-Bold',
+    fontSize: 11,
+  },
+  projTech: {
+    fontFamily: 'Times-Italic',
+    fontSize: 10,
+    marginLeft: 5,
+  }
+});
+
+export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.name}>{data.personalInfo.fullName || "Your Name"}</Text>
+          <View style={styles.contactInfo}>
+            {data.personalInfo.email && <Text style={styles.contactItem}>{data.personalInfo.email}</Text>}
+            {data.personalInfo.phone && <Text style={styles.contactItem}>| {data.personalInfo.phone}</Text>}
+            {data.personalInfo.location && <Text style={styles.contactItem}>| {data.personalInfo.location}</Text>}
+          </View>
+          {((data.projects || []).filter(p => p.url).length > 0) && (
+            <View style={{ ...styles.contactInfo, marginTop: 4 }}>
+              {(data.projects || []).filter(p => p.url).map((p, i) => (
+                <Text key={i} style={styles.contactItem}>
+                  {p.url?.toLowerCase().includes('github') ? 'GitHub' : p.url?.toLowerCase().includes('linkedin') ? 'LinkedIn' : 'Portfolio'}: {p.url}
+                </Text>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Summary */}
+        {data.personalInfo.summary && (
+          <View style={styles.section}>
+            <Text style={styles.summaryText}>{data.personalInfo.summary}</Text>
+          </View>
+        )}
+
+        {/* Skills */}
+        {(data.skills || []).length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Skills</Text>
+            {(data.skills || []).map((skill, index) => (
+              <View key={index} style={styles.skillRow}>
+                <Text style={styles.skillCategory}>{skill.category}:</Text>
+                <Text style={styles.skillItems}>{(skill.items || []).join(', ')}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Experience */}
+        {(data.experience || []).length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Experience</Text>
+            {(data.experience || []).map((exp, index) => (
+              <View key={index} style={styles.expBlock}>
+                <View style={styles.expHeaderRow}>
+                  <Text style={styles.expTitle}>{exp.position}</Text>
+                  <Text style={styles.expDates}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
+                </View>
+                <View style={styles.expSubRow}>
+                  <Text style={styles.expCompany}>{exp.company}</Text>
+                  <Text style={styles.expLocation}>{exp.location}</Text>
+                </View>
+                {(exp.description || []).map((item, i) => (
+                  <View key={i} style={styles.bulletRow}>
+                    <Text style={styles.bulletPoint}>•</Text>
+                    <Text style={styles.bulletContent}>{item}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Projects */}
+        {(data.projects || []).length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Projects</Text>
+            {(data.projects || []).map((proj, index) => (
+              <View key={index} style={styles.expBlock}>
+                <View style={styles.projHeader}>
+                  <Text style={styles.projTitle}>{proj.name}</Text>
+                  {((proj.technologies || []).length > 0) && (
+                    <Text style={styles.projTech}>| {(proj.technologies || []).join(', ')}</Text>
+                  )}
+                </View>
+                <View style={styles.bulletRow}>
+                  <Text style={styles.bulletPoint}>•</Text>
+                  <Text style={styles.bulletContent}>{proj.description}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Education */}
+        {(data.education || []).length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Education</Text>
+            {(data.education || []).map((edu, index) => (
+              <View key={index} style={styles.eduBlock}>
+                <View>
+                  <Text style={styles.eduInst}>{edu.institution}</Text>
+                  <Text style={styles.eduDegree}>{edu.degree} in {edu.fieldOfStudy} {edu.gpa ? `| GPA: ${edu.gpa}` : ''}</Text>
+                </View>
+                <View>
+                  <Text style={styles.eduDates}>{edu.startDate} – {edu.current ? 'Present' : edu.endDate}</Text>
+                  <Text style={styles.eduLocation}>{edu.location}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+      </Page>
+    </Document>
+  );
+};
