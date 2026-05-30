@@ -58,7 +58,7 @@ export function ModernExecutive({ data }: { data: ResumeData }) {
                 <div className="text-sm space-y-1.5">
                   {(data.skills || []).map((skill, index) => (
                     <div key={index} className="flex">
-                      <span className="font-semibold text-gray-900 w-1/4 flex-shrink-0">{skill.category}</span>
+                      <span className="font-semibold text-gray-900 whitespace-nowrap pr-3 flex-shrink-0">{skill.category}</span>
                       <span className="text-gray-700">{(skill.items || []).join(' • ')}</span>
                     </div>
                   ))}

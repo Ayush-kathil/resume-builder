@@ -57,8 +57,8 @@ export function ClassicATS({ data }: { data: ResumeData }) {
                 </h2>
                 <div className="text-[13px] space-y-1">
                   {(data.skills || []).map((skill, index) => (
-                    <div key={index}>
-                      <span className="font-bold">{skill.category}:</span>{' '}
+                    <div key={index} className="flex">
+                      <span className="font-bold whitespace-nowrap pr-2">{skill.category}:</span>
                       <span>{(skill.items || []).join(', ')}</span>
                     </div>
                   ))}

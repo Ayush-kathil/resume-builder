@@ -38,12 +38,15 @@ export default function BuilderPage() {
       const html2pdfModule = await import('html2pdf.js');
       const html2pdf = html2pdfModule.default;
 
+      const elementWidth = element.offsetWidth;
+      const elementHeight = element.offsetHeight;
+
       const opt: any = {
         margin: 0,
         filename: `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        jsPDF: { unit: 'px', format: [elementWidth, elementHeight], orientation: 'portrait' }
       };
 
       await html2pdf().set(opt).from(element).save();
