@@ -3,11 +3,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Plus, Upload, FileText, Loader2 } from 'lucide-react';
+import { Plus, Upload, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useResumeStore } from '@/store/resumeStore';
 import { SmartSetupModal } from '@/components/modals/SmartSetupModal';
+import { Loading3D } from '@/components/ui/Loading3D';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -77,7 +78,7 @@ export default function Dashboard() {
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center"
           >
-            <Loader2 className="h-12 w-12 text-white animate-spin mb-6" />
+            <Loading3D />
             <motion.p
               key={loadingText}
               initial={{ opacity: 0, y: 10 }}
