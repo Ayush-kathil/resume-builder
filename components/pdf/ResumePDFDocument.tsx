@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Helvetica-Bold',
     textTransform: 'uppercase',
-    marginBottom: 5,
+    marginBottom: 10,
   },
   contactInfo: {
     flexDirection: 'row',
@@ -204,7 +204,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                 <View key="experience" style={styles.section}>
                   <Text style={styles.sectionTitle}>Experience</Text>
                   {(data.experience || []).map((exp, index) => (
-                    <View key={index} style={styles.expBlock} wrap={false}>
+                    <View key={index} style={styles.expBlock}>
                       <View style={styles.expHeaderRow}>
                         <Text style={styles.expTitle}>{exp.position}</Text>
                         <Text style={styles.expDates}>{formatResumeDate(exp.startDate)} – {exp.current ? 'Present' : formatResumeDate(exp.endDate)}</Text>
