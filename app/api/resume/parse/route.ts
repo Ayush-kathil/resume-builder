@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+// Polyfill DOMMatrix and Path2D for pdf-parse (pdfjs-dist) in Node 18+
+if (typeof globalThis.DOMMatrix === 'undefined') {
+  (globalThis as any).DOMMatrix = class DOMMatrix {};
+}
+if (typeof globalThis.Path2D === 'undefined') {
+  (globalThis as any).Path2D = class Path2D {};
+}
+
 export const dynamic = 'force-dynamic';
 
 const openai = new OpenAI({
@@ -9,11 +17,6 @@ const openai = new OpenAI({
 
 export async function POST(req: Request) {
   try {
-    // Polyfill DOMMatrix for pdf-parse (pdfjs-dist) in Node 18+
-    if (typeof globalThis.DOMMatrix === 'undefined') {
-      (globalThis as any).DOMMatrix = class DOMMatrix {};
-    }
-
     const pdfParse = require('pdf-parse');
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -41,9 +44,9 @@ export async function POST(req: Request) {
     try {
        const pdfData = await pdfParse(buffer);
        textContent = pdfData.text;
-    } catch (e) {
+    } catch (e: any) {
        console.error("PDF Parse error", e);
-       return NextResponse.json({ error: 'Failed to extract text from PDF' }, { status: 500 });
+       return NextResponse.json({ error: `Failed to extract text from PDF: ${e.message || e.toString()}` }, { status: 500 });
     }
 
     const systemPrompt = `You are a world-class AI Resume Parser designed to ingest raw, potentially chaotic resume text and output a perfectly structured JSON object matching the \`ResumeData\` schema.
