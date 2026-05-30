@@ -3,9 +3,18 @@ import clientPromise from "@/lib/mongodb";
 import mongoose from "mongoose";
 import Otp from "@/models/Otp";
 import bcrypt from "bcryptjs";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import { render } from "@react-email/render";
+import WelcomeEmail from "@/emails/WelcomeEmail";
+import React from 'react';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function POST(request: Request) {
   try {
@@ -57,32 +66,22 @@ export async function POST(request: Request) {
     // Delete used OTP
     await Otp.deleteOne({ _id: validOtp._id });
 
-    // Trigger Resend Automation
-    if (process.env.RESEND_API_KEY) {
+    // Send Welcome Email
+    if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
       try {
-        await resend.automations.create({
-          name: 'Welcome series',
-          steps: [
-            {
-              key: 'start',
-              type: 'trigger',
-              config: { eventName: 'user.created' },
-            },
-            {
-              key: 'welcome',
-              type: 'send_email',
-              config: {
-                template: {
-                  id: '044db673-fff6-420f-a566-f6aba05d60e7',
-                },
-              },
-            },
-          ],
-          connections: [{ from: 'start', to: 'welcome' }],
+        const emailHtml = await render(React.createElement(WelcomeEmail, { userName: email.split('@')[0] }));
+        
+        await transporter.sendMail({
+          from: `"Resume Builder" <${process.env.SMTP_EMAIL}>`,
+          to: email,
+          subject: 'Welcome to the Future of Resumes',
+          html: emailHtml,
         });
       } catch (err) {
-        console.error("Resend automation failed to trigger", err);
+        console.error("Welcome email failed to send via SMTP", err);
       }
+    } else {
+      console.log('NO SMTP CREDENTIALS, WELCOME EMAIL NOT SENT');
     }
 
     return NextResponse.json({ success: true, userId: result.insertedId });

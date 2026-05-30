@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import clientPromise from '@/lib/mongodb';
 import Otp from '@/models/Otp';
 import dns from 'node:dns';
@@ -7,7 +7,13 @@ import dns from 'node:dns';
 // Force IPv4 resolution to prevent querySrv ECONNREFUSED on some ISPs
 dns.setDefaultResultOrder('ipv4first');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function POST(req: Request) {
   try {
@@ -35,21 +41,22 @@ export async function POST(req: Request) {
     // Save new OTP
     await Otp.create({ email, otp: otpCode });
 
-    // Send email using Resend
-    if (process.env.RESEND_API_KEY) {
-      const { data, error } = await resend.emails.send({
-        from: 'Resume Builder <onboarding@resend.dev>',
-        to: [email],
-        subject: 'Your Login Code',
-        html: `<p>Your single-use login code is: <strong>${otpCode}</strong></p><p>This code will expire in 5 minutes.</p>`,
+    // Send email using Nodemailer
+    if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+      await transporter.sendMail({
+        from: `"Resume Builder" <${process.env.SMTP_EMAIL}>`,
+        to: email,
+        subject: 'Your Verification Code',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2>Verification Code</h2>
+            <p>Your single-use verification code is: <strong style="font-size: 24px;">${otpCode}</strong></p>
+            <p>This code will expire in 5 minutes.</p>
+          </div>
+        `,
       });
-
-      if (error) {
-        console.error('Resend Error:', error);
-        return NextResponse.json({ error: `Resend Error: ${error.message}` }, { status: 500 });
-      }
     } else {
-      console.log('NO RESEND API KEY, OTP IS:', otpCode);
+      console.log('NO SMTP CREDENTIALS, OTP IS:', otpCode);
     }
 
     return NextResponse.json({ success: true, message: 'OTP sent' });
