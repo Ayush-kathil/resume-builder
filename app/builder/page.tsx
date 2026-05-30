@@ -3,7 +3,7 @@
 import { EditorPane } from '@/components/builder/EditorPane';
 import { PreviewPane } from '@/components/builder/PreviewPane';
 import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
-import { Download, Share2, Sparkles, ArrowLeft, FileText, FileDown, X } from 'lucide-react';
+import { Download, Share2, Sparkles, ArrowLeft, FileText, FileDown, X, Cloud, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,12 +12,16 @@ import { exportDocx } from '@/lib/exportDocx';
 import { ATSWidget } from '@/components/ui/ATSWidget';
 import { pdf } from '@react-pdf/renderer';
 import { ResumePDFDocument } from '@/components/pdf/ResumePDFDocument';
+import { useAutoSave } from '@/hooks/useAutoSave';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const { data } = useResumeStore();
+  
+  // Hook up the enterprise auto-save
+  const saveStatus = useAutoSave();
 
   const handleExportPDF = async () => {
     setIsExportingPDF(true);
@@ -75,6 +79,48 @@ export default function BuilderPage() {
         </div>
 
         <div className="flex items-center gap-4">
+          {/* Auto-Save Indicator */}
+          <div className="hidden md:flex items-center justify-center min-w-[100px] h-9 px-3 rounded-full bg-black/20 border border-white/5 backdrop-blur-md">
+            <AnimatePresence mode="wait">
+              {saveStatus === 'saved' && (
+                <motion.div
+                  key="saved"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-400"
+                >
+                  <Cloud className="h-3.5 w-3.5" />
+                  <span>Saved</span>
+                </motion.div>
+              )}
+              {saveStatus === 'saving' && (
+                <motion.div
+                  key="saving"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="flex items-center gap-1.5 text-xs font-medium text-blue-400"
+                >
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Saving...</span>
+                </motion.div>
+              )}
+              {saveStatus === 'error' && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="flex items-center gap-1.5 text-xs font-medium text-red-400"
+                >
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  <span>Error</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <motion.button 
             animate={{ y: [0, -3, 0] }}
             transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 0.5 }}

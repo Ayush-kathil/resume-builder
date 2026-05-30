@@ -25,109 +25,121 @@ export function ClassicATS({ data }: { data: ResumeData }) {
         )}
       </header>
 
-      {data.personalInfo.summary && (
-        <section className="mb-4">
-          <p className="text-[13px] leading-relaxed text-justify">
-            {data.personalInfo.summary}
-          </p>
-        </section>
-      )}
-
-      {(data.skills || []).length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
-            Skills
-          </h2>
-          <div className="text-[13px] space-y-1">
-            {(data.skills || []).map((skill, index) => (
-              <div key={index}>
-                <span className="font-bold">{skill.category}:</span>{' '}
-                <span>{(skill.items || []).join(', ')}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {(data.experience || []).length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
-            Experience
-          </h2>
-          <div className="space-y-3">
-            {(data.experience || []).map((exp, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-baseline mb-0.5">
-                  <h3 className="text-[14px] font-bold">{exp.position}</h3>
-                  <span className="text-[13px] font-bold">
-                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                  </span>
-                </div>
-                <div className="flex justify-between items-baseline mb-1.5">
-                  <span className="text-[13px] italic">{exp.company}</span>
-                  <span className="text-[13px] italic">{exp.location}</span>
-                </div>
-                <ul className="list-disc list-outside ml-5 text-[13px] space-y-1">
-                  {(exp.description || []).map((item, i) => (
-                    <li key={i} className="leading-snug pl-1">{item}</li>
+      {(data.sectionOrder || ['summary', 'experience', 'projects', 'education', 'skills']).map((sectionId) => {
+        switch (sectionId) {
+          case 'summary':
+            return data.personalInfo.summary ? (
+              <section key="summary" className="mb-4">
+                <p className="text-[13px] leading-relaxed text-justify">
+                  {data.personalInfo.summary}
+                </p>
+              </section>
+            ) : null;
+          
+          case 'skills':
+            return (data.skills || []).length > 0 ? (
+              <section key="skills" className="mb-4">
+                <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
+                  Skills
+                </h2>
+                <div className="text-[13px] space-y-1">
+                  {(data.skills || []).map((skill, index) => (
+                    <div key={index}>
+                      <span className="font-bold">{skill.category}:</span>{' '}
+                      <span>{(skill.items || []).join(', ')}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+                </div>
+              </section>
+            ) : null;
 
-      {(data.projects || []).length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
-            Projects
-          </h2>
-          <div className="space-y-3">
-            {(data.projects || []).map((proj, index) => (
-              <div key={index}>
-                <div className="mb-1">
-                  <h3 className="text-[14px] font-bold inline">{proj.name}</h3>
-                  {(proj.technologies || []).length > 0 && (
-                    <span className="text-[13px] italic ml-2">
-                      | {(proj.technologies || []).join(', ')}
-                    </span>
-                  )}
+          case 'experience':
+            return (data.experience || []).length > 0 ? (
+              <section key="experience" className="mb-4">
+                <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
+                  Experience
+                </h2>
+                <div className="space-y-3">
+                  {(data.experience || []).map((exp, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between items-baseline mb-0.5">
+                        <h3 className="text-[14px] font-bold">{exp.position}</h3>
+                        <span className="text-[13px] font-bold">
+                          {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-baseline mb-1.5">
+                        <span className="text-[13px] italic">{exp.company}</span>
+                        <span className="text-[13px] italic">{exp.location}</span>
+                      </div>
+                      <ul className="list-disc list-outside ml-5 text-[13px] space-y-1">
+                        {(exp.description || []).map((item, i) => (
+                          <li key={i} className="leading-snug pl-1">{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-                <ul className="list-disc list-outside ml-5 text-[13px]">
-                  <li className="leading-snug pl-1">{proj.description}</li>
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              </section>
+            ) : null;
 
-      {(data.education || []).length > 0 && (
-        <section className="mb-4">
-          <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
-            Education
-          </h2>
-          <div className="space-y-2">
-            {(data.education || []).map((edu, index) => (
-              <div key={index} className="flex justify-between items-baseline">
-                <div>
-                  <h3 className="text-[14px] font-bold">{edu.institution}</h3>
-                  <div className="text-[13px]">
-                    {edu.degree} in {edu.fieldOfStudy} {edu.gpa && `| GPA: ${edu.gpa}`}
-                  </div>
+          case 'projects':
+            return (data.projects || []).length > 0 ? (
+              <section key="projects" className="mb-4">
+                <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
+                  Projects
+                </h2>
+                <div className="space-y-3">
+                  {(data.projects || []).map((proj, index) => (
+                    <div key={index}>
+                      <div className="mb-1">
+                        <h3 className="text-[14px] font-bold inline">{proj.name}</h3>
+                        {(proj.technologies || []).length > 0 && (
+                          <span className="text-[13px] italic ml-2">
+                            | {(proj.technologies || []).join(', ')}
+                          </span>
+                        )}
+                      </div>
+                      <ul className="list-disc list-outside ml-5 text-[13px]">
+                        <li className="leading-snug pl-1">{proj.description}</li>
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-right">
-                  <div className="text-[13px] font-bold">
-                    {edu.startDate} – {edu.current ? 'Present' : edu.endDate}
-                  </div>
-                  <div className="text-[13px] italic">{edu.location}</div>
+              </section>
+            ) : null;
+
+          case 'education':
+            return (data.education || []).length > 0 ? (
+              <section key="education" className="mb-4">
+                <h2 className="text-[14px] font-bold uppercase border-b-[1px] border-black pb-1 mb-2">
+                  Education
+                </h2>
+                <div className="space-y-2">
+                  {(data.education || []).map((edu, index) => (
+                    <div key={index} className="flex justify-between items-baseline">
+                      <div>
+                        <h3 className="text-[14px] font-bold">{edu.institution}</h3>
+                        <div className="text-[13px]">
+                          {edu.degree} in {edu.fieldOfStudy} {edu.gpa && `| GPA: ${edu.gpa}`}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[13px] font-bold">
+                          {edu.startDate} – {edu.current ? 'Present' : edu.endDate}
+                        </div>
+                        <div className="text-[13px] italic">{edu.location}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              </section>
+            ) : null;
+
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 }

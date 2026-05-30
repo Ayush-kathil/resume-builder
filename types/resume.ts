@@ -52,6 +52,7 @@ export interface ResumeData {
   education: Education[];
   skills: Skill[];
   projects: Project[];
+  sectionOrder?: string[];
 }
 
 export const initialResumeData: ResumeData = {
@@ -66,4 +67,5 @@ export const initialResumeData: ResumeData = {
   education: [],
   skills: [],
   projects: [],
+  sectionOrder: ['summary', 'experience', 'projects', 'education', 'skills'],
 };

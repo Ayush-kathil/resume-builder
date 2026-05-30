@@ -21,6 +21,7 @@ interface ResumeState {
   setTemplate: (template: string) => void;
   targetJobKeywords: string;
   setTargetJobKeywords: (keywords: string) => void;
+  setSectionOrder: (order: string[]) => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
@@ -126,6 +127,13 @@ export const useResumeStore = create<ResumeState>((set) => ({
       data: {
         ...state.data,
         projects: state.data.projects.filter((project) => project.id !== id),
+      },
+    })),
+  setSectionOrder: (order) =>
+    set((state) => ({
+      data: {
+        ...state.data,
+        sectionOrder: order,
       },
     })),
   setResumeData: (data) => set({ data }),

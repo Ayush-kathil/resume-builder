@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ExperienceEditor } from './ExperienceEditor';
@@ -10,10 +10,10 @@ import { EducationEditor } from './EducationEditor';
 import { SkillsEditor } from './SkillsEditor';
 import { ProjectsEditor } from './ProjectsEditor';
 
-import { motion } from 'framer-motion';
+import { motion, Reorder } from 'framer-motion';
 
 export function EditorPane() {
-  const { data, selectedTemplate, setTemplate, updatePersonalInfo, setResumeData } = useResumeStore();
+  const { data, selectedTemplate, setTemplate, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
   const [isShortening, setIsShortening] = useState(false);
 
   const handleShorten = async () => {
@@ -132,46 +132,97 @@ export function EditorPane() {
                 />
               </div>
             </div>
-
-            <div>
-              <div className="flex justify-between items-end mb-1">
-                <label className="block text-sm font-medium text-gray-400">Professional Summary</label>
-                <button
-                  onClick={async () => {
-                    toast.loading('Generating summary from experience...', { id: 'summary' });
-                    try {
-                      const res = await fetch('/api/ai/summary', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ experience: data.experience, education: data.education })
-                      });
-                      const result = await res.json();
-                      if (!res.ok) throw new Error(result.error);
-                      updatePersonalInfo({ summary: result.summary });
-                      toast.success('Summary generated!', { id: 'summary' });
-                    } catch (e: any) {
-                      toast.error(e.message || 'Failed to generate summary', { id: 'summary' });
-                    }
-                  }}
-                  className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 bg-indigo-500/10 px-2 py-1 rounded-md transition-colors"
-                >
-                  <Sparkles className="w-3 h-3" /> Auto-Generate
-                </button>
-              </div>
-              <textarea
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[100px] resize-y"
-                value={data.personalInfo.summary}
-                onChange={(e) => updatePersonalInfo({ summary: e.target.value })}
-                placeholder="Brief professional summary..."
-              />
-            </div>
           </div>
         </section>
 
-        <ExperienceEditor />
-        <EducationEditor />
-        <SkillsEditor />
-        <ProjectsEditor />
+        {/* Dynamic Reorderable Sections */}
+        <Reorder.Group 
+          axis="y" 
+          values={data.sectionOrder || ['summary', 'experience', 'projects', 'education', 'skills']} 
+          onReorder={setSectionOrder}
+          className="space-y-8"
+        >
+          {(data.sectionOrder || ['summary', 'experience', 'projects', 'education', 'skills']).map((sectionId) => {
+            return (
+              <Reorder.Item 
+                key={sectionId} 
+                value={sectionId}
+                className="relative bg-white/5 border border-white/10 rounded-xl p-4 shadow-lg cursor-grab active:cursor-grabbing"
+              >
+                {sectionId === 'summary' && (
+                  <div>
+                    <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                      <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                        <GripVertical className="w-5 h-5 text-gray-500" /> Professional Summary
+                      </h3>
+                      <button
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={async () => {
+                          toast.loading('Generating summary...', { id: 'summary' });
+                          try {
+                            const res = await fetch('/api/ai/summary', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ experience: data.experience, education: data.education })
+                            });
+                            const result = await res.json();
+                            if (!res.ok) throw new Error(result.error);
+                            updatePersonalInfo({ summary: result.summary });
+                            toast.success('Summary generated!', { id: 'summary' });
+                          } catch (e: any) {
+                            toast.error(e.message || 'Failed to generate summary', { id: 'summary' });
+                          }
+                        }}
+                        className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 bg-indigo-500/10 px-2 py-1 rounded-md transition-colors"
+                      >
+                        <Sparkles className="w-3 h-3" /> Auto-Generate
+                      </button>
+                    </div>
+                    <textarea
+                      onPointerDown={(e) => e.stopPropagation()}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[100px] resize-y"
+                      value={data.personalInfo.summary}
+                      onChange={(e) => updatePersonalInfo({ summary: e.target.value })}
+                      placeholder="Brief professional summary..."
+                    />
+                  </div>
+                )}
+                {sectionId === 'experience' && (
+                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                     <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
+                        <GripVertical className="w-5 h-5 text-gray-500" /> Experience
+                     </h3>
+                     <div className="pt-12"><ExperienceEditor /></div>
+                  </div>
+                )}
+                {sectionId === 'education' && (
+                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
+                        <GripVertical className="w-5 h-5 text-gray-500" /> Education
+                    </h3>
+                    <div className="pt-12"><EducationEditor /></div>
+                  </div>
+                )}
+                {sectionId === 'skills' && (
+                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
+                        <GripVertical className="w-5 h-5 text-gray-500" /> Skills
+                    </h3>
+                    <div className="pt-12"><SkillsEditor /></div>
+                  </div>
+                )}
+                {sectionId === 'projects' && (
+                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
+                        <GripVertical className="w-5 h-5 text-gray-500" /> Projects
+                    </h3>
+                    <div className="pt-12"><ProjectsEditor /></div>
+                  </div>
+                )}
+              </Reorder.Item>
+            );
+          })}
+        </Reorder.Group>
       </div>
     </div>
   );

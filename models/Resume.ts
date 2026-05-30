@@ -78,6 +78,10 @@ const ResumeSchema = new Schema<IResume>(
           technologies: [String],
         },
       ],
+      sectionOrder: {
+        type: [String],
+        default: ['summary', 'experience', 'projects', 'education', 'skills'],
+      },
     },
   },
   {

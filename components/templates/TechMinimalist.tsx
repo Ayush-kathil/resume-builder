@@ -21,105 +21,117 @@ export function TechMinimalist({ data }: { data: ResumeData }) {
         </div>
       </header>
 
-      {data.personalInfo.summary && (
-        <section className="mb-3">
-          <p className="text-xs leading-relaxed">
-            {data.personalInfo.summary}
-          </p>
-        </section>
-      )}
+      {(data.sectionOrder || ['summary', 'skills', 'experience', 'projects', 'education']).map((sectionId) => {
+        switch (sectionId) {
+          case 'summary':
+            return data.personalInfo.summary ? (
+              <section key="summary" className="mb-3">
+                <p className="text-xs leading-relaxed">
+                  {data.personalInfo.summary}
+                </p>
+              </section>
+            ) : null;
 
-      {(data.skills || []).length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
-            Skills
-          </h2>
-          <div className="text-xs space-y-0.5">
-            {(data.skills || []).map((skill, index) => (
-              <div key={index} className="flex">
-                <span className="font-bold w-[120px] flex-shrink-0">{skill.category}:</span>
-                <span className="font-mono text-[11px] text-gray-700">{(skill.items || []).join(', ')}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {(data.experience || []).length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
-            Experience
-          </h2>
-          <div className="space-y-2.5">
-            {(data.experience || []).map((exp, index) => (
-              <div key={index}>
-                <div className="flex justify-between items-baseline">
-                  <div>
-                    <span className="text-[13px] font-bold">{exp.position}</span>
-                    <span className="text-[12px] text-gray-600 ml-2">at {exp.company}</span>
-                  </div>
-                  <span className="text-[11px] font-mono text-gray-500">
-                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate} | {exp.location}
-                  </span>
-                </div>
-                <ul className="list-disc list-outside ml-4 mt-0.5 text-[12px] space-y-0.5">
-                  {(exp.description || []).map((item, i) => (
-                    <li key={i} className="leading-snug pl-0.5">{item}</li>
+          case 'skills':
+            return (data.skills || []).length > 0 ? (
+              <section key="skills" className="mb-3">
+                <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
+                  Skills
+                </h2>
+                <div className="text-xs space-y-0.5">
+                  {(data.skills || []).map((skill, index) => (
+                    <div key={index} className="flex">
+                      <span className="font-bold w-[120px] flex-shrink-0">{skill.category}:</span>
+                      <span className="font-mono text-[11px] text-gray-700">{(skill.items || []).join(', ')}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+                </div>
+              </section>
+            ) : null;
 
-      {(data.projects || []).length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
-            Projects
-          </h2>
-          <div className="space-y-2">
-            {(data.projects || []).map((proj, index) => (
-              <div key={index}>
-                <div className="flex items-baseline">
-                  <span className="text-[13px] font-bold">{proj.name}</span>
-                  {(proj.technologies || []).length > 0 && (
-                    <span className="text-[11px] font-mono text-gray-500 ml-2">
-                      [{(proj.technologies || []).join(', ')}]
-                    </span>
-                  )}
+          case 'experience':
+            return (data.experience || []).length > 0 ? (
+              <section key="experience" className="mb-3">
+                <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
+                  Experience
+                </h2>
+                <div className="space-y-2.5">
+                  {(data.experience || []).map((exp, index) => (
+                    <div key={index}>
+                      <div className="flex justify-between items-baseline">
+                        <div>
+                          <span className="text-[13px] font-bold">{exp.position}</span>
+                          <span className="text-[12px] text-gray-600 ml-2">at {exp.company}</span>
+                        </div>
+                        <span className="text-[11px] font-mono text-gray-500">
+                          {exp.startDate} – {exp.current ? 'Present' : exp.endDate} | {exp.location}
+                        </span>
+                      </div>
+                      <ul className="list-disc list-outside ml-4 mt-0.5 text-[12px] space-y-0.5">
+                        {(exp.description || []).map((item, i) => (
+                          <li key={i} className="leading-snug pl-0.5">{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-                <ul className="list-disc list-outside ml-4 mt-0.5 text-[12px]">
-                  <li className="leading-snug pl-0.5">{proj.description}</li>
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              </section>
+            ) : null;
 
-      {(data.education || []).length > 0 && (
-        <section className="mb-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
-            Education
-          </h2>
-          <div className="space-y-1.5">
-            {(data.education || []).map((edu, index) => (
-              <div key={index} className="flex justify-between items-baseline">
-                <div>
-                  <span className="text-[13px] font-bold">{edu.institution}</span>
-                  <span className="text-[12px] text-gray-600 ml-2">
-                    {edu.degree} in {edu.fieldOfStudy} {edu.gpa && <span className="font-mono text-[11px] ml-1">GPA: {edu.gpa}</span>}
-                  </span>
+          case 'projects':
+            return (data.projects || []).length > 0 ? (
+              <section key="projects" className="mb-3">
+                <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
+                  Projects
+                </h2>
+                <div className="space-y-2">
+                  {(data.projects || []).map((proj, index) => (
+                    <div key={index}>
+                      <div className="flex items-baseline">
+                        <span className="text-[13px] font-bold">{proj.name}</span>
+                        {(proj.technologies || []).length > 0 && (
+                          <span className="text-[11px] font-mono text-gray-500 ml-2">
+                            [{(proj.technologies || []).join(', ')}]
+                          </span>
+                        )}
+                      </div>
+                      <ul className="list-disc list-outside ml-4 mt-0.5 text-[12px]">
+                        <li className="leading-snug pl-0.5">{proj.description}</li>
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-[11px] font-mono text-gray-500">
-                  {edu.startDate} – {edu.current ? 'Present' : edu.endDate} | {edu.location}
+              </section>
+            ) : null;
+
+          case 'education':
+            return (data.education || []).length > 0 ? (
+              <section key="education" className="mb-3">
+                <h2 className="text-xs font-bold uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-1.5">
+                  Education
+                </h2>
+                <div className="space-y-1.5">
+                  {(data.education || []).map((edu, index) => (
+                    <div key={index} className="flex justify-between items-baseline">
+                      <div>
+                        <span className="text-[13px] font-bold">{edu.institution}</span>
+                        <span className="text-[12px] text-gray-600 ml-2">
+                          {edu.degree} in {edu.fieldOfStudy} {edu.gpa && <span className="font-mono text-[11px] ml-1">GPA: {edu.gpa}</span>}
+                        </span>
+                      </div>
+                      <div className="text-[11px] font-mono text-gray-500">
+                        {edu.startDate} – {edu.current ? 'Present' : edu.endDate} | {edu.location}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              </section>
+            ) : null;
+
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 }

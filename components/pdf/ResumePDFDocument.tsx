@@ -168,90 +168,98 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
           )}
         </View>
 
-        {/* Summary */}
-        {data.personalInfo.summary && (
-          <View style={styles.section}>
-            <Text style={styles.summaryText}>{data.personalInfo.summary}</Text>
-          </View>
-        )}
+        {/* Dynamic Sections */}
+        {(data.sectionOrder || ['summary', 'skills', 'experience', 'projects', 'education']).map((sectionId) => {
+          switch (sectionId) {
+            case 'summary':
+              return data.personalInfo.summary ? (
+                <View key="summary" style={styles.section}>
+                  <Text style={styles.summaryText}>{data.personalInfo.summary}</Text>
+                </View>
+              ) : null;
 
-        {/* Skills */}
-        {(data.skills || []).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
-            {(data.skills || []).map((skill, index) => (
-              <View key={index} style={styles.skillRow}>
-                <Text style={styles.skillCategory}>{skill.category}:</Text>
-                <Text style={styles.skillItems}>{(skill.items || []).join(', ')}</Text>
-              </View>
-            ))}
-          </View>
-        )}
+            case 'skills':
+              return (data.skills || []).length > 0 ? (
+                <View key="skills" style={styles.section}>
+                  <Text style={styles.sectionTitle}>Skills</Text>
+                  {(data.skills || []).map((skill, index) => (
+                    <View key={index} style={styles.skillRow}>
+                      <Text style={styles.skillCategory}>{skill.category}:</Text>
+                      <Text style={styles.skillItems}>{(skill.items || []).join(', ')}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null;
 
-        {/* Experience */}
-        {(data.experience || []).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Experience</Text>
-            {(data.experience || []).map((exp, index) => (
-              <View key={index} style={styles.expBlock}>
-                <View style={styles.expHeaderRow}>
-                  <Text style={styles.expTitle}>{exp.position}</Text>
-                  <Text style={styles.expDates}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
+            case 'experience':
+              return (data.experience || []).length > 0 ? (
+                <View key="experience" style={styles.section}>
+                  <Text style={styles.sectionTitle}>Experience</Text>
+                  {(data.experience || []).map((exp, index) => (
+                    <View key={index} style={styles.expBlock}>
+                      <View style={styles.expHeaderRow}>
+                        <Text style={styles.expTitle}>{exp.position}</Text>
+                        <Text style={styles.expDates}>{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</Text>
+                      </View>
+                      <View style={styles.expSubRow}>
+                        <Text style={styles.expCompany}>{exp.company}</Text>
+                        <Text style={styles.expLocation}>{exp.location}</Text>
+                      </View>
+                      {(exp.description || []).map((item, i) => (
+                        <View key={i} style={styles.bulletRow}>
+                          <Text style={styles.bulletPoint}>•</Text>
+                          <Text style={styles.bulletContent}>{item}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  ))}
                 </View>
-                <View style={styles.expSubRow}>
-                  <Text style={styles.expCompany}>{exp.company}</Text>
-                  <Text style={styles.expLocation}>{exp.location}</Text>
-                </View>
-                {(exp.description || []).map((item, i) => (
-                  <View key={i} style={styles.bulletRow}>
-                    <Text style={styles.bulletPoint}>•</Text>
-                    <Text style={styles.bulletContent}>{item}</Text>
-                  </View>
-                ))}
-              </View>
-            ))}
-          </View>
-        )}
+              ) : null;
 
-        {/* Projects */}
-        {(data.projects || []).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Projects</Text>
-            {(data.projects || []).map((proj, index) => (
-              <View key={index} style={styles.expBlock}>
-                <View style={styles.projHeader}>
-                  <Text style={styles.projTitle}>{proj.name}</Text>
-                  {((proj.technologies || []).length > 0) && (
-                    <Text style={styles.projTech}>| {(proj.technologies || []).join(', ')}</Text>
-                  )}
+            case 'projects':
+              return (data.projects || []).length > 0 ? (
+                <View key="projects" style={styles.section}>
+                  <Text style={styles.sectionTitle}>Projects</Text>
+                  {(data.projects || []).map((proj, index) => (
+                    <View key={index} style={styles.expBlock}>
+                      <View style={styles.projHeader}>
+                        <Text style={styles.projTitle}>{proj.name}</Text>
+                        {((proj.technologies || []).length > 0) && (
+                          <Text style={styles.projTech}>| {(proj.technologies || []).join(', ')}</Text>
+                        )}
+                      </View>
+                      <View style={styles.bulletRow}>
+                        <Text style={styles.bulletPoint}>•</Text>
+                        <Text style={styles.bulletContent}>{proj.description}</Text>
+                      </View>
+                    </View>
+                  ))}
                 </View>
-                <View style={styles.bulletRow}>
-                  <Text style={styles.bulletPoint}>•</Text>
-                  <Text style={styles.bulletContent}>{proj.description}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
+              ) : null;
 
-        {/* Education */}
-        {(data.education || []).length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Education</Text>
-            {(data.education || []).map((edu, index) => (
-              <View key={index} style={styles.eduBlock}>
-                <View>
-                  <Text style={styles.eduInst}>{edu.institution}</Text>
-                  <Text style={styles.eduDegree}>{edu.degree} in {edu.fieldOfStudy} {edu.gpa ? `| GPA: ${edu.gpa}` : ''}</Text>
+            case 'education':
+              return (data.education || []).length > 0 ? (
+                <View key="education" style={styles.section}>
+                  <Text style={styles.sectionTitle}>Education</Text>
+                  {(data.education || []).map((edu, index) => (
+                    <View key={index} style={styles.eduBlock}>
+                      <View>
+                        <Text style={styles.eduInst}>{edu.institution}</Text>
+                        <Text style={styles.eduDegree}>{edu.degree} in {edu.fieldOfStudy} {edu.gpa ? `| GPA: ${edu.gpa}` : ''}</Text>
+                      </View>
+                      <View>
+                        <Text style={styles.eduDates}>{edu.startDate} – {edu.current ? 'Present' : edu.endDate}</Text>
+                        <Text style={styles.eduLocation}>{edu.location}</Text>
+                      </View>
+                    </View>
+                  ))}
                 </View>
-                <View>
-                  <Text style={styles.eduDates}>{edu.startDate} – {edu.current ? 'Present' : edu.endDate}</Text>
-                  <Text style={styles.eduLocation}>{edu.location}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        )}
+              ) : null;
+
+            default:
+              return null;
+          }
+        })}
 
       </Page>
     </Document>
