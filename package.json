@@ -21,7 +21,6 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.17.0",
-    "mongodb": "4.1",
     "mongoose": "^9.6.3",
     "next": "16.2.6",
     "next-auth": "^4.24.14",
