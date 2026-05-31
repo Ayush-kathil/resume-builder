@@ -192,7 +192,17 @@ export const useResumeStore = create<ResumeState>((set) => ({
     }),
   setResumeData: (data) => set((state) => {
     state.commit();
-    return { data };
+    return { 
+      data: {
+        ...data,
+        personalInfo: data.personalInfo || { fullName: '', email: '', phone: '', location: '', summary: '' },
+        experience: data.experience || [],
+        education: data.education || [],
+        skills: data.skills || [],
+        projects: data.projects || [],
+        sectionOrder: data.sectionOrder || initialResumeData.sectionOrder,
+      } 
+    };
   }),
   sanitizeData: () => set((state) => {
     const newData = { ...state.data };
