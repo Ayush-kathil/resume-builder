@@ -1,17 +1,12 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { ResumeData } from '@/types/resume';
 import { formatResumeDate } from '@/lib/formatDate';
-
-Font.register({
-  family: 'Computer Modern',
-  src: '/fonts/ComputerModern.ttf',
-});
 
 const styles = StyleSheet.create({
   page: {
     padding: 24,
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontSize: 10,
     color: '#000000',
     lineHeight: 1.3,
@@ -25,7 +20,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     marginBottom: 4,
@@ -43,7 +38,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 11,
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     borderBottomWidth: 0.5,
@@ -59,7 +54,7 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   skillCategory: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     width: '15%',
   },
@@ -74,12 +69,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   expTitle: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     fontSize: 10,
   },
   expDates: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     fontSize: 9,
   },
@@ -89,12 +84,12 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   expCompany: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontStyle: 'italic',
     fontSize: 9,
   },
   expLocation: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontStyle: 'italic',
     fontSize: 9,
   },
@@ -118,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   eduInst: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     fontSize: 10,
   },
@@ -126,13 +121,13 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
   eduDates: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     fontSize: 9,
     textAlign: 'right',
   },
   eduLocation: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontStyle: 'italic',
     fontSize: 9,
     textAlign: 'right',
@@ -143,12 +138,12 @@ const styles = StyleSheet.create({
     marginBottom: 1,
   },
   projTitle: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontWeight: 'bold',
     fontSize: 10,
   },
   projTech: {
-    fontFamily: 'Computer Modern',
+    fontFamily: 'Times-Roman',
     fontStyle: 'italic',
     fontSize: 9,
     marginLeft: 4,

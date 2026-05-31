@@ -41,15 +41,6 @@ export async function POST(req: Request) {
       },
     };
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro-latest',
-      tools: [
-        {
-          functionDeclarations: [editResumeDataDeclaration],
-        },
-      ],
-    });
-
     const systemInstruction = `
 You are an expert ATS resume editor and FAANG-grade AI assistant. The user wants to make a targeted edit to their existing resume.
 
@@ -64,9 +55,20 @@ INSTRUCTIONS:
 5. Strictly forbid AI filler words, corporate jargon, and robotic structures. Use direct, factual, and highly humanized engineering tone.
 `;
 
-    const chat = model.startChat({
-      systemInstruction: systemInstruction,
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro-latest',
+      tools: [
+        {
+          functionDeclarations: [editResumeDataDeclaration],
+        },
+      ],
+      systemInstruction: {
+        role: "system",
+        parts: [{ text: systemInstruction }]
+      },
     });
+
+    const chat = model.startChat();
 
     const result = await chat.sendMessage(userPrompt);
     const response = result.response;
