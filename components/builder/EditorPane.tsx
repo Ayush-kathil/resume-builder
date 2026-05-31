@@ -10,11 +10,14 @@ import { EducationEditor } from './EducationEditor';
 import { SkillsEditor } from './SkillsEditor';
 import { ProjectsEditor } from './ProjectsEditor';
 
-import { motion, Reorder } from 'framer-motion';
+import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { AIChatbot } from './AIChatbot';
+import Link from 'next/link';
 
 export function EditorPane() {
   const { data, selectedTemplate, setTemplate, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
+  const [showProModal, setShowProModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +55,8 @@ export function EditorPane() {
 
 
   return (
-    <div className="w-full h-full bg-slate-900/40 backdrop-blur-xl border-r border-white/10 p-6 overflow-y-auto">
+    <div className="relative w-full h-full bg-slate-900/40 backdrop-blur-xl border-r border-white/10 overflow-hidden">
+      <div className="w-full h-full p-6 overflow-y-auto custom-scrollbar">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-white">Editor</h2>
         <div className="flex items-center gap-2">
@@ -114,8 +118,13 @@ export function EditorPane() {
                 <motion.div 
                   key={tpl.id}
                   whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setTemplate(tpl.id)}
+                  onClick={() => {
+                    if (tpl.id !== 'classic') {
+                      setShowProModal(true);
+                      return;
+                    }
+                    setTemplate(tpl.id);
+                  }}
                   className={`flex-shrink-0 snap-center w-40 h-28 rounded-xl border p-4 cursor-pointer flex flex-col justify-end transition-all ${
                     isSelected 
                       ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]' 
@@ -310,6 +319,47 @@ export function EditorPane() {
           })}
         </Reorder.Group>
       </div>
+      </div>
+
+      <AIChatbot />
+
+      <AnimatePresence>
+        {showProModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-slate-900 border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
+              <div className="mx-auto w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-indigo-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Unlock Pro Templates</h3>
+              <p className="text-gray-400 text-sm mb-6">
+                Premium templates and unlimited AI edits are available on our Pro plan. Upgrade to stand out.
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link href="/pricing" className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors">
+                  View Plans
+                </Link>
+                <button 
+                  onClick={() => setShowProModal(false)}
+                  className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl transition-colors"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

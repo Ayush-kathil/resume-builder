@@ -11,7 +11,7 @@ export default function PricingPage() {
       name: 'Basic',
       price: 'Free',
       description: 'Perfect for entry-level candidates looking to build a clean ATS resume.',
-      features: ['1 AI Resume Generation', 'Basic Templates', 'PDF Export'],
+      features: ['1 AI Resume Edit', '1 Standard Template (Classic)', 'Standard PDF Export'],
       highlighted: false,
     },
     {
@@ -19,16 +19,8 @@ export default function PricingPage() {
       price: '$12',
       period: '/mo',
       description: 'The ultimate toolset for professionals targeting top-tier FAANG companies.',
-      features: ['Unlimited AI Generation', 'Premium Templates', 'Word & PDF Export', 'Smart Cover Letters', 'Custom Tone Controls'],
+      features: ['Unlimited AI Edits', 'All Premium Templates', 'Priority Rendering', 'Smart Cover Letters', 'Custom Tone Controls'],
       highlighted: true,
-    },
-    {
-      name: 'Enterprise',
-      price: '$49',
-      period: '/mo',
-      description: 'For agencies and career coaches managing multiple clients.',
-      features: ['Everything in Pro', 'Client Management', 'Custom Branding', 'API Access', 'Dedicated Support'],
-      highlighted: false,
     }
   ];
 
@@ -49,7 +41,7 @@ export default function PricingPage() {
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">Choose the plan that fits your ambition. Generate world-class resumes in seconds.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl items-center">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}

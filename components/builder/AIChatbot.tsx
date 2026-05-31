@@ -55,8 +55,35 @@ export function AIChatbot() {
       
       if (!res.ok) throw new Error(result.error || 'Failed to edit resume');
 
-      // Update global resume state
-      setResumeData(result);
+      if (result.patches && Array.isArray(result.patches)) {
+        const newData = JSON.parse(JSON.stringify(data));
+        
+        result.patches.forEach((patch: any) => {
+          const keys = patch.path.split('.');
+          let current = newData;
+          for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) current[keys[i]] = {};
+            current = current[keys[i]];
+          }
+          
+          let parsedValue = patch.value;
+          try {
+            // Attempt to parse arrays or objects if the LLM sent them as strings
+            parsedValue = JSON.parse(patch.value);
+          } catch (e) {
+            // Keep as string if parsing fails
+          }
+          
+          current[keys[keys.length - 1]] = parsedValue;
+        });
+
+        setResumeData(newData);
+      } else if (result.error) {
+        throw new Error(result.error);
+      } else {
+        // Fallback for full JSON returned (if the LLM didn't use the tool properly)
+        setResumeData(result);
+      }
 
       // Add success response
       setMessages(prev => [...prev, { 
@@ -87,7 +114,7 @@ export function AIChatbot() {
         initial={{ scale: 0 }}
         animate={{ scale: isOpen ? 0 : 1 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-105 transition-transform"
+        className="absolute bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-105 transition-transform"
       >
         <Sparkles className="w-6 h-6" />
       </motion.button>
@@ -99,7 +126,7 @@ export function AIChatbot() {
             initial={{ opacity: 0, y: 50, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
-            className="fixed bottom-6 left-6 z-50 w-80 sm:w-96 h-[500px] max-h-[80vh] flex flex-col bg-[#0a0a0c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+            className="absolute bottom-6 right-6 z-50 w-80 sm:w-96 h-[500px] max-h-[80vh] flex flex-col bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">

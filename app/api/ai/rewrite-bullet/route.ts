@@ -6,9 +6,10 @@ export async function POST(req: NextRequest) {
     const { bullet, company, position } = await req.json();
 
     const prompt = `
-      You are an expert technical recruiter. 
+      You are an expert technical recruiter and FAANG-tier AI resume writer.
       Rewrite the following resume bullet point using the XYZ/STAR method (Accomplished [X] as measured by [Y], by doing [Z]).
-      Make it sound highly impactful, metric-driven, and professional.
+      
+      CRITICAL TONE CONSTRAINT: You must completely eliminate "machine-like" language, AI filler words, corporate jargon, and dramatic verbs (e.g., "dazzling", "unleashed", "spearheaded", "conquered", "fostered"). Write in a direct, factual, highly humanized engineering tone. Focus on raw technical achievements and clear business impact without fluff.
       
       Context: Role was ${position} at ${company}.
       Original Bullet: "${bullet}"

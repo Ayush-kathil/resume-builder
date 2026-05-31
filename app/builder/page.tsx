@@ -14,7 +14,6 @@ import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
 import { useAutoSave } from '@/hooks/useAutoSave';
-import { AIChatbot } from '@/components/builder/AIChatbot';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -227,7 +226,6 @@ export default function BuilderPage() {
       </AnimatePresence>
       
       <ATSWidget />
-      <AIChatbot />
 
       {/* Modals */}
       <ATSCheckerModal 

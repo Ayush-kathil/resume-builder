@@ -3,102 +3,110 @@ import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/rendere
 import { ResumeData } from '@/types/resume';
 import { formatResumeDate } from '@/lib/formatDate';
 
-// Register a standard font for a clean, ATS-friendly look.
-// Helvetica (which closely matches Arial) guarantees a >95% ATS Parsing Rate.
-// The Page size is set to a massive height to create a single long scrollable page.
+Font.register({
+  family: 'Computer Modern',
+  src: '/fonts/ComputerModern.ttf',
+});
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
-    fontFamily: 'Helvetica',
-    fontSize: 11,
+    padding: 24,
+    fontFamily: 'Computer Modern',
+    fontSize: 10,
     color: '#000000',
     lineHeight: 1.3,
   },
   header: {
-    marginBottom: 15,
-    borderBottomWidth: 1,
+    marginBottom: 8,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#000000',
-    paddingBottom: 10,
+    paddingBottom: 4,
     textAlign: 'center',
   },
   name: {
-    fontSize: 24,
-    fontFamily: 'Helvetica-Bold',
+    fontSize: 18,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
     textTransform: 'uppercase',
-    marginBottom: 10,
+    marginBottom: 4,
   },
   contactInfo: {
     flexDirection: 'row',
     justifyContent: 'center',
-    fontSize: 10,
+    fontSize: 9,
   },
   contactItem: {
     marginHorizontal: 3,
   },
   section: {
-    marginBottom: 12,
+    marginBottom: 6,
   },
   sectionTitle: {
-    fontSize: 12,
-    fontFamily: 'Helvetica-Bold',
+    fontSize: 11,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
     textTransform: 'uppercase',
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: '#000000',
-    paddingBottom: 2,
-    marginBottom: 6,
+    paddingBottom: 1,
+    marginBottom: 3,
   },
   summaryText: {
     textAlign: 'justify',
   },
   skillRow: {
     flexDirection: 'row',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   skillCategory: {
-    fontFamily: 'Helvetica-Bold',
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
     width: '15%',
   },
   skillItems: {
     width: '85%',
   },
   expBlock: {
-    marginBottom: 8,
+    marginBottom: 4,
   },
   expHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   expTitle: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 11,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
   expDates: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 10,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
+    fontSize: 9,
   },
   expSubRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   expCompany: {
-    fontFamily: 'Helvetica-Oblique',
-    fontSize: 10,
+    fontFamily: 'Computer Modern',
+    fontStyle: 'italic',
+    fontSize: 9,
   },
   expLocation: {
-    fontFamily: 'Helvetica-Oblique',
-    fontSize: 10,
+    fontFamily: 'Computer Modern',
+    fontStyle: 'italic',
+    fontSize: 9,
   },
   bulletRow: {
     flexDirection: 'row',
-    marginBottom: 2,
-    paddingLeft: 10,
-    paddingRight: 15,
+    marginBottom: 1,
+    paddingLeft: 6,
+    paddingRight: 6,
   },
   bulletPoint: {
-    width: 10,
-    fontSize: 10,
+    width: 8,
+    fontSize: 9,
   },
   bulletContent: {
     flex: 1,
@@ -107,38 +115,43 @@ const styles = StyleSheet.create({
   eduBlock: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   eduInst: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 11,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
   eduDegree: {
-    fontSize: 10,
+    fontSize: 9,
   },
   eduDates: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 10,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
+    fontSize: 9,
     textAlign: 'right',
   },
   eduLocation: {
-    fontFamily: 'Helvetica-Oblique',
-    fontSize: 10,
+    fontFamily: 'Computer Modern',
+    fontStyle: 'italic',
+    fontSize: 9,
     textAlign: 'right',
   },
   projHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   projTitle: {
-    fontFamily: 'Helvetica-Bold',
-    fontSize: 11,
+    fontFamily: 'Computer Modern',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
   projTech: {
-    fontFamily: 'Helvetica-Oblique',
-    fontSize: 10,
-    marginLeft: 5,
+    fontFamily: 'Computer Modern',
+    fontStyle: 'italic',
+    fontSize: 9,
+    marginLeft: 4,
   }
 });
 

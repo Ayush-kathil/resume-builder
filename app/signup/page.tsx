@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
-import { Mail, Sparkles, KeyRound, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Sparkles, KeyRound, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -15,6 +15,34 @@ export default function SignupPage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+  useEffect(() => {
+    if (!email || !email.includes('@')) {
+      setEmailExists(null);
+      setIsCheckingEmail(false);
+      return;
+    }
+
+    const checkEmail = async () => {
+      setIsCheckingEmail(true);
+      try {
+        const res = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setEmailExists(data.exists);
+        }
+      } catch (err) {
+        console.error('Failed to check email', err);
+      } finally {
+        setIsCheckingEmail(false);
+      }
+    };
+
+    const debounceId = setTimeout(checkEmail, 500);
+    return () => clearTimeout(debounceId);
+  }, [email]);
 
   const handleSendOtp = async () => {
     if (!email) {
@@ -111,14 +139,23 @@ export default function SignupPage() {
                   disabled={otpSent}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all disabled:opacity-50"
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all disabled:opacity-50"
                 />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  {isCheckingEmail ? (
+                    <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                  ) : emailExists === true ? (
+                    <AlertCircle className="h-5 w-5 text-red-400" />
+                  ) : emailExists === false && !otpSent ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                  ) : null}
+                </div>
               </div>
               {!otpSent ? (
                 <button
                   type="button"
                   onClick={handleSendOtp}
-                  disabled={isSubmitting || !email}
+                  disabled={isSubmitting || !email || emailExists === true}
                   className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-2xl px-4 transition-colors disabled:opacity-50"
                 >
                   Verify
@@ -129,6 +166,19 @@ export default function SignupPage() {
                 </div>
               )}
             </div>
+            
+            <AnimatePresence>
+              {emailExists === true && !isCheckingEmail && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-red-400 text-xs px-2"
+                >
+                  This email is already registered. Please log in instead.
+                </motion.p>
+              )}
+            </AnimatePresence>
 
             {otpSent && (
               <motion.div

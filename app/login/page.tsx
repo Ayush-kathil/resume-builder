@@ -1,16 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
-import { Mail, Sparkles, KeyRound } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Mail, Sparkles, KeyRound, AlertCircle, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
+  useEffect(() => {
+    if (!email || !email.includes('@')) {
+      setEmailExists(null);
+      setIsCheckingEmail(false);
+      return;
+    }
+
+    const checkEmail = async () => {
+      setIsCheckingEmail(true);
+      try {
+        const res = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setEmailExists(data.exists);
+        }
+      } catch (err) {
+        console.error('Failed to check email', err);
+      } finally {
+        setIsCheckingEmail(false);
+      }
+    };
+
+    const debounceId = setTimeout(checkEmail, 500);
+    return () => clearTimeout(debounceId);
+  }, [email]);
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,9 +92,29 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
               />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                {isCheckingEmail ? (
+                  <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                ) : emailExists === false ? (
+                  <AlertCircle className="h-5 w-5 text-red-400" />
+                ) : null}
+              </div>
             </div>
+            
+            <AnimatePresence>
+              {emailExists === false && !isCheckingEmail && (
+                <motion.p
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="text-red-400 text-xs px-2"
+                >
+                  Account not found. Please sign up first.
+                </motion.p>
+              )}
+            </AnimatePresence>
             <div className="relative">
               <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
@@ -80,7 +128,7 @@ export default function LoginPage() {
             </div>
             <button
               type="submit"
-              disabled={isSubmitting || !email || !password}
+              disabled={isSubmitting || !email || !password || emailExists === false}
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-indigo-500/25 mt-2"
             >
               {isSubmitting ? 'Logging in...' : 'Log In'}

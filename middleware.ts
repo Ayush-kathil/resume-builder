@@ -11,16 +11,13 @@ export default withAuth(
       authorized: ({ req, token }) => {
         const path = req.nextUrl.pathname;
         
-        // Public paths that do not require authentication
-        const publicPaths = ['/', '/login', '/signup', '/forgot-password'];
-        
-        // Allow access to public paths
-        if (publicPaths.includes(path) || path.startsWith('/api/')) {
-          return true;
+        // Strictly protect /dashboard and /builder
+        if (path.startsWith('/dashboard') || path.startsWith('/builder')) {
+          return !!token;
         }
-
-        // Require token for all other paths
-        return !!token;
+        
+        // Allow access to other public or API routes
+        return true;
       },
     },
     pages: {
