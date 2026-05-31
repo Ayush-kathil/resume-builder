@@ -15,7 +15,7 @@ import { AIChatbot } from './AIChatbot';
 import Link from 'next/link';
 
 export function EditorPane() {
-  const { data, selectedTemplate, setTemplate, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
+  const { data, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
   const [showProModal, setShowProModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -101,43 +101,7 @@ export function EditorPane() {
       </div>
       
       <div className="space-y-8 pb-10 editor-pane-container">
-        {/* Template Switcher */}
-        <section className="space-y-4">
-          <h3 className="text-lg font-medium text-white border-b border-white/10 pb-2">Templates</h3>
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-            {[
-              { id: 'classic', name: 'Classic ATS', desc: 'Strictly single-column, serif' },
-              { id: 'modern', name: 'Modern Executive', desc: 'Clean sans-serif, structured' },
-              { id: 'minimalist', name: 'Technical Grid', desc: 'Grid layout, tech focus' },
-              { id: 'creative', name: 'Creative Minimalist', desc: 'Bold typography, sidebars' },
-              { id: 'academic', name: 'Executive Academic', desc: 'Dense, traditional, long-form' }
-            ].map(tpl => {
-              const isSelected = selectedTemplate === tpl.id;
-              
-              return (
-                <motion.div 
-                  key={tpl.id}
-                  whileHover={{ scale: 1.02 }}
-                  onClick={() => {
-                    if (tpl.id !== 'classic') {
-                      setShowProModal(true);
-                      return;
-                    }
-                    setTemplate(tpl.id);
-                  }}
-                  className={`flex-shrink-0 snap-center w-40 h-28 rounded-xl border p-4 cursor-pointer flex flex-col justify-end transition-all ${
-                    isSelected 
-                      ? 'border-indigo-500 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)]' 
-                      : 'border-white/10 bg-white/5 hover:border-white/30'
-                  }`}
-                >
-                  <div className="text-sm font-semibold text-white">{tpl.name}</div>
-                  <div className="text-[10px] text-gray-400 mt-1">{tpl.desc}</div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
+
 
         {/* Personal Info Section */}
         <section className="space-y-4">

@@ -162,6 +162,30 @@ export function AIChatbot() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Quick Actions */}
+            {!isTyping && messages.length <= 2 && (
+              <div className="flex flex-wrap gap-2 px-4 pb-3">
+                <button 
+                  onClick={() => {
+                    const prompt = "Shorten the entire resume to strictly fit onto one A4 page without losing critical technical impact. Cut down wordy descriptions.";
+                    setInput(prompt);
+                  }}
+                  className="px-3 py-1.5 text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-full hover:bg-indigo-500/30 transition-colors"
+                >
+                  Auto-Fit to 1 Page
+                </button>
+                <button 
+                  onClick={() => {
+                    const prompt = "Rewrite all my project descriptions using the Google/FAANG XYZ format. Make them highly humanized, removing robotic filler words and focusing on technical depth and business impact.";
+                    setInput(prompt);
+                  }}
+                  className="px-3 py-1.5 text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-full hover:bg-emerald-500/30 transition-colors"
+                >
+                  Google-ify Projects
+                </button>
+              </div>
+            )}
+
             {/* Input Area */}
             <form onSubmit={handleSubmit} className="p-3 border-t border-white/10 bg-[#0a0a0c]">
               <div className="relative flex items-center">

@@ -3,11 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Loader2, Lock, FileText, Download } from 'lucide-react';
-import { ClassicATS } from '@/components/templates/ClassicATS';
-import { ModernExecutive } from '@/components/templates/ModernExecutive';
-import { TechMinimalist } from '@/components/templates/TechMinimalist';
-import { CreativeMinimalist } from '@/components/templates/CreativeMinimalist';
-import { ExecutiveAcademic } from '@/components/templates/ExecutiveAcademic';
+import { FaangTemplate } from '@/components/templates/FaangTemplate';
 import { ResumeData } from '@/types/resume';
 import { toast } from 'sonner';
 
@@ -65,10 +61,7 @@ export default function SharedResumePage() {
   };
 
   const renderTemplate = (data: ResumeData) => {
-    // Assuming the template type might be saved in data.metadata or we default to modern.
-    // For now we'll default to 'modern' if not specified in the payload.
-    // (If selectedTemplate was passed in data, we could use it).
-    return <ModernExecutive data={data} />;
+    return <FaangTemplate data={data} />;
   };
 
   if (isLoading) {

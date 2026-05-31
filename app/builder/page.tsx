@@ -45,7 +45,8 @@ export default function BuilderPage() {
         filename: `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'px', format: [elementWidth, elementHeight], orientation: 'portrait' }
+        jsPDF: { unit: 'px', format: [elementWidth, elementHeight], orientation: 'portrait' },
+        enableLinks: true
       };
 
       await html2pdf().set(opt).from(element).save();
@@ -232,6 +233,7 @@ export default function BuilderPage() {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         data={data}
+        onExportPDF={handleExportPDF}
       />
       <ShareModal 
         isOpen={isShareModalOpen}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer';
 import { ResumeData } from '@/types/resume';
 import { formatResumeDate } from '@/lib/formatDate';
 
@@ -32,6 +32,8 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     marginHorizontal: 3,
+    color: '#000000',
+    textDecoration: 'none',
   },
   section: {
     marginBottom: 6,
@@ -159,26 +161,36 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
         <View style={styles.header}>
           <Text style={styles.name}>{data.personalInfo.fullName || "Your Name"}</Text>
           <View style={styles.contactInfo}>
-            {data.personalInfo.email && <Text style={styles.contactItem}>{data.personalInfo.email}</Text>}
+            {data.personalInfo.email && (
+              <Link src={`mailto:${data.personalInfo.email}`} style={styles.contactItem}>
+                {data.personalInfo.email}
+              </Link>
+            )}
             {data.personalInfo.phone && <Text style={styles.contactItem}>| {data.personalInfo.phone}</Text>}
             {data.personalInfo.location && <Text style={styles.contactItem}>| {data.personalInfo.location}</Text>}
           </View>
           {(data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website) && (
             <View style={{ ...styles.contactInfo, marginTop: 4 }}>
               {data.personalInfo.linkedin && (
-                <Text style={styles.contactItem}>LinkedIn: {data.personalInfo.linkedin}</Text>
+                <Link src={data.personalInfo.linkedin.startsWith('http') ? data.personalInfo.linkedin : `https://${data.personalInfo.linkedin}`} style={styles.contactItem}>
+                  LinkedIn: {data.personalInfo.linkedin}
+                </Link>
               )}
               {data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website) && (
                 <Text style={styles.contactItem}>|</Text>
               )}
               {data.personalInfo.github && (
-                <Text style={styles.contactItem}>GitHub: {data.personalInfo.github}</Text>
+                <Link src={data.personalInfo.github.startsWith('http') ? data.personalInfo.github : `https://${data.personalInfo.github}`} style={styles.contactItem}>
+                  GitHub: {data.personalInfo.github}
+                </Link>
               )}
               {data.personalInfo.github && data.personalInfo.website && (
                 <Text style={styles.contactItem}>|</Text>
               )}
               {data.personalInfo.website && (
-                <Text style={styles.contactItem}>Portfolio: {data.personalInfo.website}</Text>
+                <Link src={data.personalInfo.website.startsWith('http') ? data.personalInfo.website : `https://${data.personalInfo.website}`} style={styles.contactItem}>
+                  Portfolio: {data.personalInfo.website}
+                </Link>
               )}
             </View>
           )}
@@ -239,7 +251,13 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                   {(data.projects || []).map((proj, index) => (
                     <View key={index} style={styles.expBlock} wrap={false}>
                       <View style={styles.projHeader}>
-                        <Text style={styles.projTitle}>{proj.name}</Text>
+                        {proj.url ? (
+                          <Link src={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} style={{ ...styles.projTitle, textDecoration: 'none', color: 'black' }}>
+                            {proj.name}
+                          </Link>
+                        ) : (
+                          <Text style={styles.projTitle}>{proj.name}</Text>
+                        )}
                         {((proj.technologies || []).length > 0) && (
                           <Text style={styles.projTech}>| {(proj.technologies || []).join(', ')}</Text>
                         )}

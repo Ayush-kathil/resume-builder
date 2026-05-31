@@ -12,13 +12,13 @@ interface ATSCheckerModalProps {
   isOpen: boolean;
   onClose: () => void;
   data: ResumeData;
+  onExportPDF?: () => Promise<void>;
 }
 
-export function ATSCheckerModal({ isOpen, onClose, data }: ATSCheckerModalProps) {
+export function ATSCheckerModal({ isOpen, onClose, data, onExportPDF }: ATSCheckerModalProps) {
   const [isScanning, setIsScanning] = useState(true);
   const [score, setScore] = useState(0);
   const [issues, setIssues] = useState<{ type: 'error' | 'warning' | 'success', message: string }[]>([]);
-  const { selectedTemplate } = useResumeStore();
 
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
@@ -31,14 +31,6 @@ export function ATSCheckerModal({ isOpen, onClose, data }: ATSCheckerModalProps)
       setTimeout(() => {
         let calculatedScore = 100;
         let foundIssues: typeof issues = [];
-
-        // Check 1: Template Complexity
-        if (selectedTemplate === 'creative' || selectedTemplate === 'minimalist') {
-          calculatedScore -= 15;
-          foundIssues.push({ type: 'warning', message: 'Multi-column or grid layouts may confuse older ATS parsers.' });
-        } else {
-          foundIssues.push({ type: 'success', message: 'Template uses a safe, single-column parsing flow.' });
-        }
 
         // Check 2: Contact Info Completeness
         if (!data.personalInfo.email || !data.personalInfo.phone) {
@@ -71,18 +63,22 @@ export function ATSCheckerModal({ isOpen, onClose, data }: ATSCheckerModalProps)
         setIsScanning(false);
       }, 1500);
     }
-  }, [isOpen, data, selectedTemplate]);
+  }, [isOpen, data]);
 
   const handleExportPDF = async () => {
     setIsExportingPDF(true);
     try {
-      const blob = await pdf(<ResumePDFDocument data={data} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
+      if (onExportPDF) {
+        await onExportPDF();
+      } else {
+        const blob = await pdf(<ResumePDFDocument data={data} />).toBlob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
     } catch (err) {
       console.error("PDF Export failed:", err);
     } finally {

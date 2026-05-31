@@ -1,26 +1,23 @@
 import { GoogleGenerativeAI, Part, GenerationConfig } from '@google/generative-ai';
 
-// Initialize the API with the key
-const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
-
 // Fallback models in order of preference
 // We start with the newest/fastest flash models, then fall back to pro if needed.
 const MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-pro-latest',
-  'gemini-1.5-flash-latest'
+  'gemini-3.1-flash',
+  'gemini-2.5-pro',
+  'gemini-2.5-flash'
 ];
 
 export async function generateContentWithFallback(
   promptData: string | Array<string | Part>, 
   config: GenerationConfig = {}
 ) {
+  const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
   if (!apiKey) {
     throw new Error('Missing Gemini API Key. Please add GEMINIAPIKEY to your .env file.');
   }
 
+  const genAI = new GoogleGenerativeAI(apiKey);
   let lastError: any;
   
   for (const modelName of MODELS) {

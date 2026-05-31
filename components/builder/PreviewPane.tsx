@@ -4,30 +4,14 @@ import { useResumeStore } from '@/store/resumeStore';
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PencilLine } from 'lucide-react';
-import { ClassicATS } from '../templates/ClassicATS';
-import { ModernExecutive } from '../templates/ModernExecutive';
-import { TechMinimalist } from '../templates/TechMinimalist';
-import { CreativeMinimalist } from '../templates/CreativeMinimalist';
-import { ExecutiveAcademic } from '../templates/ExecutiveAcademic';
+import { FaangTemplate } from '../templates/FaangTemplate';
 
 export function PreviewPane() {
-  const { data, selectedTemplate, isEditing } = useResumeStore();
+  const { data, isEditing } = useResumeStore();
   const resumeRef = useRef<HTMLDivElement>(null);
 
   const renderTemplate = () => {
-    switch (selectedTemplate) {
-      case 'modern':
-        return <ModernExecutive data={data} />;
-      case 'minimalist':
-        return <TechMinimalist data={data} />;
-      case 'creative':
-        return <CreativeMinimalist data={data} />;
-      case 'academic':
-        return <ExecutiveAcademic data={data} />;
-      case 'classic':
-      default:
-        return <ClassicATS data={data} />;
-    }
+    return <FaangTemplate data={data} />;
   };
 
   return (

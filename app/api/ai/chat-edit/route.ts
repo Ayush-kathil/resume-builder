@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, FunctionDeclaration, SchemaType } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
-
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Missing Gemini API Key' }, { status: 400 });
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+
     const { resumeData, prompt: userPrompt } = await req.json();
 
     if (!resumeData || !userPrompt) {
@@ -56,7 +59,7 @@ INSTRUCTIONS:
 `;
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro-latest',
+      model: 'gemini-2.5-flash',
       tools: [
         {
           functionDeclarations: [editResumeDataDeclaration],

@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 import { Footer } from '@/components/ui/Footer';
+import { SessionProvider } from '@/components/SessionProvider';
 
 export default function RootLayout({
   children,
@@ -22,9 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`dark ${inter.variable} ${merriweather.variable} ${robotoMono.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased font-sans relative pb-20">
-        {children}
-        <Footer />
-        <Toaster theme="dark" toastOptions={{ className: 'glass text-white border-white/10' }} />
+        <SessionProvider>
+          {children}
+          <Footer />
+          <Toaster theme="dark" toastOptions={{ className: 'glass text-white border-white/10' }} />
+        </SessionProvider>
       </body>
     </html>
   );

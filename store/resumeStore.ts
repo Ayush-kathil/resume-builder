@@ -18,8 +18,7 @@ interface ResumeState {
   updateProject: (id: string, project: Partial<Project>) => void;
   removeProject: (id: string) => void;
   setResumeData: (data: ResumeData) => void;
-  selectedTemplate: string;
-  setTemplate: (template: string) => void;
+
   targetJobKeywords: string;
   setTargetJobKeywords: (keywords: string) => void;
   setSectionOrder: (order: string[]) => void;
@@ -32,12 +31,12 @@ interface ResumeState {
 
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
-  selectedTemplate: 'classic',
+
   careerGrade: 'Professional',
   isEditing: false,
   setIsEditing: (isEditing) => set({ isEditing }),
   setCareerGrade: (grade) => set({ careerGrade: grade }),
-  setTemplate: (template) => set({ selectedTemplate: template }),
+
   targetJobKeywords: '',
   setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),
   updatePersonalInfo: (info) =>
