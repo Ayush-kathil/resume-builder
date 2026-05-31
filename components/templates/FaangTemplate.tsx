@@ -13,36 +13,41 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
   const sectionOrder = data.sectionOrder || ['education', 'experience', 'projects', 'skills'];
 
   const renderContactInfo = () => {
-    const items = [];
-    if (personalInfo.phone) items.push(personalInfo.phone);
-    if (personalInfo.linkedin) items.push(
-      <a key="linkedin" href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-        linkedin: {personalInfo.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '')}
-      </a>
-    );
-    if (personalInfo.github) items.push(
-      <a key="github" href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-        github: {personalInfo.github.replace(/https?:\/\/(www\.)?github\.com\//, '').replace(/\/$/, '')}
-      </a>
-    );
-    if (personalInfo.email) items.push(
-      <a key="email" href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a>
-    );
-    if (personalInfo.website) items.push(
-      <a key="website" href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-        portfolio: {personalInfo.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
-      </a>
-    );
-
     return (
-      <div className="flex flex-wrap justify-center items-center gap-1.5 text-[0.85rem] leading-snug">
-        {items.map((item, index) => (
-          <React.Fragment key={index}>
-            {item}
-            {index < items.length - 1 && <span className="text-gray-400">|</span>}
-          </React.Fragment>
-        ))}
-      </div>
+      <>
+        <div className="flex flex-wrap justify-center items-center gap-1.5 text-[0.85rem] leading-snug">
+          {personalInfo.phone && <span>{personalInfo.phone}</span>}
+          {personalInfo.phone && personalInfo.email && <span className="text-gray-400">|</span>}
+          {personalInfo.email && (
+            <a href={`mailto:${personalInfo.email}`} className="hover:underline">{personalInfo.email}</a>
+          )}
+        </div>
+        {(personalInfo.linkedin || personalInfo.github || personalInfo.website) && (
+          <div className="flex flex-wrap justify-center items-center gap-1.5 text-[0.85rem] leading-snug mt-0.5">
+            {personalInfo.linkedin && (
+              <>
+                <a href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  LinkedIn: {personalInfo.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '')}
+                </a>
+                {(personalInfo.github || personalInfo.website) && <span className="text-gray-400">|</span>}
+              </>
+            )}
+            {personalInfo.github && (
+              <>
+                <a href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  GitHub: {personalInfo.github.replace(/https?:\/\/(www\.)?github\.com\//, '').replace(/\/$/, '')}
+                </a>
+                {personalInfo.website && <span className="text-gray-400">|</span>}
+              </>
+            )}
+            {personalInfo.website && (
+              <a href={personalInfo.website.startsWith('http') ? personalInfo.website : `https://${personalInfo.website}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                Portfolio: {personalInfo.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
+              </a>
+            )}
+          </div>
+        )}
+      </>
     );
   };
 
@@ -152,8 +157,8 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
                       </div>
                       {proj.description && (
                         <ul className="list-disc ml-5 mt-1.5 space-y-1 text-[0.85rem] text-justify">
-                          {proj.description.split('\n').filter(Boolean).map((desc, i) => (
-                            <li key={i}>{desc.replace(/^- /, '')}</li>
+                          {(Array.isArray(proj.description) ? proj.description : typeof proj.description === 'string' ? proj.description.split('\n') : []).filter(Boolean).map((desc, i) => (
+                            <li key={i}>{String(desc).replace(/^- /, '')}</li>
                           ))}
                         </ul>
                       )}

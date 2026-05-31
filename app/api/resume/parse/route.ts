@@ -49,9 +49,9 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: `Failed to extract text from PDF: ${e.message || e.toString()}` }, { status: 500 });
     }
 
-    const systemPrompt = `You are a world-class AI Resume Parser designed to ingest raw, potentially chaotic resume text and output a perfectly structured JSON object matching the \`ResumeData\` schema.
+    const systemPrompt = `You are a world-class AI Resume Parser and Career Engineer. Your task is to ingest raw, potentially chaotic, OCR-scanned, or unstructured resume text and output a perfectly structured JSON object matching the \`ResumeData\` schema.
 
-    The user has also provided specific SETUP CONTEXT to upgrade their resume during this parse step:
+    The user has provided specific SETUP CONTEXT to upgrade their resume during this parse step:
     - Target Role: ${setupData.targetRole || 'None provided'}
     - Target JD: ${setupData.targetJD || 'None provided'}
     - Industry Keywords: ${setupData.industryKeywords || 'None provided'}
@@ -64,11 +64,15 @@ export async function POST(req: Request) {
     - Sections to Omit: ${setupData.sectionsToRemove || 'None provided'}
 
     CRITICAL INSTRUCTIONS:
-    1. **Semantic Entity Extraction**: Extract tools/skills accurately. Weave the user's "New Skills" into the skills array.
-    2. **Temporal Chronology Mapping**: Order experience chronologically, newest first. If the user mentioned "Gaps to explain", add a synthesized experience entry bridging that gap if appropriate.
-    3. **Augmentation**: Rewrite and augment the passive bullet points using the user's "Metrics to Add", "New Achievements", and "Business Outcomes". Make the resume fit the requested "${setupData.tone}" Tone. AVOID overblown, dramatic language like "dazzling", "unleashed", or "conquered". Use a strictly objective, highly professional corporate tone. Rely on raw technical achievements without fluff.
-    4. **Automatic Taxonomical Standardization**: Standardize quirky job titles to global industry equivalents.
-    5. **Omissions**: If they requested to omit certain sections, leave those arrays empty.
+    1. **Multi-Format & Noise Filtering**: The input may be from messy PDFs, OCR text, or web scraping. Filter out watermarks, page numbers, and repetitive headers/footers. Extract tables and multi-column layouts logically.
+    2. **Intelligent Section Detection**: Map non-standard headings (e.g., "Work History", "Career Journey") to "Experience", and combine scattered skills sections.
+    3. **Personal Info Extraction & Validation**: You MUST actively search the text for URLs (linkedin.com, github.com, personal portfolio domains) and ensure they are populated in the JSON output. Detect and validate email addresses. Normalize phone numbers. Clean and verify LinkedIn and GitHub URLs.
+    4. **Experience Parsing (CRITICAL)**: Normalize all dates to standard formats. Detect employment gaps and synthesize bridging entries if the user explained them in SETUP CONTEXT. Identify career progression (e.g., Intern -> Junior -> Senior) and ensure the timeline is clear and chronological (newest first). Standardize quirky job titles to global industry equivalents.
+    5. **Bullet Point Intelligence**: You MUST convert poor, passive bullets into a highly impactful structure based on the formula: "Accomplished [X] as measured by [Y] by doing [Z]". However, DO NOT use those exact robotic words. Use humanized, varied, and natural language (e.g., "Boosted user retention by 40% through the implementation of a Redis caching layer"). Inject action verbs, highlight technologies, and explicitly extract metrics. Make the tone strictly objective and highly professional without dramatic fluff.
+    6. **Skills Extraction Engine**: Extract skills from ALL sections (Skills, Experience, Projects). You MUST automatically categorize them into distinct buckets: "Programming", "Frontend", "Backend", "Cloud", "DevOps", "Database", "AI/ML", and "Tools". Ensure the user's "New Skills" are woven in appropriately.
+    7. **Project Parsing**: Extract the tech stack, impact, features built, and complexity level for each project. Summarize the project description accurately.
+    8. **FAANG Single-Page Constraint**: Even if the input is massive, summarize, condense, and select only the most impactful points to fit a single-page FAANG resume format. Limit experience bullets to 3-4 per role.
+    9. **Omissions**: Leave omitted sections as empty arrays [].
 
     You MUST return ONLY valid JSON matching this structure exactly (no markdown formatting, no \`\`\`json tags):
     {
@@ -77,7 +81,10 @@ export async function POST(req: Request) {
         "email": "...",
         "phone": "...",
         "location": "...",
-        "summary": "..." // Generate a brand new, highly targeted summary incorporating the Target Role, Tone, and JD keywords. Max 2 highly scannable, punchy lines.
+        "linkedin": "...",
+        "github": "...",
+        "website": "...",
+        "summary": "..." // Generate a highly targeted summary incorporating the Target Role, Tone, and JD keywords. Max 2 punchy lines.
       },
       "experience": [
         { "id": "uuid", "company": "...", "position": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "description": ["augmented bullet 1", "augmented bullet 2"] }
@@ -86,10 +93,11 @@ export async function POST(req: Request) {
         { "id": "uuid", "institution": "...", "degree": "...", "fieldOfStudy": "...", "location": "...", "startDate": "...", "endDate": "...", "current": false, "gpa": "..." }
       ],
       "skills": [
-        { "id": "uuid", "category": "...", "items": ["skill1", "skill2"] }
+        { "id": "uuid", "category": "Programming", "items": ["Python", "Java"] },
+        { "id": "uuid", "category": "Frontend", "items": ["React", "HTML"] }
       ],
       "projects": [
-        { "id": "uuid", "name": "...", "description": "...", "technologies": ["tech1"], "url": "..." }
+        { "id": "uuid", "name": "...", "description": "...", "technologies": ["tech1", "tech2"], "url": "..." }
       ]
     }`;
 
@@ -100,6 +108,12 @@ export async function POST(req: Request) {
     // Safely parse JSON (strip markdown if model accidentally includes it)
     const cleanedContent = rawContent.replace(/```json\n?|\n?```/g, '').trim();
     const parsedData = JSON.parse(cleanedContent);
+
+    // Ensure all items have unique IDs
+    if (parsedData.experience) parsedData.experience.forEach((e: any) => e.id = crypto.randomUUID());
+    if (parsedData.education) parsedData.education.forEach((e: any) => e.id = crypto.randomUUID());
+    if (parsedData.skills) parsedData.skills.forEach((e: any) => e.id = crypto.randomUUID());
+    if (parsedData.projects) parsedData.projects.forEach((e: any) => e.id = crypto.randomUUID());
 
     return NextResponse.json({ success: true, data: parsedData });
 

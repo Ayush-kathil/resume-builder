@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
 export function EducationEditor() {
-  const { data, addEducation, updateEducation, removeEducation, careerGrade, addExperience } = useResumeStore();
+  const { data, addEducation, updateEducation, removeEducation, careerGrade, addExperience, activeAiEditField, setActiveAiEditField } = useResumeStore();
 
   return (
     <section className="space-y-4">
@@ -44,7 +44,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.institution}
+                    value={edu.institution || ''}
                     onChange={(e) => updateEducation(edu.id, { institution: e.target.value })}
                     placeholder="e.g. Stanford University"
                   />
@@ -54,7 +54,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.location}
+                    value={edu.location || ''}
                     onChange={(e) => updateEducation(edu.id, { location: e.target.value })}
                     placeholder="Stanford, CA"
                   />
@@ -67,7 +67,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.degree}
+                    value={edu.degree || ''}
                     onChange={(e) => updateEducation(edu.id, { degree: e.target.value })}
                     placeholder="B.S."
                   />
@@ -77,7 +77,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.fieldOfStudy}
+                    value={edu.fieldOfStudy || ''}
                     onChange={(e) => updateEducation(edu.id, { fieldOfStudy: e.target.value })}
                     placeholder="Computer Science"
                   />
@@ -90,7 +90,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.startDate}
+                    value={edu.startDate || ''}
                     onChange={(e) => updateEducation(edu.id, { startDate: e.target.value })}
                     placeholder="Sep 2018"
                   />
@@ -100,7 +100,7 @@ export function EducationEditor() {
                   <input
                     type="text"
                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
-                    value={edu.endDate}
+                    value={edu.endDate || ''}
                     onChange={(e) => updateEducation(edu.id, { endDate: e.target.value })}
                     placeholder="May 2022"
                   />
@@ -117,10 +117,12 @@ export function EducationEditor() {
                 </div>
               </div>
 
-              {careerGrade === 'Entry' && (
+              {careerGrade === 'Fresher' && (
                 <div className="pt-2 border-t border-white/10">
                   <button
                     onClick={async () => {
+                      const fieldId = `edu-translate-${edu.id}`;
+                      setActiveAiEditField(fieldId);
                       toast.loading('Translating academic experience...', { id: `translate-${edu.id}` });
                       try {
                         const content = `${edu.degree} in ${edu.fieldOfStudy} at ${edu.institution}`;
@@ -145,9 +147,15 @@ export function EducationEditor() {
                         toast.success('Added to Experience section!', { id: `translate-${edu.id}` });
                       } catch (e: any) {
                         toast.error(e.message || 'Translation failed', { id: `translate-${edu.id}` });
+                      } finally {
+                        setActiveAiEditField(null);
                       }
                     }}
-                    className="flex items-center gap-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-400/10 hover:bg-emerald-400/20 px-3 py-1.5 rounded-lg transition-colors w-full justify-center"
+                    className={`flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors w-full justify-center ${
+                      activeAiEditField === `edu-translate-${edu.id}`
+                        ? 'bg-indigo-600 text-white animate-pulse'
+                        : 'text-emerald-400 hover:text-emerald-300 bg-emerald-400/10 hover:bg-emerald-400/20'
+                    }`}
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Translate to Professional Experience

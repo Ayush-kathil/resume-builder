@@ -17,7 +17,6 @@ import Link from 'next/link';
 export function EditorPane() {
   const { data, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
-  const [showProModal, setShowProModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,21 +62,22 @@ export function EditorPane() {
           <select
             value={useResumeStore.getState().careerGrade}
             onChange={(e) => {
-              const grade = e.target.value as 'Entry' | 'Professional' | 'Executive';
+              const grade = e.target.value as 'Fresher' | 'Intermediate' | 'Senior' | 'Super Senior';
               useResumeStore.getState().setCareerGrade(grade);
-              if (grade === 'Entry') {
-                // Auto-flip for Entry level: Skills & Education first
+              if (grade === 'Fresher') {
+                // Auto-flip for Fresher level: Skills & Education first
                 useResumeStore.getState().setSectionOrder(['skills', 'education', 'experience', 'projects']);
-                toast.success('Applied Skill-Over-History Flip for Entry Grade');
+                toast.success('Applied Skill-Over-History Flip for Fresher Grade');
               } else {
                 useResumeStore.getState().setSectionOrder(['experience', 'education', 'skills', 'projects']);
               }
             }}
             className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500"
           >
-            <option value="Entry">Entry Grade (0-2 YOE)</option>
-            <option value="Professional">Pro Grade (3-8 YOE)</option>
-            <option value="Executive">Exec Grade (8+ YOE)</option>
+            <option value="Fresher">Fresher</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Senior">Senior</option>
+            <option value="Super Senior">Super Senior</option>
           </select>
 
           <input 
@@ -165,7 +165,7 @@ export function EditorPane() {
                         <GripVertical className="w-5 h-5 text-gray-500" /> Professional Summary
                       </h3>
                       <div className="flex items-center gap-2">
-                        {useResumeStore.getState().careerGrade === 'Executive' && (
+                        {useResumeStore.getState().careerGrade === 'Super Senior' && (
                           <button
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={async () => {
@@ -197,7 +197,7 @@ export function EditorPane() {
                               let endpoint = '/api/ai/summary';
                               let payload: any = { experience: data.experience, education: data.education };
                               
-                              if (useResumeStore.getState().careerGrade === 'Professional' && useResumeStore.getState().targetJobKeywords) {
+                              if (useResumeStore.getState().careerGrade !== 'Fresher' && useResumeStore.getState().targetJobKeywords) {
                                 endpoint = '/api/ai/pro-tools';
                                 payload = { 
                                   action: 'keyword-injector', 
@@ -222,11 +222,11 @@ export function EditorPane() {
                           }}
                           className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 bg-indigo-500/10 px-2 py-1 rounded-md transition-colors"
                         >
-                          <Sparkles className="w-3 h-3" /> {useResumeStore.getState().careerGrade === 'Professional' ? 'Inject Keywords' : 'Auto-Generate'}
+                          <Sparkles className="w-3 h-3" /> {useResumeStore.getState().careerGrade !== 'Fresher' ? 'Inject Keywords' : 'Auto-Generate'}
                         </button>
                       </div>
                     </div>
-                    {useResumeStore.getState().careerGrade === 'Professional' && (
+                    {useResumeStore.getState().careerGrade !== 'Fresher' && (
                       <div className="mb-3" onPointerDown={(e) => e.stopPropagation()}>
                          <label className="block text-xs font-medium text-emerald-400 mb-1">Target Job Keywords (Dynamic Injection)</label>
                          <textarea 
@@ -286,44 +286,6 @@ export function EditorPane() {
       </div>
 
       <AIChatbot />
-
-      <AnimatePresence>
-        {showProModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="bg-slate-900 border border-white/10 p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
-              <div className="mx-auto w-12 h-12 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-indigo-400" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Unlock Pro Templates</h3>
-              <p className="text-gray-400 text-sm mb-6">
-                Premium templates and unlimited AI edits are available on our Pro plan. Upgrade to stand out.
-              </p>
-              <div className="flex flex-col gap-3">
-                <Link href="/pricing" className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors">
-                  View Plans
-                </Link>
-                <button 
-                  onClick={() => setShowProModal(false)}
-                  className="w-full py-2.5 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl transition-colors"
-                >
-                  Maybe Later
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

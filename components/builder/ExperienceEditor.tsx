@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { SmartBulletInput } from './SmartBulletInput';
 
 export function ExperienceEditor() {
-  const { data, addExperience, updateExperience, removeExperience, careerGrade } = useResumeStore();
+  const { data, addExperience, updateExperience, removeExperience, careerGrade, activeAiEditField, setActiveAiEditField } = useResumeStore();
 
   return (
     <section className="space-y-4">
@@ -113,9 +113,10 @@ export function ExperienceEditor() {
                         updateExperience(exp.id, { description: newDesc });
                       }}
                       onRewrite={async () => {
-                        const action = careerGrade === 'Executive' ? 'legacy-filter' : 'xyz-formula';
-                        const loadingMsg = careerGrade === 'Executive' ? 'Applying Legacy Filter...' : 'Applying XYZ Formula...';
-                        toast.loading(loadingMsg, { id: `rewrite-${exp.id}-${i}` });
+                        const fieldId = `exp-${exp.id}-desc-${i}`;
+                        const action = careerGrade === 'Super Senior' ? 'legacy-filter' : 'xyz-formula';
+                        setActiveAiEditField(fieldId);
+                        
                         try {
                           const res = await fetch('/api/ai/pro-tools', {
                             method: 'POST',
@@ -125,14 +126,17 @@ export function ExperienceEditor() {
                           const result = await res.json();
                           if (!res.ok) throw new Error(result.error);
                           
-                          const newDesc = [...exp.description];
-                          newDesc[i] = result.result; // Changed from result.bullet
+                          const newDesc = [...(exp.description || [])];
+                          newDesc[i] = result.result;
                           updateExperience(exp.id, { description: newDesc });
-                          toast.success('Bullet rewritten!', { id: `rewrite-${exp.id}-${i}` });
+                          toast.success('Bullet upgraded!', { id: `rewrite-${exp.id}-${i}` });
                         } catch (e: any) {
-                          toast.error(e.message || 'Failed to rewrite bullet', { id: `rewrite-${exp.id}-${i}` });
+                          toast.error(e.message || 'Rewrite failed', { id: `rewrite-${exp.id}-${i}` });
+                        } finally {
+                          setActiveAiEditField(null);
                         }
                       }}
+                      isAiEditing={activeAiEditField === `exp-${exp.id}-desc-${i}`}
                     />
                   ))}
                   <button

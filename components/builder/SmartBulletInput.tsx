@@ -9,9 +9,10 @@ interface SmartBulletInputProps {
   onChange: (val: string) => void;
   onRemove: () => void;
   onRewrite: () => void;
+  isAiEditing?: boolean;
 }
 
-export function SmartBulletInput({ value, onChange, onRemove, onRewrite }: SmartBulletInputProps) {
+export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEditing = false }: SmartBulletInputProps) {
   const [weakVerbsDetected, setWeakVerbsDetected] = useState<string[]>([]);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -40,10 +41,25 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite }: Smart
       <div className="flex items-start gap-2 w-full relative">
         <span className="text-gray-500 mt-2 text-xs">•</span>
         <textarea
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[60px]"
+          className={`w-full bg-white/5 border rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[60px] ${
+            isAiEditing ? 'border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]' : 'border-white/10'
+          }`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          disabled={isAiEditing}
         />
+        <AnimatePresence>
+          {isAiEditing && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute -top-3 -right-3 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg flex items-center justify-center z-10"
+            >
+              <Sparkles className="w-4 h-4 animate-pulse" />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <button
           onClick={onRemove}
           className="absolute right-10 top-2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover/bullet:opacity-100 transition-opacity bg-black/40 rounded-md backdrop-blur-sm"

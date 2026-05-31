@@ -34,6 +34,7 @@ CRITICAL SETUP CONTEXT PROVIDED BY USER:
 INSTRUCTIONS:
 - Generate a complete, high-quality placeholder resume tailored exactly for the role of "${targetRole}".
 - CRITICAL TONE CONSTRAINT: You must completely eliminate "machine-like" language, AI filler words, corporate jargon, and dramatic verbs (e.g., "dazzling", "unleashed", "spearheaded", "conquered", "fostered"). Write in a direct, factual, highly humanized engineering tone. Focus on raw technical achievements and clear business impact.
+- FAANG Single-Page Constraint: You MUST summarize, condense, and structure the content to fit a single-page FAANG resume format. Limit experience bullets to 3-4 highly impactful points per role.
 - Use the provided context to construct realistic, metric-driven bullet points using the XYZ formula (Accomplished [X] as measured by [Y], by doing [Z]).
 - If requested to omit sections (like 'Projects' or 'Education'), return those arrays as empty [].
 

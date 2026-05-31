@@ -27,36 +27,6 @@ export default function BuilderPage() {
   // Hook up the enterprise auto-save
   const saveStatus = useAutoSave();
 
-  const handleExportPDF = async () => {
-    setIsExportingPDF(true);
-    try {
-      const element = document.getElementById('resume-preview');
-      if (!element) throw new Error("Preview element not found");
-
-      // Dynamically import html2pdf to prevent server-side errors
-      const html2pdfModule = await import('html2pdf.js');
-      const html2pdf = html2pdfModule.default;
-
-      const elementWidth = element.offsetWidth;
-      const elementHeight = element.offsetHeight;
-
-      const opt: any = {
-        margin: 0,
-        filename: `${data.personalInfo.fullName || 'Untitled'}_Resume.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'px', format: [elementWidth, elementHeight], orientation: 'portrait' },
-        enableLinks: true
-      };
-
-      await html2pdf().set(opt).from(element).save();
-      setIsExportModalOpen(false);
-    } catch (err) {
-      console.error("PDF Export failed:", err);
-    } finally {
-      setIsExportingPDF(false);
-    }
-  };
 
   const handleExportDocx = async () => {
     setIsExportingDocx(true);
@@ -233,7 +203,6 @@ export default function BuilderPage() {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         data={data}
-        onExportPDF={handleExportPDF}
       />
       <ShareModal 
         isOpen={isShareModalOpen}

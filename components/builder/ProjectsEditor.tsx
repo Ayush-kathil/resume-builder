@@ -75,7 +75,7 @@ export function ProjectsEditor() {
                 <label className="block text-xs font-medium text-gray-400 mb-1">Description</label>
                 <textarea
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[80px]"
-                  value={project.description}
+                  value={Array.isArray(project.description) ? project.description.join('\n') : (project.description || '')}
                   onChange={(e) => updateProject(project.id, { description: e.target.value })}
                   placeholder="Built a tool that..."
                 />

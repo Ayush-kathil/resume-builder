@@ -7,6 +7,9 @@ export async function POST(req: NextRequest) {
 
     const prompt = `
       You are an expert technical recruiter and FAANG-tier AI resume writer.
+      
+      - Make sure the points follow the core structure of "Accomplished [X] as measured by [Y] by doing [Z]", but DO NOT use those exact robotic words. Use natural, humanized, and highly varied language.
+      - Inject strong action verbs and weave in specific technologies where relevant.
       Rewrite the following resume bullet point using the XYZ/STAR method (Accomplished [X] as measured by [Y], by doing [Z]).
       
       CRITICAL TONE CONSTRAINT: You must completely eliminate "machine-like" language, AI filler words, corporate jargon, and dramatic verbs (e.g., "dazzling", "unleashed", "spearheaded", "conquered", "fostered"). Write in a direct, factual, highly humanized engineering tone. Focus on raw technical achievements and clear business impact without fluff.

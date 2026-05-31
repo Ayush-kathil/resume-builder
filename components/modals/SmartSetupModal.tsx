@@ -79,7 +79,7 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
       setResumeData(data);
       toast.success('Resume generated!', { id: 'gen' });
       resetState();
-      router.push('/templates');
+      router.push('/builder');
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'Generation failed', { id: 'gen' });
@@ -115,7 +115,7 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
       setResumeData(data.data || data); // The API might return { data: {...} } or just {...}
       toast.success('Resume parsed and structured successfully!', { id: 'parse' });
       resetState();
-      router.push('/templates');
+      router.push('/builder');
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'An unexpected error occurred during parsing.', { id: 'parse' });

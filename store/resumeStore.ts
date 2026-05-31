@@ -22,8 +22,10 @@ interface ResumeState {
   targetJobKeywords: string;
   setTargetJobKeywords: (keywords: string) => void;
   setSectionOrder: (order: string[]) => void;
-  careerGrade: 'Entry' | 'Professional' | 'Executive';
-  setCareerGrade: (grade: 'Entry' | 'Professional' | 'Executive') => void;
+  careerGrade: 'Fresher' | 'Intermediate' | 'Senior' | 'Super Senior';
+  setCareerGrade: (grade: 'Fresher' | 'Intermediate' | 'Senior' | 'Super Senior') => void;
+  activeAiEditField: string | null;
+  setActiveAiEditField: (field: string | null) => void;
   sanitizeData: () => void;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
@@ -32,10 +34,12 @@ interface ResumeState {
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
 
-  careerGrade: 'Professional',
+  careerGrade: 'Fresher',
   isEditing: false,
   setIsEditing: (isEditing) => set({ isEditing }),
   setCareerGrade: (grade) => set({ careerGrade: grade }),
+  activeAiEditField: null,
+  setActiveAiEditField: (field) => set({ activeAiEditField: field }),
 
   targetJobKeywords: '',
   setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),
