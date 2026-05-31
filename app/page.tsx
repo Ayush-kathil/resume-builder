@@ -51,12 +51,12 @@ export default function Home() {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-white">
             Elevate Your Career with <br className="hidden md:block"/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
-              Antigravity Design.
+              Antigravity Design
             </span>
           </h1>
           
           <p className="text-lg md:text-xl text-gray-400 max-w-[600px] mx-auto">
-            Build premium, ATS-optimized resumes in minutes. Our AI analyzes job descriptions, rewrites bullet points, and generates a flawless layout.
+            Build premium, ATS-optimized resumes in minutes. Here AI analyzes job descriptions, rewrites bullet points, generates a flawless layout
           </p>
         </motion.div>
 

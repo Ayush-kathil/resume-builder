@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
+import { AI_MODELS } from '@/lib/ai/models';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,11 @@ export async function POST(req: Request) {
 
     const prompt = `${systemPrompt}\n\nUser Content:\n${content}`;
 
-    const rawContent = await generateContentWithFallback(prompt, { temperature: 0.7 });
+    const rawContent = await generateContentWithFallback(
+      prompt, 
+      { temperature: 0.7 },
+      AI_MODELS.REWRITER
+    );
 
     return NextResponse.json({ success: true, result: rawContent.trim() });
 

@@ -11,13 +11,43 @@ import { SkillsEditor } from './SkillsEditor';
 import { ProjectsEditor } from './ProjectsEditor';
 
 import { motion, Reorder, AnimatePresence } from 'framer-motion';
-import { AIChatbot } from './AIChatbot';
+import { AICopilotSidebar } from './AICopilot';
 import Link from 'next/link';
 
 export function EditorPane() {
   const { data, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if inside an input or textarea unless it's just standard undo?
+      // Actually, standard undo inside textareas is handled by browser. 
+      // If we prevent default, we break text undo. We only want to trigger global undo if they aren't typing, 
+      // OR we just let the browser handle textarea undo, and our global state will catch up on blur.
+      // But for layout changes, we want global undo.
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          useResumeStore.getState().redo();
+          toast.success('Redo');
+        } else {
+          useResumeStore.getState().undo();
+          toast.success('Undo');
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        useResumeStore.getState().redo();
+        toast.success('Redo');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,7 +189,10 @@ export function EditorPane() {
                 className="relative bg-white/5 border border-white/10 rounded-xl p-4 shadow-lg cursor-grab active:cursor-grabbing"
               >
                 {sectionId === 'summary' && (
-                  <div>
+                  <div 
+                    id="editor-summary"
+                    onClick={() => document.getElementById('preview-summary')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  >
                     <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
                       <h3 className="text-lg font-medium text-white flex items-center gap-2">
                         <GripVertical className="w-5 h-5 text-gray-500" /> Professional Summary
@@ -247,7 +280,12 @@ export function EditorPane() {
                   </div>
                 )}
                 {sectionId === 'experience' && (
-                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                  <div 
+                    id="editor-experience" 
+                    className="pointer-events-auto" 
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => document.getElementById('preview-experience')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  >
                      <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
                         <GripVertical className="w-5 h-5 text-gray-500" /> Experience
                      </h3>
@@ -255,7 +293,12 @@ export function EditorPane() {
                   </div>
                 )}
                 {sectionId === 'education' && (
-                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                  <div 
+                    id="editor-education" 
+                    className="pointer-events-auto" 
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => document.getElementById('preview-education')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  >
                     <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
                         <GripVertical className="w-5 h-5 text-gray-500" /> Education
                     </h3>
@@ -263,7 +306,12 @@ export function EditorPane() {
                   </div>
                 )}
                 {sectionId === 'skills' && (
-                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                  <div 
+                    id="editor-skills" 
+                    className="pointer-events-auto" 
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => document.getElementById('preview-skills')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  >
                     <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
                         <GripVertical className="w-5 h-5 text-gray-500" /> Skills
                     </h3>
@@ -271,7 +319,12 @@ export function EditorPane() {
                   </div>
                 )}
                 {sectionId === 'projects' && (
-                  <div className="pointer-events-auto" onPointerDown={(e) => e.stopPropagation()}>
+                  <div 
+                    id="editor-projects" 
+                    className="pointer-events-auto" 
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={() => document.getElementById('preview-projects')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                  >
                     <h3 className="text-lg font-medium text-white flex items-center gap-2 mb-4 border-b border-white/10 pb-2 cursor-grab active:cursor-grabbing absolute top-4 left-4 right-4 z-10 w-[calc(100%-32px)]" onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); e.currentTarget.parentElement?.parentElement?.dispatchEvent(new PointerEvent('pointerdown', e.nativeEvent)) }}>
                         <GripVertical className="w-5 h-5 text-gray-500" /> Projects
                     </h3>
@@ -285,7 +338,7 @@ export function EditorPane() {
       </div>
       </div>
 
-      <AIChatbot />
+      <AICopilotSidebar />
     </div>
   );
 }

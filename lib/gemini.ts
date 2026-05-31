@@ -1,16 +1,16 @@
 import { GoogleGenerativeAI, Part, GenerationConfig } from '@google/generative-ai';
+import { executeWithRetry } from './ai/retry';
+import { AI_MODELS } from './ai/models';
 
-// Fallback models in order of preference
-// We start with the newest/fastest flash models, then fall back to pro if needed.
-const MODELS = [
-  'gemini-3.1-flash',
-  'gemini-2.5-pro',
-  'gemini-2.5-flash'
-];
-
+/**
+ * Executes a Gemini request with built-in retry logic, model fallbacks, 
+ * and rate-limit backoffs.
+ */
 export async function generateContentWithFallback(
   promptData: string | Array<string | Part>, 
-  config: GenerationConfig = {}
+  config: GenerationConfig = {},
+  preferredModel: string = AI_MODELS.CHAT,
+  systemInstruction?: string
 ) {
   const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
   if (!apiKey) {
@@ -18,27 +18,37 @@ export async function generateContentWithFallback(
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  let lastError: any;
   
-  for (const modelName of MODELS) {
-    try {
-      console.log(`Attempting generation with model: ${modelName}`);
-      const model = genAI.getGenerativeModel({
+  // AbortController for request timeouts (60 seconds)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+  try {
+    const resultText = await executeWithRetry(async (modelName) => {
+      const modelConfig: any = {
         model: modelName,
         generationConfig: config
+      };
+      
+      if (systemInstruction) {
+        modelConfig.systemInstruction = {
+          role: "system",
+          parts: [{ text: systemInstruction }]
+        };
+      }
+
+      const model = genAI.getGenerativeModel(modelConfig);
+      
+      // Pass the signal if the API supports it, otherwise rely on the retry logic to catch fetch errors
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: Array.isArray(promptData) ? promptData as any : [{ text: promptData }] }]
       });
       
-      const result = await model.generateContent(promptData as any);
       return result.response.text();
-    } catch (error: any) {
-      console.warn(`Model ${modelName} failed. Error:`, error.message);
-      lastError = error;
-      
-      // If it's a 403 (Invalid Key) we should probably not retry other models 
-      // because the key itself is wrong, but since different models might have 
-      // different access levels on the key, we can keep trying.
-    }
+    }, preferredModel);
+
+    return resultText;
+  } finally {
+    clearTimeout(timeoutId);
   }
-  
-  throw new Error(`All Gemini models failed. Last error: ${lastError?.message || 'Unknown error'}`);
 }

@@ -29,6 +29,15 @@ interface ResumeState {
   sanitizeData: () => void;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  atsViewMode: boolean;
+  setAtsViewMode: (mode: boolean) => void;
+
+  // History tracking (Undo/Redo)
+  past: ResumeData[];
+  future: ResumeData[];
+  commit: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 export const useResumeStore = create<ResumeState>((set) => ({
@@ -37,119 +46,154 @@ export const useResumeStore = create<ResumeState>((set) => ({
   careerGrade: 'Fresher',
   isEditing: false,
   setIsEditing: (isEditing) => set({ isEditing }),
+  atsViewMode: false,
+  setAtsViewMode: (mode) => set({ atsViewMode: mode }),
   setCareerGrade: (grade) => set({ careerGrade: grade }),
   activeAiEditField: null,
   setActiveAiEditField: (field) => set({ activeAiEditField: field }),
 
   targetJobKeywords: '',
   setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),
+
+  past: [],
+  future: [],
+  commit: () => set((state) => {
+    // Only commit if data actually changed
+    if (state.past.length > 0 && JSON.stringify(state.past[state.past.length - 1]) === JSON.stringify(state.data)) {
+      return state;
+    }
+    return {
+      past: [...state.past, JSON.parse(JSON.stringify(state.data))],
+      future: []
+    };
+  }),
+  undo: () => set((state) => {
+    if (state.past.length === 0) return state;
+    const previous = state.past[state.past.length - 1];
+    const newPast = state.past.slice(0, state.past.length - 1);
+    return {
+      data: previous,
+      past: newPast,
+      future: [JSON.parse(JSON.stringify(state.data)), ...state.future]
+    };
+  }),
+  redo: () => set((state) => {
+    if (state.future.length === 0) return state;
+    const next = state.future[0];
+    const newFuture = state.future.slice(1);
+    return {
+      data: next,
+      past: [...state.past, JSON.parse(JSON.stringify(state.data))],
+      future: newFuture
+    };
+  }),
   updatePersonalInfo: (info) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        personalInfo: { ...state.data.personalInfo, ...info },
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return {
+        data: {
+          ...state.data,
+          personalInfo: { ...state.data.personalInfo, ...info },
+        },
+      };
+    }),
   addExperience: (exp) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        experience: [...state.data.experience, exp],
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, experience: [...state.data.experience, exp] } };
+    }),
   updateExperience: (id, updatedExp) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        experience: state.data.experience.map((exp) =>
-          exp.id === id ? { ...exp, ...updatedExp } : exp
-        ),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return {
+        data: {
+          ...state.data,
+          experience: state.data.experience.map((exp) =>
+            exp.id === id ? { ...exp, ...updatedExp } : exp
+          ),
+        },
+      };
+    }),
   removeExperience: (id) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        experience: state.data.experience.filter((exp) => exp.id !== id),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, experience: state.data.experience.filter((exp) => exp.id !== id) } };
+    }),
   addEducation: (edu) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        education: [...state.data.education, edu],
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, education: [...state.data.education, edu] } };
+    }),
   updateEducation: (id, updatedEdu) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        education: state.data.education.map((edu) =>
-          edu.id === id ? { ...edu, ...updatedEdu } : edu
-        ),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return {
+        data: {
+          ...state.data,
+          education: state.data.education.map((edu) =>
+            edu.id === id ? { ...edu, ...updatedEdu } : edu
+          ),
+        },
+      };
+    }),
   removeEducation: (id) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        education: state.data.education.filter((edu) => edu.id !== id),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, education: state.data.education.filter((edu) => edu.id !== id) } };
+    }),
   addSkill: (skill) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        skills: [...state.data.skills, skill],
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, skills: [...state.data.skills, skill] } };
+    }),
   updateSkill: (id, updatedSkill) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        skills: state.data.skills.map((skill) =>
-          skill.id === id ? { ...skill, ...updatedSkill } : skill
-        ),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return {
+        data: {
+          ...state.data,
+          skills: state.data.skills.map((skill) =>
+            skill.id === id ? { ...skill, ...updatedSkill } : skill
+          ),
+        },
+      };
+    }),
   removeSkill: (id) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        skills: state.data.skills.filter((skill) => skill.id !== id),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, skills: state.data.skills.filter((skill) => skill.id !== id) } };
+    }),
   addProject: (project) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        projects: [...state.data.projects, project],
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, projects: [...state.data.projects, project] } };
+    }),
   updateProject: (id, updatedProject) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        projects: state.data.projects.map((project) =>
-          project.id === id ? { ...project, ...updatedProject } : project
-        ),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return {
+        data: {
+          ...state.data,
+          projects: state.data.projects.map((project) =>
+            project.id === id ? { ...project, ...updatedProject } : project
+          ),
+        },
+      };
+    }),
   removeProject: (id) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        projects: state.data.projects.filter((project) => project.id !== id),
-      },
-    })),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, projects: state.data.projects.filter((project) => project.id !== id) } };
+    }),
   setSectionOrder: (order) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        sectionOrder: order,
-      },
-    })),
-  setResumeData: (data) => set({ data }),
+    set((state) => {
+      state.commit();
+      return { data: { ...state.data, sectionOrder: order } };
+    }),
+  setResumeData: (data) => set((state) => {
+    state.commit();
+    return { data };
+  }),
   sanitizeData: () => set((state) => {
     const newData = { ...state.data };
 

@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0a;
+  --color-background: #09090B;
   --color-foreground: #ededed;
   --color-primary: #ffffff;
   --color-primary-foreground: #000000;
-  --color-muted: #262626;
+  --color-muted: #111113;
   --color-muted-foreground: #a3a3a3;
-  --color-border: #262626;
+  --color-border: #18181B;
   --color-accent: #3b82f6;
 }
 
 @layer base {
   :root {
-    --background: #0a0a0a;
+    --background: #09090B;
     --foreground: #ededed;
   }
   

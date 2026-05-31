@@ -14,6 +14,7 @@ import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { CommandPalette } from '@/components/ui/CommandPalette';
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -197,6 +198,7 @@ export default function BuilderPage() {
       </AnimatePresence>
       
       <ATSWidget />
+      <CommandPalette />
 
       {/* Modals */}
       <ATSCheckerModal 

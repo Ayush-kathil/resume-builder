@@ -6,7 +6,7 @@ import { formatResumeDate } from '@/lib/formatDate';
 const styles = StyleSheet.create({
   page: {
     padding: 36, // 0.5in margins
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontSize: 10, // 10pt base font
     color: '#000000',
     lineHeight: 1.2,
@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24, // \Huge in LaTeX
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontWeight: 'bold',
     marginBottom: 4,
   },
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 12, // \large in LaTeX
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     borderBottomWidth: 1,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   skillCategory: {
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontWeight: 'bold',
   },
   expBlock: {
@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   expTitleCompany: {
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontWeight: 'bold',
     fontSize: 10,
   },
   expDates: {
-    fontFamily: 'Times-Roman',
+    fontFamily: 'Helvetica',
     fontWeight: 'bold',
     fontSize: 10,
   },

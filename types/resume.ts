@@ -44,6 +44,9 @@ export interface Project {
   description: string;
   url?: string;
   technologies: string[];
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
 }
 
 export interface ResumeData {

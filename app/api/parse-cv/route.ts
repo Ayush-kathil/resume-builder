@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
+import { AI_MODELS } from '@/lib/ai/models';
 
 // Use the exact key name requested by the user
 const apiKey = process.env.GEMINIAPIKEY || process.env.GEMINI_API_KEY || '';
@@ -110,7 +111,7 @@ Return ONLY the raw JSON object. Do not wrap it in markdown block quotes (like \
 
     try {
       content = await generateContentWithFallback([
-        prompt,
+        { text: prompt },
         {
           inlineData: {
             data: buffer.toString('base64'),
@@ -119,7 +120,7 @@ Return ONLY the raw JSON object. Do not wrap it in markdown block quotes (like \
         }
       ], {
         responseMimeType: 'application/json',
-      });
+      }, AI_MODELS.PARSER);
       
     } catch (err: any) {
       console.error('Gemini API call failed:', err);

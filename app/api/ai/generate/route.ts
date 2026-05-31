@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
+import { AI_MODELS } from '@/lib/ai/models';
 
 export async function POST(req: Request) {
   try {
@@ -85,7 +86,11 @@ The JSON MUST exactly match this TypeScript interface structure:
 RETURN ONLY VALID JSON. NO MARKDOWN FORMATTING OR BACKTICKS.
 `;
 
-    const content = await generateContentWithFallback(prompt, { temperature: 0.7 });
+    const content = await generateContentWithFallback(
+      prompt, 
+      { temperature: 0.7 },
+      AI_MODELS.REWRITER
+    );
     
     let text = content.trim();
     text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();

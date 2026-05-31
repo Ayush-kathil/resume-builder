@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { scanForWeakVerbs, strongVerbs } from '@/lib/actionVerbs';
-import { AlertTriangle, Trash2, Sparkles } from 'lucide-react';
+import { AlertTriangle, Trash2, Sparkles, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SmartBulletInputProps {
   value: string;
   onChange: (val: string) => void;
   onRemove: () => void;
-  onRewrite: () => void;
+  onRewrite: (actionType: string) => void;
   isAiEditing?: boolean;
 }
 
@@ -36,8 +36,13 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
     };
   }, [value]);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <div className="relative group/bullet flex flex-col gap-1 w-full">
+    <div 
+      className="relative group/bullet flex flex-col gap-1 w-full"
+      onMouseLeave={() => setIsMenuOpen(false)}
+    >
       <div className="flex items-start gap-2 w-full relative">
         <span className="text-gray-500 mt-2 text-xs">•</span>
         <textarea
@@ -60,20 +65,56 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
             </motion.div>
           )}
         </AnimatePresence>
-        <button
-          onClick={onRemove}
-          className="absolute right-10 top-2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover/bullet:opacity-100 transition-opacity bg-black/40 rounded-md backdrop-blur-sm"
-          title="Remove bullet"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={onRewrite}
-          className="absolute right-2 top-2 p-1 bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-md opacity-0 group-hover/bullet:opacity-100 transition-opacity shadow-lg"
-          title="AI Rewrite"
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-        </button>
+        <div className="absolute right-2 top-2 opacity-0 group-hover/bullet:opacity-100 transition-opacity flex items-center gap-1">
+          <button
+            onClick={onRemove}
+            className="p-1.5 bg-black/40 text-gray-500 hover:text-red-400 rounded-md backdrop-blur-sm shadow-lg flex items-center justify-center transition-colors"
+            title="Remove bullet"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+          
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-1.5 bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-md shadow-lg flex items-center gap-1 backdrop-blur-sm"
+            title="AI Actions"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <ChevronDown className="w-3 h-3" />
+          </button>
+          
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                className="absolute right-0 top-full mt-1 w-40 bg-[#111113]/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-xl z-20 overflow-hidden"
+              >
+                <div className="flex flex-col py-1">
+                  {[
+                    { label: 'Improve', action: 'improve' },
+                    { label: 'Quantify Impact', action: 'quantify' },
+                    { label: 'ATS Optimize', action: 'ats-optimize' },
+                    { label: 'Make Professional', action: 'professional' },
+                    { label: 'Shorten', action: 'shorten' },
+                  ].map((item) => (
+                    <button
+                      key={item.action}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        onRewrite(item.action);
+                      }}
+                      className="px-3 py-1.5 text-xs text-left text-gray-300 hover:bg-indigo-500/20 hover:text-white transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       <AnimatePresence>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
+import { AI_MODELS } from '@/lib/ai/models';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,7 +19,11 @@ export async function POST(req: NextRequest) {
       ${JSON.stringify(education)}
     `;
 
-    const content = await generateContentWithFallback(prompt, { temperature: 0.7 });
+    const content = await generateContentWithFallback(
+      prompt, 
+      { temperature: 0.7 },
+      AI_MODELS.SUMMARY
+    );
     const text = content.trim();
 
     return NextResponse.json({ summary: text });

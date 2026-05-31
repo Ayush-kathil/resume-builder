@@ -1,14 +1,39 @@
 import React from 'react';
 import { ResumeData } from '@/types/resume';
 import { formatResumeDate } from '@/lib/formatDate';
-import { MapPin, Mail, Phone, Globe, Github, Linkedin } from 'lucide-react';
+
+import { useResumeStore } from '@/store/resumeStore';
 
 interface FaangTemplateProps {
   data: ResumeData;
 }
 
+const HighlightText = ({ text }: { text: string }) => {
+  const { atsViewMode, targetJobKeywords } = useResumeStore();
+  
+  if (!atsViewMode || !targetJobKeywords || !text) return <>{text}</>;
+
+  const keywords = targetJobKeywords.split(',').map(k => k.trim()).filter(Boolean);
+  if (keywords.length === 0) return <>{text}</>;
+
+  // Simple string replacement for heatmap
+  const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (keywords.some(k => k.toLowerCase() === part.toLowerCase())) {
+          return <span key={i} className="bg-emerald-400/40 text-emerald-900 px-0.5 rounded shadow-sm">{part}</span>;
+        }
+        return part;
+      })}
+    </>
+  );
+};
+
 export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
-  const { personalInfo, summary, experience, education, projects, skills } = data;
+  const { personalInfo, experience, education, projects, skills } = data;
 
   const sectionOrder = data.sectionOrder || ['education', 'experience', 'projects', 'skills'];
 
@@ -52,13 +77,13 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
   };
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <h2 className="text-[1.1rem] uppercase tracking-wider font-semibold text-black border-b-[1px] border-black pb-0.5 mb-2 mt-4 font-serif">
+    <h2 className="text-[1.1rem] uppercase tracking-wider font-semibold text-black border-b-[1px] border-black pb-0.5 mb-2 mt-4 font-sans">
       {title}
     </h2>
   );
 
   return (
-    <div className="w-full h-full bg-white text-black text-[0.9rem] leading-snug p-8 font-serif" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
+    <div className="w-full h-full bg-white text-black text-[0.9rem] leading-snug p-8 font-sans" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
       {/* Header */}
       <header className="mb-4 text-center">
         <h1 className="text-3xl font-bold mb-1 tracking-tight" style={{ fontVariant: 'small-caps' }}>
@@ -72,8 +97,13 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
         switch (sectionId) {
           case 'summary':
             return personalInfo.summary ? (
-              <div key="summary" className="mb-4 text-justify">
-                {personalInfo.summary}
+              <div 
+                key="summary" 
+                id="preview-summary"
+                className="mb-4 text-justify cursor-pointer hover:bg-black/5 rounded transition-colors"
+                onClick={() => document.getElementById('editor-summary')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+              >
+                <HighlightText text={personalInfo.summary} />
               </div>
             ) : null;
 
@@ -102,7 +132,12 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
 
           case 'experience':
             return experience && experience.length > 0 ? (
-              <div key="experience">
+              <div 
+                key="experience" 
+                id="preview-experience"
+                className="cursor-pointer hover:bg-black/5 rounded p-1 -m-1 transition-colors"
+                onClick={() => document.getElementById('editor-experience')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
                 <SectionTitle title="Experience" />
                 <div className="space-y-4">
                   {experience.map((exp, idx) => (
@@ -119,7 +154,7 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
                       {exp.description && exp.description.length > 0 && (
                         <ul className="list-disc ml-5 mt-1.5 space-y-1 text-[0.85rem] text-justify">
                           {exp.description.map((desc, i) => (
-                            <li key={i}>{desc}</li>
+                            <li key={i}><HighlightText text={desc} /></li>
                           ))}
                         </ul>
                       )}
@@ -131,7 +166,12 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
 
           case 'projects':
             return projects && projects.length > 0 ? (
-              <div key="projects">
+              <div 
+                key="projects" 
+                id="preview-projects"
+                className="cursor-pointer hover:bg-black/5 rounded p-1 -m-1 transition-colors"
+                onClick={() => document.getElementById('editor-projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
                 <SectionTitle title="Projects" />
                 <div className="space-y-3">
                   {projects.map((proj, idx) => (
@@ -152,13 +192,17 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
                           )}
                         </span>
                         <span className="text-[0.85rem] whitespace-nowrap">
-                          {formatResumeDate(proj.startDate)} - {proj.current ? 'Present' : formatResumeDate(proj.endDate)}
+                          {proj.startDate && (
+                            <>
+                              {formatResumeDate(proj.startDate)} - {proj.current ? 'Present' : formatResumeDate(proj.endDate)}
+                            </>
+                          )}
                         </span>
                       </div>
                       {proj.description && (
                         <ul className="list-disc ml-5 mt-1.5 space-y-1 text-[0.85rem] text-justify">
                           {(Array.isArray(proj.description) ? proj.description : typeof proj.description === 'string' ? proj.description.split('\n') : []).filter(Boolean).map((desc, i) => (
-                            <li key={i}>{String(desc).replace(/^- /, '')}</li>
+                            <li key={i}><HighlightText text={String(desc).replace(/^- /, '')} /></li>
                           ))}
                         </ul>
                       )}
@@ -170,13 +214,18 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
 
           case 'skills':
             return skills && skills.length > 0 ? (
-              <div key="skills">
+              <div 
+                key="skills" 
+                id="preview-skills"
+                className="cursor-pointer hover:bg-black/5 rounded p-1 -m-1 transition-colors"
+                onClick={() => document.getElementById('editor-skills')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              >
                 <SectionTitle title="Technical Skills" />
                 <div className="space-y-1 text-[0.9rem]">
                   {skills.map((skillGroup, idx) => (
                     <div key={idx} className="flex">
                       <span className="font-bold w-[20%] min-w-[120px]">{skillGroup.category}:</span>
-                      <span className="flex-1">{skillGroup.items.join(', ')}</span>
+                      <span className="flex-1"><HighlightText text={skillGroup.items.join(', ')} /></span>
                     </div>
                   ))}
                 </div>

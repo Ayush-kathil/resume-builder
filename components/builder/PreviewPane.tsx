@@ -3,24 +3,58 @@
 import { useResumeStore } from '@/store/resumeStore';
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PencilLine } from 'lucide-react';
+import { PencilLine, ScanSearch, FileText } from 'lucide-react';
 import { FaangTemplate } from '../templates/FaangTemplate';
 
 export function PreviewPane() {
-  const { data, isEditing } = useResumeStore();
+  const { data, isEditing, atsViewMode, setAtsViewMode } = useResumeStore();
   const resumeRef = useRef<HTMLDivElement>(null);
+
+  // Simple Density Analyzer
+  const calculateDensity = () => {
+    const textStr = JSON.stringify(data);
+    if (textStr.length < 2000) return { label: 'Good', color: 'text-emerald-400', bg: 'bg-emerald-400/10' };
+    if (textStr.length < 4000) return { label: 'Excellent', color: 'text-blue-400', bg: 'bg-blue-400/10' };
+    return { label: 'Overcrowded', color: 'text-red-400', bg: 'bg-red-400/10' };
+  };
+
+  const density = calculateDensity();
 
   const renderTemplate = () => {
     return <FaangTemplate data={data} />;
   };
 
   return (
-    <div className="w-full h-full bg-white/5 backdrop-blur-xl border-l border-white/10 p-8 flex justify-center overflow-y-auto relative print-container">
+    <div className="w-full h-full bg-white/5 backdrop-blur-xl border-l border-white/10 p-8 flex flex-col items-center overflow-y-auto relative print-container">
+      
+      {/* Preview Header / Tools */}
+      <div className="w-full max-w-[800px] flex justify-between items-center mb-4 print:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-medium">
+            <FileText className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-300">Density:</span>
+            <span className={`${density.color} ${density.bg} px-1.5 py-0.5 rounded`}>{density.label}</span>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setAtsViewMode(!atsViewMode)}
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition-all shadow-lg border ${
+            atsViewMode 
+              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+              : 'bg-black/40 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          <ScanSearch className="w-4 h-4" />
+          {atsViewMode ? 'ATS Heatmap Active' : 'Toggle ATS Heatmap'}
+        </button>
+      </div>
+
       {/* Resume Paper (A4) */}
       <div 
         ref={resumeRef}
         id="resume-preview"
-        className="w-full max-w-[800px] transition-all duration-300 print:max-w-none print:w-full print:p-0 print:shadow-none print:bg-white relative"
+        className="w-full max-w-[800px] transition-all duration-300 print:max-w-none print:w-full print:p-0 print:shadow-none print:bg-white relative shadow-2xl"
       >
         {renderTemplate()}
 

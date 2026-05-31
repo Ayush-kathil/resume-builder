@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
+import { AI_MODELS } from '@/lib/ai/models';
 
 export async function POST(req: Request) {
   try {
@@ -25,7 +26,11 @@ Input JSON:
 ${JSON.stringify(resumeData)}
 `;
 
-    const content = await generateContentWithFallback(prompt, { responseMimeType: 'application/json' });
+    const content = await generateContentWithFallback(
+      prompt, 
+      { responseMimeType: 'application/json' },
+      AI_MODELS.REWRITER
+    );
 
     let cleanContent = content.trim();
     if (cleanContent.startsWith('```json')) {
