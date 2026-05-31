@@ -32,7 +32,7 @@ jobs:
       run: npm run build
       env:
         NEXT_PUBLIC_API_URL: http://localhost:3000
-        MONGODB_URI: ${{ secrets.MONGODB_URI }}
-        JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        ADMIN_PASSCODE: ${{ secrets.ADMIN_PASSCODE }}
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb://localhost:27017/dummy' }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET || 'dummy_jwt_secret' }}
+        ADMIN_PASSCODE: ${{ secrets.ADMIN_PASSCODE || 'dummy_passcode' }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'dummy_key' }}
