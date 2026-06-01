@@ -5,27 +5,27 @@ import { formatResumeDate } from '@/lib/formatDate';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 24, // Reduced margins for single page fit
+    padding: 20, // Reduced from 24
     fontFamily: 'Helvetica',
-    fontSize: 10,
+    fontSize: 9.5, // Slightly reduced
     color: '#000000',
-    lineHeight: 1.15,
+    lineHeight: 1.1, // Denser line height
   },
   header: {
-    marginBottom: 6,
+    marginBottom: 4,
     textAlign: 'center',
   },
   name: {
-    fontSize: 22,
+    fontSize: 20, // Reduced from 22
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
-    marginBottom: 6,
-    paddingBottom: 4,
+    marginBottom: 2,
+    paddingBottom: 2,
   },
   contactInfo: {
     flexDirection: 'row',
     justifyContent: 'center',
-    fontSize: 10,
+    fontSize: 9.5,
     flexWrap: 'wrap',
     gap: 4,
   },
@@ -34,29 +34,29 @@ const styles = StyleSheet.create({
     textDecoration: 'none',
   },
   section: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
-    paddingBottom: 2,
-    marginBottom: 3,
+    paddingBottom: 1,
+    marginBottom: 2,
   },
   summaryText: {
     textAlign: 'justify',
   },
   skillRow: {
     flexDirection: 'row',
-    marginBottom: 1.5,
+    marginBottom: 1,
     paddingLeft: 4,
   },
   skillBullet: {
     width: 6,
-    fontSize: 10,
+    fontSize: 9.5,
   },
   skillContent: {
     flex: 1,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   expBlock: {
-    marginBottom: 4,
+    marginBottom: 3,
   },
   expHeaderRow: {
     flexDirection: 'row',
@@ -78,27 +78,27 @@ const styles = StyleSheet.create({
   expTitleCompany: {
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   expDates: {
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   expSubRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 1.5,
+    marginBottom: 1,
   },
   expSubtitle: {
     fontFamily: 'Times-Roman',
     fontStyle: 'italic',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   expLocation: {
     fontFamily: 'Times-Roman',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   bulletRow: {
     flexDirection: 'row',
@@ -108,14 +108,14 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     width: 6,
-    fontSize: 10,
+    fontSize: 9.5,
   },
   bulletContent: {
     flex: 1,
     textAlign: 'justify',
   },
   eduBlock: {
-    marginBottom: 4,
+    marginBottom: 3,
   },
   eduHeaderRow: {
     flexDirection: 'row',
@@ -125,33 +125,33 @@ const styles = StyleSheet.create({
   eduInst: {
     fontFamily: 'Times-Roman',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   eduDates: {
     fontFamily: 'Times-Roman',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   eduSubRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 1.5,
+    marginBottom: 1,
   },
   eduDegree: {
     fontFamily: 'Times-Roman',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   eduGpa: {
     fontFamily: 'Times-Roman',
     fontStyle: 'italic',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   projHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 1.5,
+    marginBottom: 1,
   },
   projTitleBox: {
     flexDirection: 'row',
@@ -161,12 +161,12 @@ const styles = StyleSheet.create({
   projTitle: {
     fontFamily: 'Times-Roman',
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: 9.5,
   },
   projTech: {
     fontFamily: 'Times-Roman',
     fontStyle: 'italic',
-    fontSize: 10,
+    fontSize: 9.5,
   }
 });
 
@@ -191,7 +191,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
               {data.personalInfo.linkedin && (
                 <>
                   <Link src={data.personalInfo.linkedin.startsWith('http') ? data.personalInfo.linkedin : `https://${data.personalInfo.linkedin}`} style={styles.contactItem}>
-                    LinkedIn: {data.personalInfo.linkedin.replace(new RegExp('https?:\\\\/\\\\/(www\\\\.)?linkedin\\\\.com\\\\/in\\\\/'), '').replace(new RegExp('\\\\/$'), '')}
+                    LinkedIn
                   </Link>
                   {(data.personalInfo.github || data.personalInfo.website) && <Text style={styles.contactItem}>|</Text>}
                 </>
@@ -199,14 +199,14 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
               {data.personalInfo.github && (
                 <>
                   <Link src={data.personalInfo.github.startsWith('http') ? data.personalInfo.github : `https://${data.personalInfo.github}`} style={styles.contactItem}>
-                    GitHub: {data.personalInfo.github.replace(new RegExp('https?:\\\\/\\\\/(www\\\\.)?github\\\\.com\\\\/'), '').replace(new RegExp('\\\\/$'), '')}
+                    GitHub
                   </Link>
                   {data.personalInfo.website && <Text style={styles.contactItem}>|</Text>}
                 </>
               )}
               {data.personalInfo.website && (
                 <Link src={data.personalInfo.website.startsWith('http') ? data.personalInfo.website : `https://${data.personalInfo.website}`} style={styles.contactItem}>
-                  Portfolio: {data.personalInfo.website.replace(new RegExp('^https?:\\\\/\\\\/(www\\\\.)?'), '').replace(new RegExp('\\\\/$'), '')}
+                  Portfolio
                 </Link>
               )}
             </View>

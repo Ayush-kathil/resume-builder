@@ -163,6 +163,39 @@ export function EditorPane() {
                 />
               </div>
             </div>
+            
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">LinkedIn</label>
+                <input
+                  type="url"
+                  className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg px-4 py-2 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
+                  value={data.personalInfo.linkedin || ''}
+                  onChange={(e) => updatePersonalInfo({ linkedin: e.target.value })}
+                  placeholder="linkedin.com/in/johndoe"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">GitHub</label>
+                <input
+                  type="url"
+                  className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg px-4 py-2 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
+                  value={data.personalInfo.github || ''}
+                  onChange={(e) => updatePersonalInfo({ github: e.target.value })}
+                  placeholder="github.com/johndoe"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">Portfolio</label>
+                <input
+                  type="url"
+                  className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg px-4 py-2 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
+                  value={data.personalInfo.website || ''}
+                  onChange={(e) => updatePersonalInfo({ website: e.target.value })}
+                  placeholder="johndoe.com"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
