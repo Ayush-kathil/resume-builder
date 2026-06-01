@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
 import { exportDocx } from '@/lib/exportDocx';
-import { ATSWidget } from '@/components/ui/ATSWidget';
+import { AIChatbot } from '@/components/builder/AIChatbot';
 import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
@@ -178,7 +178,7 @@ export default function BuilderPage() {
         )}
       </AnimatePresence>
       
-      <ATSWidget />
+      <AIChatbot />
       <CommandPalette />
 
       {/* Modals */}

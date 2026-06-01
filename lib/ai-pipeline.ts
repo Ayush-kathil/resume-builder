@@ -35,8 +35,9 @@ Rules:
 1. Normalize dates, companies, and skills.
 2. Extract metrics and technologies.
 3. Return ONLY valid JSON matching this exact structure with no markdown blocks.
-4. CRITICAL: The entire resume content MUST be aggressively condensed and humanized to fit on a single page. Prioritize quality and impact.
+4. CRITICAL: The entire resume content MUST be aggressively condensed, humanized, and optimized to fit on a single page, ensuring high impact and ZERO plagiarism.
 5. Projects MUST have exactly 3 high-impact bullet points in the description array.
+6. MANDATORY ATS OPTIMIZATION: Ensure the resulting resume achieves an ATS score greater than 95 by densely embedding the provided Industry Keywords and Target JD keywords naturally into the professional summary, experience bullets, and skills section.
 `;
 
 // ----------------------------------------------------

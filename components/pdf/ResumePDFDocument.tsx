@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
-    marginBottom: 2,
+    marginBottom: 6,
+    paddingBottom: 4,
   },
   contactInfo: {
     flexDirection: 'row',

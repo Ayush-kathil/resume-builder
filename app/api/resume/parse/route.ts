@@ -3,6 +3,7 @@ import { generateContentWithFallback } from '@/lib/gemini';
 import { generateParsePrompt } from '@/lib/ai-pipeline';
 import { AI_MODELS } from '@/lib/ai/models';
 import PDFParser from 'pdf2json';
+import mammoth from 'mammoth';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,11 +25,12 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file') as File | null;
+    const rawText = formData.get('rawText') as string | null;
     const setupDataString = formData.get('setupData') as string | null;
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    if (!file && !rawText) {
+      return NextResponse.json({ error: 'No file or text provided' }, { status: 400 });
     }
 
     let setupData: any = {};
@@ -40,15 +42,24 @@ export async function POST(req: Request) {
       }
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    
     let textContent = '';
-    try {
-       const rawText = await extractTextFromPDF(buffer);
-       textContent = rawText.replace(/\n{3,}/g, '\n\n').trim();
-    } catch (e: any) {
-       console.error("PDF Parse error", e);
-       return NextResponse.json({ error: `Failed to extract text from PDF: ${e.message || e.toString()}` }, { status: 500 });
+    
+    if (rawText) {
+      textContent = rawText;
+    } else if (file) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      try {
+        if (file.name.endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          const result = await mammoth.extractRawText({ buffer });
+          textContent = result.value;
+        } else {
+          const rawPdfText = await extractTextFromPDF(buffer);
+          textContent = rawPdfText.replace(/\n{3,}/g, '\n\n').trim();
+        }
+      } catch (e: any) {
+         console.error("Parse error", e);
+         return NextResponse.json({ error: `Failed to extract text: ${e.message || e.toString()}` }, { status: 500 });
+      }
     }
 
     const systemPrompt = generateParsePrompt(setupData);
