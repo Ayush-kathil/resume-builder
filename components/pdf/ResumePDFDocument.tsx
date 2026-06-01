@@ -5,56 +5,56 @@ import { formatResumeDate } from '@/lib/formatDate';
 
 const styles = StyleSheet.create({
   page: {
-    padding: 36, // 0.5in margins
+    padding: 24, // Reduced margins for single page fit
     fontFamily: 'Helvetica',
-    fontSize: 10, // 10pt base font
+    fontSize: 10,
     color: '#000000',
-    lineHeight: 1.2,
+    lineHeight: 1.15,
   },
   header: {
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   name: {
-    fontSize: 24, // \Huge in LaTeX
+    fontSize: 22,
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   contactInfo: {
     flexDirection: 'row',
     justifyContent: 'center',
     fontSize: 10,
     flexWrap: 'wrap',
+    gap: 4,
   },
   contactItem: {
-    marginHorizontal: 3,
     color: '#000000',
     textDecoration: 'none',
   },
   section: {
-    marginBottom: 8,
+    marginBottom: 6,
   },
   sectionTitle: {
-    fontSize: 12, // \large in LaTeX
+    fontSize: 11,
     fontFamily: 'Helvetica',
     fontWeight: 'bold',
     textTransform: 'uppercase',
     borderBottomWidth: 1,
     borderBottomColor: '#000000',
     paddingBottom: 2,
-    marginBottom: 4,
+    marginBottom: 3,
   },
   summaryText: {
     textAlign: 'justify',
   },
   skillRow: {
     flexDirection: 'row',
-    marginBottom: 2,
-    paddingLeft: 8,
+    marginBottom: 1.5,
+    paddingLeft: 4,
   },
   skillBullet: {
-    width: 8,
+    width: 6,
     fontSize: 10,
   },
   skillContent: {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   expBlock: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   expHeaderRow: {
     flexDirection: 'row',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   expSubtitle: {
     fontFamily: 'Times-Roman',
@@ -101,12 +101,12 @@ const styles = StyleSheet.create({
   },
   bulletRow: {
     flexDirection: 'row',
-    marginBottom: 1,
-    paddingLeft: 8,
-    paddingRight: 4,
+    marginBottom: 0.5,
+    paddingLeft: 4,
+    paddingRight: 2,
   },
   bulletPoint: {
-    width: 8,
+    width: 6,
     fontSize: 10,
   },
   bulletContent: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
   },
   eduBlock: {
-    marginBottom: 6,
+    marginBottom: 4,
   },
   eduHeaderRow: {
     flexDirection: 'row',
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   eduDegree: {
     fontFamily: 'Times-Roman',
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginBottom: 2,
+    marginBottom: 1.5,
   },
   projTitleBox: {
     flexDirection: 'row',
@@ -287,7 +287,7 @@ export const ResumePDFDocument = ({ data }: { data: ResumeData }) => {
                           )}
                         </View>
                       </View>
-                      {(Array.isArray(proj.description) ? proj.description : typeof proj.description === 'string' ? proj.description.split('\n') : []).filter(Boolean).map((desc, i) => (
+                      {(proj.description || []).filter(Boolean).map((desc, i) => (
                         <View key={i} style={styles.bulletRow}>
                           <Text style={styles.bulletPoint}>•</Text>
                           <Text style={styles.bulletContent}>{String(desc).replace(/^- /, '')}</Text>

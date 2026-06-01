@@ -65,6 +65,23 @@ export async function POST(req: Request) {
     const cleanedContent = rawContent.replace(/```json\n?|\n?```/g, '').trim();
     const parsedData = JSON.parse(cleanedContent);
 
+    // Fallbacks in case the LLM misbehaves
+    if (parsedData.personalInformation && !parsedData.personalInfo) {
+      parsedData.personalInfo = parsedData.personalInformation;
+      delete parsedData.personalInformation;
+    }
+    if (parsedData.summary && parsedData.personalInfo && !parsedData.personalInfo.summary) {
+      parsedData.personalInfo.summary = parsedData.summary;
+      delete parsedData.summary;
+    }
+    if (parsedData.projects) {
+      parsedData.projects.forEach((proj: any) => {
+        if (typeof proj.description === 'string') {
+          proj.description = proj.description.split('\n').filter((d: string) => d.trim());
+        }
+      });
+    }
+
     // Ensure all items have unique IDs
     if (parsedData.experience) parsedData.experience.forEach((e: any) => e.id = crypto.randomUUID());
     if (parsedData.education) parsedData.education.forEach((e: any) => e.id = crypto.randomUUID());

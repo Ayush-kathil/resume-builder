@@ -154,7 +154,9 @@ export const exportDocx = async (data: ResumeData) => {
           spacing: { before: 100, after: 50 }
         })
       );
-      children.push(createBullet(proj.description));
+      (proj.description || []).forEach(desc => {
+        children.push(createBullet(desc));
+      });
     });
   }
 

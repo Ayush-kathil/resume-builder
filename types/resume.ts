@@ -41,7 +41,7 @@ export interface Skill {
 export interface Project {
   id: string;
   name: string;
-  description: string;
+  description: string[];
   url?: string;
   technologies: string[];
   startDate?: string;

@@ -98,17 +98,17 @@ export function ExperienceEditor() {
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-2">Description (Bullet Points)</label>
                 <div className="space-y-2">
-                  {exp.description.map((bullet, i) => (
+                  {(exp.description || []).map((bullet, i) => (
                     <SmartBulletInput
                       key={i}
                       value={bullet}
                       onChange={(newVal) => {
-                        const newDesc = [...exp.description];
+                        const newDesc = [...(exp.description || [])];
                         newDesc[i] = newVal;
                         updateExperience(exp.id, { description: newDesc });
                       }}
                       onRemove={() => {
-                        const newDesc = [...exp.description];
+                        const newDesc = [...(exp.description || [])];
                         newDesc.splice(i, 1);
                         updateExperience(exp.id, { description: newDesc });
                       }}
@@ -140,7 +140,7 @@ export function ExperienceEditor() {
                     />
                   ))}
                   <button
-                    onClick={() => updateExperience(exp.id, { description: [...exp.description, ''] })}
+                    onClick={() => updateExperience(exp.id, { description: [...(exp.description || []), ''] })}
                     className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-2"
                   >
                     <Plus className="w-3 h-3" /> Add Bullet

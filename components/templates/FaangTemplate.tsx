@@ -151,10 +151,10 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
                       {exp.location && (
                         <div className="italic text-[0.85rem] mt-0.5">{exp.location}</div>
                       )}
-                      {exp.description && exp.description.length > 0 && (
+                      {exp.description && (exp.description || []).length > 0 && (
                         <ul className="list-disc ml-5 mt-1.5 space-y-1 text-[0.85rem] text-justify">
-                          {exp.description.map((desc, i) => (
-                            <li key={i}><HighlightText text={desc} /></li>
+                          {(exp.description || []).filter(Boolean).map((desc, i) => (
+                            <li key={i}><HighlightText text={String(desc).replace(/^- /, '')} /></li>
                           ))}
                         </ul>
                       )}
@@ -201,7 +201,7 @@ export const FaangTemplate: React.FC<FaangTemplateProps> = ({ data }) => {
                       </div>
                       {proj.description && (
                         <ul className="list-disc ml-5 mt-1.5 space-y-1 text-[0.85rem] text-justify">
-                          {(Array.isArray(proj.description) ? proj.description : typeof proj.description === 'string' ? proj.description.split('\n') : []).filter(Boolean).map((desc, i) => (
+                          {(proj.description || []).filter(Boolean).map((desc, i) => (
                             <li key={i}><HighlightText text={String(desc).replace(/^- /, '')} /></li>
                           ))}
                         </ul>

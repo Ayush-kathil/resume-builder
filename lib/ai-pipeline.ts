@@ -19,11 +19,10 @@ The user has provided specific SETUP CONTEXT to upgrade their resume during this
 - Sections to Omit: ${setupData.sectionsToRemove || 'None provided'}
 
 Required Fields:
-- personalInformation (fullName, email, phone, location, linkedin, github, website)
-- summary (string)
+- personalInfo (fullName, email, phone, location, linkedin, github, website, summary)
 - experience (array of objects: company, position, location, startDate, endDate, current, description)
 - education (array of objects: institution, degree, fieldOfStudy, location, startDate, endDate, current, gpa)
-- projects (array of objects: name, description, technologies, url)
+- projects (array of objects: name, description (array of exactly 3 bullet points, concise), technologies, url)
 - certifications (array of objects: name, issuer, date)
 - skills (array of objects: category, items)
 - achievements (array of strings)
@@ -36,6 +35,8 @@ Rules:
 1. Normalize dates, companies, and skills.
 2. Extract metrics and technologies.
 3. Return ONLY valid JSON matching this exact structure with no markdown blocks.
+4. CRITICAL: The entire resume content MUST be aggressively condensed and humanized to fit on a single page. Prioritize quality and impact.
+5. Projects MUST have exactly 3 high-impact bullet points in the description array.
 `;
 
 // ----------------------------------------------------

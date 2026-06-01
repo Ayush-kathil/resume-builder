@@ -4,7 +4,13 @@ import { useResumeStore } from '@/store/resumeStore';
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PencilLine, ScanSearch, FileText } from 'lucide-react';
-import { FaangTemplate } from '../templates/FaangTemplate';
+import dynamic from 'next/dynamic';
+import { ResumePDFDocument } from '../pdf/ResumePDFDocument';
+
+const PDFViewer = dynamic(
+  () => import('@react-pdf/renderer').then(mod => mod.PDFViewer),
+  { ssr: false }
+);
 
 export function PreviewPane() {
   const { data, isEditing, atsViewMode, setAtsViewMode } = useResumeStore();
@@ -21,7 +27,13 @@ export function PreviewPane() {
   const density = calculateDensity();
 
   const renderTemplate = () => {
-    return <FaangTemplate data={data} />;
+    return (
+      <div className="w-full aspect-[1/1.414]">
+        <PDFViewer className="w-full h-full" showToolbar={false}>
+          <ResumePDFDocument data={data} />
+        </PDFViewer>
+      </div>
+    );
   };
 
   return (

@@ -214,7 +214,7 @@ export const useResumeStore = create<ResumeState>((set) => ({
 
     newData.projects = (newData.projects || []).map(proj => ({
       ...proj,
-      description: sanitizeText(proj.description),
+      description: (proj.description || []).map(d => sanitizeText(d)),
       technologies: (proj.technologies || []).map(t => sanitizeText(t))
     }));
 

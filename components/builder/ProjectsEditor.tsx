@@ -18,7 +18,7 @@ export function ProjectsEditor() {
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.8 }}
         >
           <button 
-            onClick={() => addProject({ id: uuidv4(), name: '', description: '', url: '', technologies: [] })}
+            onClick={() => addProject({ id: uuidv4(), name: '', description: [], url: '', technologies: [] })}
             className="text-xs flex items-center gap-1 bg-white/5 border border-white/10 text-blue-400 hover:text-blue-300 hover:bg-white/10 px-3 py-1.5 rounded-full transition-all shadow-lg shadow-black/20"
           >
             <Plus className="h-3.5 w-3.5" /> Add Section
@@ -75,8 +75,8 @@ export function ProjectsEditor() {
                 <label className="block text-xs font-medium text-gray-400 mb-1">Description</label>
                 <textarea
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white/20 transition-all min-h-[80px]"
-                  value={Array.isArray(project.description) ? project.description.join('\n') : (project.description || '')}
-                  onChange={(e) => updateProject(project.id, { description: e.target.value })}
+                  value={(project.description || []).join('\n')}
+                  onChange={(e) => updateProject(project.id, { description: e.target.value.split('\n') })}
                   placeholder="Built a tool that..."
                 />
               </div>
