@@ -2,125 +2,109 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FileText, Sparkles, Target, Zap } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050505] flex flex-col items-center justify-center">
-      {/* Background Orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 0.8, 0.5],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-white/5 rounded-full blur-[120px]"
-        />
-        <motion.div
-          animate={{
-            y: [0, 30, 0],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-          className="absolute bottom-1/4 right-1/4 w-[30vw] h-[30vw] bg-white/5 rounded-full blur-[100px]"
-        />
-      </div>
-
-      <div className="z-10 container px-4 md:px-6 flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-3xl space-y-6"
-        >
-          <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-gray-300 backdrop-blur-md mb-4">
-            <Sparkles className="mr-2 h-4 w-4" />
-            <span className="font-medium">AI-Powered Resume Architect</span>
+    <main className="min-h-screen bg-[#F2F1ED] text-[#1a1a1a] font-sans selection:bg-[#1a1a1a] selection:text-[#F2F1ED]">
+      {/* Navigation */}
+      <nav className="w-full flex items-center justify-between p-6 md:px-12 lg:px-24">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="flex gap-[2px]">
+            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
+            <div className="w-1.5 h-6 bg-[#1a1a1a] rounded-full translate-y-[-4px]"></div>
+            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-white">
-            Elevate Your Career with <br className="hidden md:block"/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-500">
-              Antigravity Design
-            </span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-gray-400 max-w-[600px] mx-auto">
-            Build premium, ATS-optimized resumes in minutes. Here AI analyzes job descriptions, rewrites bullet points, generates a flawless layout
-          </p>
-        </motion.div>
+          <span className="font-playfair text-xl tracking-tight font-medium">resume maker</span>
+        </Link>
+        <div className="flex items-center gap-6 text-sm font-medium">
+          <Link href="/login" className="hover:opacity-70 transition-opacity">Log in</Link>
+          <Link href="/signup" className="bg-[#1a1a1a] text-[#F2F1ED] px-5 py-2.5 rounded-full hover:bg-black transition-colors">
+            Sign up
+          </Link>
+        </div>
+      </nav>
 
+      {/* Hero Section */}
+      <section className="flex flex-col items-center pt-20 pb-12 px-6 md:pt-32 md:pb-24 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="mt-10 flex flex-col sm:flex-row gap-4"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-4xl mx-auto flex flex-col items-center"
         >
-          <Link href="/login">
-            <motion.button
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group overflow-hidden rounded-full bg-white text-black px-8 py-4 font-medium transition-all"
-            >
-              <span className="relative z-10 flex items-center">
-                Get Started
-                <FileText className="ml-2 h-4 w-4" />
-              </span>
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-gray-200 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.button>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-playfair font-medium tracking-tight leading-[1.05] mb-8">
+            A perfect resume for every application
+          </h1>
+          
+          <Link href="/signup">
+            <button className="group flex items-center gap-3 bg-[#1a1a1a] text-[#F2F1ED] px-6 py-3 rounded-full font-medium hover:bg-black transition-all">
+              <span>Build your resume</span>
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </button>
           </Link>
         </motion.div>
+      </section>
 
-        {/* Feature Cards with Floating Effects */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
-          <FeatureCard 
-            icon={<Target className="h-6 w-6" />}
-            title="ATS Optimization"
-            description="Smart structuring ensures your resume passes through Applicant Tracking Systems flawlessly."
-            delay={0.4}
+      {/* Fluid Wave Image Section */}
+      <section className="w-full px-4 md:px-8 max-w-[1400px] mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full h-[30vh] md:h-[50vh] rounded-[2rem] overflow-hidden"
+        >
+          <Image 
+            src="/landing-wave.png" 
+            alt="Fluid dynamic wave" 
+            fill 
+            className="object-cover"
+            priority
           />
-          <FeatureCard 
-            icon={<Zap className="h-6 w-6" />}
-            title="AI Content Writer"
-            description="Our Gemini AI rewrites your bullet points using the STAR method for maximum impact."
-            delay={0.5}
-          />
-          <FeatureCard 
-            icon={<Sparkles className="h-6 w-6" />}
-            title="Premium Aesthetics"
-            description="Export to a clean, formal, and weightless design that stands out to recruiters."
-            delay={0.6}
-          />
+        </motion.div>
+      </section>
+
+      {/* Marquee Section */}
+      <section className="w-full py-24 overflow-hidden bg-[#F2F1ED]">
+        <div className="text-center mb-10 text-sm font-medium text-gray-500 uppercase tracking-wider">
+          Trusted by professionals hired at
         </div>
-      </div>
+        <div className="relative flex overflow-x-hidden group">
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 md:gap-24 px-8">
+            <MarqueeItem text="Google" />
+            <MarqueeItem text="Meta" />
+            <MarqueeItem text="Apple" />
+            <MarqueeItem text="Netflix" />
+            <MarqueeItem text="Amazon" />
+            <MarqueeItem text="Microsoft" />
+            <MarqueeItem text="Stripe" />
+            <MarqueeItem text="Airbnb" />
+          </div>
+          {/* Duplicate for seamless infinite scrolling */}
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-16 md:gap-24 px-8 absolute top-0" style={{ left: '100%' }}>
+            <MarqueeItem text="Google" />
+            <MarqueeItem text="Meta" />
+            <MarqueeItem text="Apple" />
+            <MarqueeItem text="Netflix" />
+            <MarqueeItem text="Amazon" />
+            <MarqueeItem text="Microsoft" />
+            <MarqueeItem text="Stripe" />
+            <MarqueeItem text="Airbnb" />
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
 
-function FeatureCard({ icon, title, description, delay }: { icon: React.ReactNode, title: string, description: string, delay: number }) {
+function MarqueeItem({ text }: { text: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay, ease: "easeOut" }}
-      whileHover={{ y: -8, boxShadow: "0 20px 40px -10px rgba(255,255,255,0.05)" }}
-      className="p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md flex flex-col items-start text-left"
-    >
-      <div className="p-3 bg-white/10 rounded-lg text-white mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
-      <p className="text-gray-400">{description}</p>
-    </motion.div>
+    <span className="text-2xl md:text-3xl font-playfair font-medium text-[#1a1a1a] opacity-80 mix-blend-multiply">
+      {text}
+    </span>
   );
 }
