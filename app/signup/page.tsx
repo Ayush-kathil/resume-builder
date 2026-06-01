@@ -101,16 +101,16 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#0a0a0a] text-white font-sans">
+    <div className="min-h-screen w-full flex bg-white text-[#1a1a1a] font-sans">
       {/* Left Column - Form */}
       <div className="w-full lg:w-1/2 flex flex-col p-8 lg:p-16 xl:p-24 justify-center relative">
         <Link href="/" className="absolute top-8 left-8 lg:top-12 lg:left-12 flex items-center gap-2 group">
           <div className="flex gap-[2px]">
-            <div className="w-1.5 h-4 bg-white rounded-full"></div>
-            <div className="w-1.5 h-6 bg-white rounded-full translate-y-[-4px]"></div>
-            <div className="w-1.5 h-4 bg-white rounded-full"></div>
+            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
+            <div className="w-1.5 h-6 bg-[#1a1a1a] rounded-full translate-y-[-4px]"></div>
+            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
           </div>
-          <span className="font-playfair text-xl tracking-tight">resume maker</span>
+          <span className="font-playfair text-xl tracking-tight text-[#1a1a1a]">resume maker</span>
         </Link>
 
         <div className="max-w-md w-full mx-auto">
@@ -121,7 +121,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-6">
             
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-200">Email address</label>
+              <label className="text-sm font-medium text-gray-500">Email address</label>
               <div className="flex gap-2">
                 <input
                   type="email"
@@ -130,32 +130,32 @@ export default function SignupPage() {
                   disabled={otpSent}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="flex-1 w-full bg-black border border-[#222] rounded-xl py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-white transition-all disabled:opacity-50"
+                  className="flex-1 w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all disabled:opacity-50"
                 />
                 {!otpSent ? (
                   <button
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSubmitting || !email || emailExists === true}
-                    className="bg-white text-black font-medium rounded-xl px-4 hover:bg-gray-200 transition-colors disabled:opacity-50 min-w-[80px] flex items-center justify-center"
+                    className="bg-[#1a1a1a] text-white font-medium rounded-xl px-4 hover:bg-black transition-colors disabled:opacity-50 min-w-[80px] flex items-center justify-center"
                   >
-                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Verify'}
+                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : 'Verify'}
                   </button>
                 ) : (
-                  <div className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center rounded-xl px-4 min-w-[80px]">
+                  <div className="bg-emerald-50 text-emerald-500 border border-emerald-200 flex items-center justify-center rounded-xl px-4 min-w-[80px]">
                     <CheckCircle2 className="h-5 w-5" />
                   </div>
                 )}
               </div>
               {emailExists === true && (
-                <p className="text-red-400 text-xs mt-1">This email is already registered. Please log in.</p>
+                <p className="text-red-500 text-xs mt-1">This email is already registered. Please log in.</p>
               )}
             </div>
 
             {otpSent && (
               <>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200">Verification Code</label>
+                  <label className="text-sm font-medium text-gray-500">Verification Code</label>
                   <input
                     type="text"
                     required
@@ -163,31 +163,31 @@ export default function SignupPage() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 6-digit code"
-                    className="w-full tracking-widest bg-black border border-[#222] rounded-xl py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                    className="w-full tracking-widest bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200">Password</label>
+                  <label className="text-sm font-medium text-gray-500">Password</label>
                   <input
                     type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min 8 characters"
-                    className="w-full bg-black border border-[#222] rounded-xl py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-200">Confirm Password</label>
+                  <label className="text-sm font-medium text-gray-500">Confirm Password</label>
                   <input
                     type="password"
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your password"
-                    className="w-full bg-black border border-[#222] rounded-xl py-3 px-4 text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
                   />
                 </div>
 
@@ -195,18 +195,18 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !otp || !password || !confirmPassword}
-                    className="w-full bg-white text-black font-medium rounded-full py-2.5 px-6 hover:bg-gray-200 transition-colors disabled:opacity-50 flex items-center justify-center"
+                    className="w-full bg-[#1a1a1a] text-white font-medium rounded-full py-2.5 px-6 hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center"
                   >
-                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create account'}
+                    {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : 'Create account'}
                   </button>
                 </div>
               </>
             )}
           </form>
 
-          <div className="mt-12 text-sm text-gray-400">
+          <div className="mt-12 text-sm text-gray-500">
             Already have an account?{' '}
-            <Link href="/login" className="text-white hover:underline transition-colors">
+            <Link href="/login" className="text-[#1a1a1a] font-medium hover:underline transition-colors">
               Log in
             </Link>
           </div>
@@ -215,12 +215,12 @@ export default function SignupPage() {
 
       {/* Right Column - Image */}
       <div className="hidden lg:flex w-1/2 p-4 lg:p-6">
-        <div className="relative w-full h-full rounded-[2rem] overflow-hidden">
+        <div className="relative w-full h-full rounded-[2rem] overflow-hidden bg-[#f9f9f9] border border-[#e5e5e5]">
           <Image 
             src="/auth-fluid.png" 
             alt="Abstract fluid gradient" 
             fill 
-            className="object-cover"
+            className="object-cover opacity-80"
             priority
           />
         </div>

@@ -61,15 +61,15 @@ export async function POST(req: Request) {
         to: email,
         subject: 'Your Verification Code',
         html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 40px; background-color: #18181b; border: 1px solid #27272a; border-radius: 12px; color: #ededed; text-align: center;">
-            <h2 style="color: #ffffff; font-size: 24px; font-weight: 800; margin-top: 0; margin-bottom: 8px;">Security <span style="color: #3b82f6;">Verification</span></h2>
-            <p style="color: #a1a1aa; font-size: 15px; line-height: 24px; margin-bottom: 32px;">Please use the verification code below to securely log into your ResumeAI account.</p>
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 500px; margin: 40px auto; padding: 40px; background-color: #ffffff; border: 1px solid #e5e5e5; border-radius: 16px; color: #1a1a1a; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+            <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 800; margin-top: 0; margin-bottom: 8px;">Security <span style="color: #3b82f6;">Verification</span></h2>
+            <p style="color: #52525b; font-size: 15px; line-height: 24px; margin-bottom: 32px;">Please use the verification code below to securely log into your ResumeAI account.</p>
             
-            <div style="background-color: #27272a; border: 1px solid #3f3f46; border-radius: 8px; padding: 24px; margin-bottom: 32px;">
-              <strong style="font-size: 36px; letter-spacing: 8px; color: #ffffff;">${otpCode}</strong>
+            <div style="background-color: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+              <strong style="font-size: 36px; letter-spacing: 8px; color: #1a1a1a;">${otpCode}</strong>
             </div>
             
-            <p style="color: #71717a; font-size: 13px; margin-bottom: 0;">This code will expire in 5 minutes. If you didn't request this, you can safely ignore this email.</p>
+            <p style="color: #a1a1aa; font-size: 13px; margin-bottom: 0;">This code will expire in 5 minutes. If you didn't request this, you can safely ignore this email.</p>
           </div>
         `,
       });

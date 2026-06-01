@@ -95,12 +95,17 @@ export function AIChatbot() {
 
     } catch (error: any) {
       console.error(error);
+      const errorMsg = error.message || String(error);
+      const isBusy = errorMsg.toLowerCase().includes('busy') || errorMsg.toLowerCase().includes('demand') || errorMsg.toLowerCase().includes('quota') || errorMsg.toLowerCase().includes('temporarily');
+      
       setMessages(prev => [...prev, { 
         id: (Date.now() + 1).toString(), 
         role: 'assistant', 
-        content: "Sorry, I encountered an error while updating your resume." 
+        content: isBusy 
+          ? "I'm currently assisting a high volume of users and need a quick breather. Please give me a few seconds and try again! 🧘" 
+          : "Oops, something went wrong on my end while trying to update your resume. Let's try that again." 
       }]);
-      toast.error('AI Edit Failed', { id: 'chat-edit' });
+      toast.error(isBusy ? 'AI is resting 🧘' : 'AI Edit Failed', { id: 'chat-edit' });
     } finally {
       setIsTyping(false);
       setIsEditing(false);

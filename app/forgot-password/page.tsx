@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { AntigravityBackground } from '@/components/ui/AntigravityBackground';
 import { Mail, Sparkles, KeyRound, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -81,25 +80,24 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-transparent">
-        <AntigravityBackground />
+      <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#fafafa]">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-10 mx-4 text-center"
+          className="w-full max-w-md p-8 bg-white border border-[#e5e5e5] rounded-3xl shadow-xl z-10 mx-4 text-center"
         >
           <div className="flex justify-center mb-6">
-            <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center border border-green-500/30">
-              <CheckCircle2 className="h-8 w-8 text-green-400" />
+            <div className="h-16 w-16 bg-green-50 rounded-full flex items-center justify-center border border-green-100">
+              <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Password Reset Successfully</h2>
-          <p className="text-gray-400 text-sm mb-8">
+          <h2 className="text-2xl font-bold text-[#1a1a1a] mb-2">Password Reset Successfully</h2>
+          <p className="text-gray-500 text-sm mb-8">
             You can now use your new password to log in to your account.
           </p>
           <Link
             href="/login"
-            className="w-full inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-2xl py-3.5 px-4 hover:from-indigo-500 hover:to-purple-500 transition-all active:scale-[0.98] shadow-lg shadow-indigo-500/25"
+            className="w-full inline-block bg-[#1a1a1a] text-white font-semibold rounded-2xl py-3.5 px-4 hover:bg-black transition-all active:scale-[0.98] shadow-md shadow-black/5"
           >
             Back to Login
           </Link>
@@ -109,21 +107,20 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-transparent">
-      <AntigravityBackground />
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-[#fafafa]">
       
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="w-full max-w-md p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl z-10 mx-4"
+        className="w-full max-w-md p-8 bg-white border border-[#e5e5e5] rounded-3xl shadow-xl z-10 mx-4"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="h-12 w-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-            <Sparkles className="h-6 w-6 text-indigo-400" />
+          <div className="h-12 w-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6">
+            <Sparkles className="h-6 w-6 text-indigo-500" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Reset Password</h1>
-          <p className="text-gray-400 text-sm text-center">
+          <h1 className="text-3xl font-bold text-[#1a1a1a] tracking-tight mb-2">Reset Password</h1>
+          <p className="text-gray-500 text-sm text-center">
             Verify your email to set a new password.
           </p>
         </div>
@@ -141,7 +138,7 @@ export default function ForgotPasswordPage() {
                   disabled={otpSent}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all disabled:opacity-50"
+                  className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-2xl py-3.5 pl-12 pr-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all disabled:opacity-50"
                 />
               </div>
               {!otpSent ? (
@@ -149,12 +146,12 @@ export default function ForgotPasswordPage() {
                   type="button"
                   onClick={handleSendOtp}
                   disabled={isSubmitting || !email}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-2xl px-4 transition-colors disabled:opacity-50"
+                  className="bg-[#1a1a1a] hover:bg-black text-white font-medium rounded-2xl px-4 transition-colors disabled:opacity-50"
                 >
                   Verify
                 </button>
               ) : (
-                <div className="bg-green-500/20 text-green-400 border border-green-500/30 flex items-center justify-center rounded-2xl px-4">
+                <div className="bg-green-50 text-green-600 border border-green-200 flex items-center justify-center rounded-2xl px-4">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
               )}
@@ -174,7 +171,7 @@ export default function ForgotPasswordPage() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 6-digit OTP"
-                    className="w-full text-center tracking-[0.5em] text-xl bg-black/40 border border-white/10 rounded-2xl py-3.5 px-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    className="w-full text-center tracking-[0.5em] text-xl bg-[#f9f9f9] border border-[#e5e5e5] rounded-2xl py-3.5 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                   />
                 </div>
 
@@ -186,7 +183,7 @@ export default function ForgotPasswordPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="New Password (min 8 chars)"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-2xl py-3.5 pl-12 pr-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                   />
                 </div>
 
@@ -198,7 +195,7 @@ export default function ForgotPasswordPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm New Password"
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                    className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-2xl py-3.5 pl-12 pr-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                   />
                 </div>
 
@@ -214,7 +211,7 @@ export default function ForgotPasswordPage() {
           </form>
           
           <div className="text-center mt-6">
-            <Link href="/login" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm font-medium transition-colors">
+            <Link href="/login" className="inline-flex items-center gap-2 text-gray-500 hover:text-[#1a1a1a] text-sm font-medium transition-colors">
               <ArrowLeft className="w-4 h-4" />
               Back to Login
             </Link>
