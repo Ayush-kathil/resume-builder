@@ -29,6 +29,8 @@ interface ResumeState {
 
   targetJobKeywords: string;
   setTargetJobKeywords: (keywords: string) => void;
+  targetJobDescription: string;
+  setTargetJobDescription: (jd: string) => void;
   setSectionOrder: (order: string[]) => void;
   careerGrade: 'Fresher' | 'Intermediate' | 'Senior' | 'Super Senior';
   setCareerGrade: (grade: 'Fresher' | 'Intermediate' | 'Senior' | 'Super Senior') => void;
@@ -67,6 +69,8 @@ export const useResumeStore = create<ResumeState>((set) => ({
 
   targetJobKeywords: '',
   setTargetJobKeywords: (keywords) => set({ targetJobKeywords: keywords }),
+  targetJobDescription: '',
+  setTargetJobDescription: (jd) => set({ targetJobDescription: jd }),
 
   past: [],
   future: [],

@@ -113,12 +113,22 @@ export default function BuilderPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* Document Editor & Preview container */}
         <div className="flex-1 flex overflow-hidden relative">
-          <div className="w-full md:w-1/2 h-full z-10 bg-white">
+          <motion.div 
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full md:w-1/2 h-full z-10 bg-white"
+          >
             <EditorPane />
-          </div>
-          <div className="hidden md:block md:w-1/2 h-full z-10 bg-[#F2F1ED]">
+          </motion.div>
+          <motion.div 
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            className="hidden md:block md:w-1/2 h-full z-10 bg-[#F2F1ED]"
+          >
             <PreviewPane />
-          </div>
+          </motion.div>
         </div>
       </div>
 
