@@ -1,10 +1,20 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: imageContainerRef,
+    offset: ["start end", "center center"]
+  });
+  
+  // Scale from 85% to 100% as it scrolls into view, Apple style
+  const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
+
   return (
     <main className="min-h-screen bg-[#F2F1ED] text-[#1a1a1a] font-sans selection:bg-[#1a1a1a] selection:text-[#F2F1ED]">
       {/* Navigation */}
@@ -51,10 +61,11 @@ export default function Home() {
       </section>
 
       {/* Resumes Image Section */}
-      <section className="w-full px-4 md:px-8 max-w-[1400px] mx-auto">
+      <section className="w-full px-4 md:px-8 max-w-[1400px] mx-auto py-12" ref={imageContainerRef}>
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
+          style={{ scale }}
           transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           className="relative w-full h-[40vh] md:h-[60vh] rounded-[2rem] overflow-hidden"
         >

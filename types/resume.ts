@@ -30,6 +30,7 @@ export interface Education {
   current: boolean;
   location: string;
   gpa?: string;
+  coursework?: string;
 }
 
 export interface Skill {
@@ -55,6 +56,8 @@ export interface ResumeData {
   education: Education[];
   skills: Skill[];
   projects: Project[];
+  achievements?: string[];
+  responsibilities?: Experience[];
   sectionOrder?: string[];
 }
 
@@ -70,5 +73,7 @@ export const initialResumeData: ResumeData = {
   education: [],
   skills: [],
   projects: [],
-  sectionOrder: ['summary', 'experience', 'projects', 'education', 'skills'],
+  achievements: [],
+  responsibilities: [],
+  sectionOrder: ['summary', 'education', 'experience', 'projects', 'responsibilities', 'skills', 'achievements'],
 };

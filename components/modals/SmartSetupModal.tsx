@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowRight, X, Upload, Loader2, FileText } from 'lucide-react';
+import { Sparkles, ArrowRight, X, Upload, Loader2, FileText, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useResumeStore } from '@/store/resumeStore';
 import { toast } from 'sonner';
@@ -27,6 +27,71 @@ const TECH_SKILLS = [
   "C#", "Go", "Rust", "AWS", "Azure", "GCP", "Docker", "Kubernetes", "SQL", "MongoDB", 
   "PostgreSQL", "Redis", "GraphQL", "Machine Learning", "System Design", "DevOps"
 ];
+
+// Premium Custom Dropdown Component
+function CustomDropdown({ value, onChange, options, placeholder, label }: { value: string, onChange: (v: string) => void, options: string[], placeholder: string, label: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter options based on input
+  const filteredOptions = options.filter(opt => opt.toLowerCase().includes(value.toLowerCase()));
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">{label}</label>
+      <div className="relative">
+        <input 
+          type="text" 
+          value={value} 
+          onChange={e => {
+            onChange(e.target.value);
+            setIsOpen(true);
+          }} 
+          onFocus={() => setIsOpen(true)}
+          placeholder={placeholder} 
+          className="w-full bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all font-sans" 
+        />
+        <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && filteredOptions.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="absolute z-50 w-full mt-2 bg-white border border-[#e5e5e5] rounded-2xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar"
+          >
+            {filteredOptions.map((opt) => (
+              <div 
+                key={opt}
+                onClick={() => {
+                  onChange(opt);
+                  setIsOpen(false);
+                }}
+                className="px-5 py-3 hover:bg-[#F2F1ED] cursor-pointer transition-colors text-sm text-[#1a1a1a]"
+              >
+                {opt}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 
 export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps) {
   const router = useRouter();
@@ -159,15 +224,17 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={springConfig}
-        className="w-full max-w-2xl bg-white border border-[#e5e5e5] rounded-3xl p-8 relative overflow-hidden shadow-2xl"
+        className="w-full max-w-2xl bg-white border border-[#e5e5e5] rounded-[2rem] p-10 relative overflow-hidden shadow-2xl"
       >
-        <button onClick={resetState} className="absolute top-6 right-6 text-gray-400 hover:text-[#1a1a1a] transition-colors z-20">
+        <button onClick={resetState} className="absolute top-8 right-8 text-gray-400 hover:text-[#1a1a1a] transition-colors z-20">
           <X className="h-6 w-6" />
         </button>
 
-        <div className="flex items-center gap-3 mb-8 text-[#1a1a1a]">
-          <Sparkles className="h-5 w-5" />
-          <span className="font-medium tracking-wide uppercase text-sm">
+        <div className="flex items-center gap-3 mb-10 text-[#1a1a1a]">
+          <div className="w-8 h-8 rounded-full bg-[#F2F1ED] flex items-center justify-center">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <span className="font-playfair tracking-wide font-medium text-lg">
             {mode === 'fresh' ? 'AI Setup: Start Fresh' : 'AI Setup: Upgrade Resume'}
           </span>
         </div>
@@ -181,54 +248,76 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
           onChange={handleFileUpload} 
         />
 
-        <div className="relative h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+        <div className="relative h-[400px] overflow-y-auto pr-2 custom-scrollbar">
           <AnimatePresence mode="wait">
             
             {/* STEP 1: Core Target */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-playfair font-bold text-[#1a1a1a] mb-2">Target Role & Aspirations</h2>
-                <p className="text-gray-500 text-sm mb-6">Let's align your resume perfectly with your next role.</p>
+              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                <div>
+                  <h2 className="text-4xl font-playfair font-medium text-[#1a1a1a] mb-3 tracking-tight">Target Role & Aspirations</h2>
+                  <p className="text-gray-500 text-base">Let the AI perfectly align your resume with your next dream role.</p>
+                </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">What is your exact target job title?</label>
-                    <input type="text" value={targetRole} onChange={e => setTargetRole(e.target.value)} placeholder="e.g. Senior Software Engineer" className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl px-4 py-3 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a]" />
+                    <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">What is your exact target job title?</label>
+                    <input 
+                      type="text" 
+                      value={targetRole} 
+                      onChange={e => setTargetRole(e.target.value)} 
+                      placeholder="e.g. Senior Software Engineer" 
+                      className="w-full bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all font-sans" 
+                    />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Target Company (Optional)</label>
-                    <input list="asian-companies" type="text" value={targetCompany} onChange={e => setTargetCompany(e.target.value)} placeholder="e.g. TCS, Infosys, Flipkart..." className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl px-4 py-3 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a]" />
-                    <datalist id="asian-companies">
-                      {ASIAN_COMPANIES.map(c => <option key={c} value={c} />)}
-                    </datalist>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Key Skills / Technologies</label>
-                    <input list="tech-skills" type="text" value={targetSkills} onChange={e => setTargetSkills(e.target.value)} placeholder="e.g. React, Next.js, System Design" className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl px-4 py-3 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a]" />
-                    <datalist id="tech-skills">
-                      {TECH_SKILLS.map(s => <option key={s} value={s} />)}
-                    </datalist>
-                  </div>
+                  
+                  <CustomDropdown 
+                    label="Target Company (Optional)"
+                    value={targetCompany}
+                    onChange={setTargetCompany}
+                    options={ASIAN_COMPANIES}
+                    placeholder="e.g. TCS, Infosys, Flipkart..."
+                  />
+
+                  <CustomDropdown 
+                    label="Key Skills / Technologies to Highlight"
+                    value={targetSkills}
+                    onChange={setTargetSkills}
+                    options={TECH_SKILLS}
+                    placeholder="e.g. React, Next.js, System Design"
+                  />
                 </div>
               </motion.div>
             )}
 
             {/* STEP 2: Updates & Import */}
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-playfair font-bold text-[#1a1a1a] mb-2">{mode === 'fresh' ? 'Recent Achievements' : 'Import Your Data'}</h2>
-                <p className="text-gray-500 text-sm mb-6">{mode === 'fresh' ? 'What have you achieved recently?' : 'Paste your LinkedIn profile text, portfolio text, or click Next to upload a PDF/DOCX.'}</p>
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                <div>
+                  <h2 className="text-4xl font-playfair font-medium text-[#1a1a1a] mb-3 tracking-tight">{mode === 'fresh' ? 'Recent Achievements' : 'Import Your Data'}</h2>
+                  <p className="text-gray-500 text-base">{mode === 'fresh' ? 'What have you achieved recently?' : 'Paste text from LinkedIn, or simply click upload for your PDF/DOCX.'}</p>
+                </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Any specific achievements to highlight? (Optional)</label>
-                    <textarea value={achievements} onChange={e => setAchievements(e.target.value)} placeholder="e.g. Led a team of 5, increased sales by 20%..." className="w-full h-20 bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl px-4 py-3 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] resize-none" />
+                    <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Any specific achievements to guarantee inclusion? (Optional)</label>
+                    <textarea 
+                      value={achievements} 
+                      onChange={e => setAchievements(e.target.value)} 
+                      placeholder="e.g. Led a team of 5, increased sales by 20%, won Hackathon..." 
+                      className="w-full h-24 bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all resize-none font-sans" 
+                    />
                   </div>
                   
                   {mode === 'upload' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Paste Raw Text (LinkedIn, Portfolio, etc.)</label>
-                      <textarea value={rawText} onChange={e => setRawText(e.target.value)} placeholder="Leave blank if you prefer to upload a PDF/DOCX file instead..." className="w-full h-32 bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl px-4 py-3 text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] resize-none" />
+                      <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Paste Raw Text (LinkedIn, Portfolio)</label>
+                      <textarea 
+                        value={rawText} 
+                        onChange={e => setRawText(e.target.value)} 
+                        placeholder="Leave blank to upload a file instead..." 
+                        className="w-full h-32 bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all resize-none font-sans" 
+                      />
                     </div>
                   )}
                 </div>
@@ -239,23 +328,23 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
         </div>
 
         {/* Footer Navigation */}
-        <div className="mt-6 flex justify-between items-center border-t border-[#e5e5e5] pt-6">
+        <div className="mt-8 flex justify-between items-center border-t border-[#e5e5e5] pt-8">
           <div className="flex gap-2">
             {[1, 2].map((i) => (
-              <div key={i} className={`h-1.5 w-6 rounded-full transition-colors ${step >= i ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`} />
+              <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${step >= i ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`} />
             ))}
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {step > 1 && (
-              <button onClick={handlePrev} disabled={isProcessing} className="px-4 py-2 text-sm text-gray-500 hover:text-[#1a1a1a] transition-colors disabled:opacity-50 font-medium">
+              <button onClick={handlePrev} disabled={isProcessing} className="px-5 py-3 text-sm text-gray-500 hover:text-[#1a1a1a] transition-colors disabled:opacity-50 font-medium">
                 Back
               </button>
             )}
             <button
               onClick={handleNext}
               disabled={isProcessing || (step === 1 && !targetRole)}
-              className="flex items-center gap-2 bg-[#1a1a1a] text-white px-6 py-2.5 rounded-full font-medium hover:bg-black transition-colors disabled:opacity-50"
+              className="group flex items-center gap-3 bg-[#1a1a1a] text-[#F2F1ED] px-8 py-4 rounded-full font-medium hover:bg-black transition-all disabled:opacity-50"
             >
               {isProcessing ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
@@ -263,7 +352,12 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
                 mode === 'fresh' ? <><Sparkles className="h-4 w-4" /> Generate</> : 
                 (rawText ? <><FileText className="h-4 w-4" /> Parse Text</> : <><Upload className="h-4 w-4" /> Upload Document</>)
               ) : (
-                <>Next <ArrowRight className="h-4 w-4" /></>
+                <>
+                  <span>Next Step</span>
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <ArrowRight className="h-3 w-3" />
+                  </div>
+                </>
               )}
             </button>
           </div>

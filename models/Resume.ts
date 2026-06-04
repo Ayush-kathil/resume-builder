@@ -60,6 +60,7 @@ const ResumeSchema = new Schema<IResume>(
           current: Boolean,
           location: String,
           gpa: String,
+          coursework: String,
         },
       ],
       skills: [
@@ -73,14 +74,27 @@ const ResumeSchema = new Schema<IResume>(
         {
           id: String,
           name: String,
-          description: String,
+          description: [String],
           url: String,
           technologies: [String],
         },
       ],
+      achievements: [String],
+      responsibilities: [
+        {
+          id: String,
+          company: String,
+          position: String,
+          startDate: String,
+          endDate: String,
+          current: Boolean,
+          location: String,
+          description: [String],
+        },
+      ],
       sectionOrder: {
         type: [String],
-        default: ['summary', 'experience', 'projects', 'education', 'skills'],
+        default: ['summary', 'education', 'experience', 'projects', 'responsibilities', 'skills', 'achievements'],
       },
     },
   },

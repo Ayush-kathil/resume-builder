@@ -7,37 +7,27 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeStore } from '@/store/resumeStore';
-import { exportDocx } from '@/lib/exportDocx';
+// import { exportDocx } from '@/lib/exportDocx';
 import { AIChatbot } from '@/components/builder/AIChatbot';
-import { ATSCheckerModal } from '@/components/builder/ATSCheckerModal';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { CommandPalette } from '@/components/ui/CommandPalette';
+import dynamic from 'next/dynamic';
+
+const PdfExportButton = dynamic(() => import('@/components/builder/PdfExportButton'), {
+  ssr: false,
+});
 
 export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
-  const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const { data, sanitizeData } = useResumeStore();
   
   // Hook up the enterprise auto-save
   const saveStatus = useAutoSave();
-
-
-  const handleExportDocx = async () => {
-    setIsExportingDocx(true);
-    try {
-      await exportDocx(data);
-      setIsExportModalOpen(false);
-    } catch (error) {
-      console.error("Failed to export DOCX:", error);
-    } finally {
-      setIsExportingDocx(false);
-    }
-  };
 
   return (
     <div className="h-screen w-full flex flex-col bg-[#F2F1ED] text-[#1a1a1a] overflow-hidden relative font-sans">
@@ -115,16 +105,7 @@ export default function BuilderPage() {
             Share Link
           </button>
           
-          <button 
-            onClick={() => {
-              sanitizeData();
-              setIsExportModalOpen(true);
-            }}
-            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#1a1a1a] text-[#F2F1ED] text-sm font-medium hover:bg-black transition-all"
-          >
-            <Download className="h-4 w-4" />
-            Export
-          </button>
+          <PdfExportButton data={data} />
         </div>
       </header>
 
@@ -182,11 +163,6 @@ export default function BuilderPage() {
       <CommandPalette />
 
       {/* Modals */}
-      <ATSCheckerModal 
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        data={data}
-      />
       <ShareModal 
         isOpen={isShareModalOpen}
         onClose={() => setIsShareModalOpen(false)}

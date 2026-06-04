@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
-import { Sparkles, GripVertical, Upload, Loader2 } from 'lucide-react';
+import { Sparkles, GripVertical, Upload, Loader2, Undo2, Redo2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ExperienceEditor } from './ExperienceEditor';
@@ -112,9 +112,32 @@ export function EditorPane() {
             onChange={handleFileUpload} 
           />
           <button
+            onClick={() => {
+              useResumeStore.getState().undo();
+              toast.success('Undo');
+            }}
+            disabled={useResumeStore.getState().past.length === 0}
+            className="flex items-center gap-1 bg-[#f9f9f9] hover:bg-[#e5e5e5] text-[#1a1a1a] text-xs font-semibold px-3 py-2 rounded-full transition-all border border-[#e5e5e5] disabled:opacity-50"
+            title="Undo (Ctrl+Z)"
+          >
+            <Undo2 className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => {
+              useResumeStore.getState().redo();
+              toast.success('Redo');
+            }}
+            disabled={useResumeStore.getState().future.length === 0}
+            className="flex items-center gap-1 bg-[#f9f9f9] hover:bg-[#e5e5e5] text-[#1a1a1a] text-xs font-semibold px-3 py-2 rounded-full transition-all border border-[#e5e5e5] disabled:opacity-50"
+            title="Redo (Ctrl+Y)"
+          >
+            <Redo2 className="h-3.5 w-3.5" />
+          </button>
+          
+          <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isParsing}
-            className="flex items-center gap-2 bg-[#f9f9f9] hover:bg-[#e5e5e5] text-[#1a1a1a] text-xs font-semibold px-4 py-2 rounded-full transition-all border border-[#e5e5e5] disabled:opacity-50"
+            className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-black text-white text-xs font-semibold px-4 py-2 rounded-full transition-all disabled:opacity-50 ml-2"
           >
             {isParsing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
             Import PDF

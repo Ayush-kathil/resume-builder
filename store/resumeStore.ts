@@ -2,8 +2,16 @@ import { create } from 'zustand';
 import { ResumeData, initialResumeData, PersonalInfo, Experience, Education, Skill, Project } from '@/types/resume';
 import { sanitizeText } from '@/lib/techDictionary';
 
+export interface ThemeConfig {
+  accentColor: string;
+  fontFamily: 'serif' | 'sans';
+}
+
 interface ResumeState {
   data: ResumeData;
+  themeConfig: ThemeConfig;
+  setThemeConfig: (config: Partial<ThemeConfig>) => void;
+  
   updatePersonalInfo: (info: Partial<PersonalInfo>) => void;
   addExperience: (exp: Experience) => void;
   updateExperience: (id: string, exp: Partial<Experience>) => void;
@@ -42,6 +50,11 @@ interface ResumeState {
 
 export const useResumeStore = create<ResumeState>((set) => ({
   data: initialResumeData,
+  themeConfig: {
+    accentColor: '#000000',
+    fontFamily: 'serif',
+  },
+  setThemeConfig: (config) => set((state) => ({ themeConfig: { ...state.themeConfig, ...config } })),
 
   careerGrade: 'Fresher',
   isEditing: false,
@@ -200,6 +213,8 @@ export const useResumeStore = create<ResumeState>((set) => ({
         education: data.education || [],
         skills: data.skills || [],
         projects: data.projects || [],
+        achievements: data.achievements || [],
+        responsibilities: data.responsibilities || [],
         sectionOrder: data.sectionOrder || initialResumeData.sectionOrder,
       } 
     };
