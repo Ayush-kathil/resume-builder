@@ -47,7 +47,7 @@ export default function LoginPage() {
       if (res?.error) {
         alert("Invalid email or password");
       } else {
-        window.location.href = '/dashboard';
+        window.location.href = '/welcome';
       }
     } catch (error) {
       console.error('Password login failed', error);

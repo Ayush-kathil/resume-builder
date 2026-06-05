@@ -18,9 +18,9 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: Request) {
   try {
-    const { email, otp, password } = await request.json();
+    const { email, name, otp, password } = await request.json();
 
-    if (!email || !otp || !password) {
+    if (!email || !name || !otp || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -56,6 +56,7 @@ export async function POST(request: Request) {
 
     // Create user
     const result = await db.collection("users").insertOne({
+      name,
       email,
       password: hashedPassword,
       emailVerified: new Date(),

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -55,6 +55,7 @@ export default function ProfilePage() {
 
       if (!res.ok) throw new Error(data.error);
       
+      await update({ name });
       toast.success('Profile updated successfully!');
     } catch (err: any) {
       toast.error(err.message || 'Failed to update profile');

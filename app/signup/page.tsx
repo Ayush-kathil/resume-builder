@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { toast } from 'sonner';
 
 export default function SignupPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
@@ -39,8 +40,8 @@ export default function SignupPage() {
   }, [email]);
 
   const handleSendOtp = async () => {
-    if (!email) {
-      toast.error('Please enter your email first.');
+    if (!name || !email) {
+      toast.error('Please enter your name and email first.');
       return;
     }
     setIsSubmitting(true);
@@ -81,7 +82,7 @@ export default function SignupPage() {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp, password })
+        body: JSON.stringify({ name, email, otp, password })
       });
       
       const data = await res.json();
@@ -121,6 +122,19 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-6">
             
             <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-500">Full name</label>
+              <input
+                type="text"
+                required
+                value={name}
+                disabled={otpSent}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all disabled:opacity-50"
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium text-gray-500">Email address</label>
               <div className="flex gap-2">
                 <input
@@ -136,7 +150,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    disabled={isSubmitting || !email || emailExists === true}
+                    disabled={isSubmitting || !name || !email || emailExists === true}
                     className="bg-[#1a1a1a] text-white font-medium rounded-xl px-4 hover:bg-black transition-colors disabled:opacity-50 min-w-[80px] flex items-center justify-center"
                   >
                     {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : 'Verify'}
