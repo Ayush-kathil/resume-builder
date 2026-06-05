@@ -170,6 +170,18 @@ ${rawText}
 
   } catch (error: any) {
     console.error('PDF Parse Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+    
+    let statusCode = 500;
+    let errorMessage = 'An unexpected error occurred while parsing the document.';
+
+    const errStr = error.message || String(error);
+    if (errStr.includes('503') || errStr.toLowerCase().includes('high demand') || errStr.toLowerCase().includes('busy') || errStr.toLowerCase().includes('quota')) {
+      statusCode = 503;
+      errorMessage = 'AI service is temporarily busy due to high demand. Spikes in demand are usually temporary. Please try again in a few moments.';
+    } else {
+      errorMessage = errStr;
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
 }
