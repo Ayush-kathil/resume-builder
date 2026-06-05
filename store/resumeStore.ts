@@ -39,6 +39,8 @@ interface ResumeState {
   sanitizeData: () => void;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
+  activeAccordion: string;
+  setActiveAccordion: (accordion: string) => void;
   atsViewMode: boolean;
   setAtsViewMode: (mode: boolean) => void;
 
@@ -57,6 +59,10 @@ export const useResumeStore = create<ResumeState>((set) => ({
     fontFamily: 'serif',
   },
   setThemeConfig: (config) => set((state) => ({ themeConfig: { ...state.themeConfig, ...config } })),
+
+  activeAccordion: 'summary',
+  setActiveAccordion: (accordion) => set({ activeAccordion: accordion }),
+
 
   careerGrade: 'Fresher',
   isEditing: false,

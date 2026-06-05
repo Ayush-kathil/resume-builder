@@ -213,114 +213,25 @@ export function PreviewPane() {
   };
 
   return (
-    <div className="w-full h-full bg-[#f9f9f9] border-l border-[#e5e5e5] p-8 flex flex-col items-center overflow-y-auto relative print-container custom-scrollbar">
+    <div className="w-full h-full bg-[#F2F1ED] p-8 flex flex-col items-center overflow-y-auto relative print-container custom-scrollbar pb-32">
       
-      {/* Preview Header / Tools */}
-      <div className="w-full max-w-[800px] flex flex-col gap-4 mb-6 print:hidden">
-        <div className="flex flex-col bg-white p-4 rounded-2xl border border-[#e5e5e5] shadow-sm">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-6">
-              
-              {/* Density Analyzer */}
-              <div className="flex items-center gap-2 text-xs font-medium border-r border-[#e5e5e5] pr-6">
-                <FileText className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-500">Density:</span>
-                <span className={`${density.color} ${density.bg} px-2 py-1 rounded-full`}>{density.label}</span>
-              </div>
-
-              {/* Accent Color Picker */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500">Accent:</span>
-                <div className="flex items-center gap-1.5">
-                  {['#000000', '#2563EB', '#10B981', '#8B5CF6', '#F59E0B'].map(color => (
-                    <button
-                      key={color}
-                      onClick={() => useResumeStore.getState().setThemeConfig({ accentColor: color })}
-                      className={`w-5 h-5 rounded-full transition-transform ${useResumeStore.getState().themeConfig.accentColor === color ? 'scale-125 ring-2 ring-offset-1 ring-gray-400' : 'hover:scale-110'}`}
-                      style={{ backgroundColor: color }}
-                      title={color}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Typography Selector */}
-              <div className="flex items-center gap-2 border-l border-[#e5e5e5] pl-6">
-                <span className="text-xs font-medium text-gray-500">Font:</span>
-                <select
-                  value={useResumeStore.getState().themeConfig.fontFamily}
-                  onChange={(e) => useResumeStore.getState().setThemeConfig({ fontFamily: e.target.value as 'serif' | 'sans' })}
-                  className="text-xs border border-[#e5e5e5] rounded-md px-2 py-1 bg-white text-[#1a1a1a] focus:outline-none"
-                >
-                  <option value="serif">Classic Serif</option>
-                  <option value="sans">Modern Sans</option>
-                </select>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setAtsViewMode(!atsViewMode)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                atsViewMode 
-                  ? 'bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-inner' 
-                  : 'bg-[#f9f9f9] text-gray-600 border border-[#e5e5e5] hover:bg-[#e5e5e5]'
-              }`}
-            >
-              <ScanSearch className="w-4 h-4" />
-              {atsViewMode ? 'FAANG Pro-Score Active' : 'Enable FAANG Pro-Score'}
-            </button>
-          </div>
-          
-          <AnimatePresence>
-            {atsViewMode && (
-              <motion.div 
-                initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
-                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                className="overflow-hidden border-t border-[#e5e5e5]"
-              >
-                <div className="pt-4 flex gap-6">
-                  <div className="flex-1">
-                    <label className="block text-xs font-semibold text-gray-600 mb-2">Target Job Description (JD Matcher)</label>
-                    <textarea 
-                      className="w-full h-24 bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg p-3 text-xs text-[#1a1a1a] focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-all custom-scrollbar"
-                      placeholder="Paste the FAANG Job Description here to get a match score and missing keywords..."
-                      value={targetJobDescription}
-                      onChange={(e) => setTargetJobDescription(e.target.value)}
-                    />
-                  </div>
-                  
-                  {targetJobDescription.trim().length > 20 && atsScoreData && (
-                    <div className="w-[200px] flex flex-col justify-center items-center bg-[#f9f9f9] rounded-xl border border-[#e5e5e5] p-4">
-                      <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">ATS Match Score</div>
-                      <div className={`text-4xl font-bold ${atsScoreData.score > 75 ? 'text-emerald-500' : atsScoreData.score > 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                        {atsScoreData.score}%
-                      </div>
-                      {atsScoreData.missing.length > 0 && (
-                        <div className="mt-2 text-center w-full">
-                          <div className="text-[10px] text-gray-500 mb-1">Missing Keywords:</div>
-                          <div className="flex flex-wrap gap-1 justify-center">
-                            {atsScoreData.missing.map((w, i) => (
-                              <span key={i} className="text-[9px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded border border-red-200">
-                                {w}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-4 flex gap-4 text-xs">
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-green-100 border border-green-500 block"></span> <span className="text-gray-600 font-medium">Impact Metrics (Quantified)</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-100 border border-blue-500 block"></span> <span className="text-gray-600 font-medium">Strong FAANG Verbs</span></div>
-                  <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-100 border border-red-500 block"></span> <span className="text-gray-600 font-medium">Weak Action Verbs</span></div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      {/* Floating Formatting Toolbar */}
+      <div className="sticky top-0 z-20 w-auto mb-8 bg-white border border-[#e5e5e5] rounded-full shadow-md px-4 py-2 flex items-center gap-2 text-gray-600 print:hidden transition-all">
+        <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Bold"><strong className="font-serif">B</strong></button>
+        <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Italic"><em className="font-serif">I</em></button>
+        <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Underline"><span className="underline font-serif">U</span></button>
+        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+        <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip text-xs flex gap-1 items-center" title="Text Color">
+          <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: themeConfig.accentColor }}></span>
+        </button>
+        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+        <button 
+          onClick={() => setAtsViewMode(!atsViewMode)}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${atsViewMode ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+        >
+          <ScanSearch className="w-3.5 h-3.5" />
+          {atsViewMode ? 'Pro-Score ON' : 'Pro-Score OFF'}
+        </button>
       </div>
 
       {/* Resume Paper (A4) */}

@@ -192,13 +192,40 @@ export function AIChatbot() {
             )}
 
             {/* Input Area */}
-            <form onSubmit={handleSubmit} className="p-3 border-t border-white/10 bg-[#0a0a0c]">
+            <form onSubmit={handleSubmit} className="p-3 border-t border-white/10 bg-[#0a0a0c] relative">
+              
+              {/* @ Mentions Dropdown */}
+              <AnimatePresence>
+                {input.endsWith('@') && !isTyping && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute bottom-full left-3 mb-2 w-48 bg-gray-900 border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50"
+                  >
+                    <div className="p-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-black/50">Target Section</div>
+                    {['@Summary', '@Experience', '@Education', '@Skills', '@Projects'].map(section => (
+                      <button
+                        key={section}
+                        type="button"
+                        onClick={() => {
+                          setInput(input.slice(0, -1) + section + ' ');
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-gray-200 hover:bg-indigo-600 transition-colors"
+                      >
+                        {section}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="relative flex items-center">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask AI to edit your resume..."
+                  placeholder="Ask AI or type @ to select a section..."
                   className="w-full bg-white/5 border border-white/10 rounded-full pl-4 pr-12 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   disabled={isTyping}
                 />
