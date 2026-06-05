@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IUser extends Document {
   email: string;
   name?: string;
+  password?: string;
   resumeIds: mongoose.Types.ObjectId[];
   tier: 'freemium' | 'premium' | 'enterprise';
   tokenBalance: number;
@@ -23,6 +24,10 @@ const UserSchema = new Schema<IUser>(
     name: {
       type: String,
       trim: true,
+    },
+    password: {
+      type: String,
+      select: false, // Don't return password by default
     },
     resumeIds: [
       {

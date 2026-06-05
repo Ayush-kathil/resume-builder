@@ -27,11 +27,19 @@ export default function Dashboard() {
           </div>
           <span className="font-playfair text-xl tracking-tight font-medium">resume maker</span>
         </Link>
-        <Link href="/">
-          <button className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">
-            Sign out
-          </button>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/profile">
+            <button className="text-sm font-medium hover:opacity-70 transition-opacity flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profile
+            </button>
+          </Link>
+          <Link href="/">
+            <button className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">
+              Sign out
+            </button>
+          </Link>
+        </div>
       </nav>
 
       <div className="max-w-4xl w-full mx-auto space-y-12 relative z-10 flex flex-col items-center flex-1 justify-center pb-20">

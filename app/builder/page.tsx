@@ -25,7 +25,7 @@ export default function BuilderPage() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
-  const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState<'edit' | 'preview' | 'style'>('edit');
   const { data, sanitizeData } = useResumeStore();
   
   // Hook up the enterprise auto-save
@@ -35,18 +35,21 @@ export default function BuilderPage() {
     <div className="h-screen w-full flex flex-col bg-[#F2F1ED] text-[#1a1a1a] overflow-hidden relative font-sans">
       
       {/* Top Navbar */}
-      <header className="h-16 flex-shrink-0 border-b border-[#e5e5e5] bg-white px-6 flex items-center justify-between z-10 relative shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-gray-500 hover:text-[#1a1a1a] transition-colors bg-[#f9f9f9] p-2 rounded-full border border-[#e5e5e5]">
+      <header className="h-16 flex-shrink-0 border-b border-[#e5e5e5] bg-white px-4 md:px-6 flex items-center justify-between z-10 relative shadow-sm">
+        <div className="flex items-center gap-3 md:gap-4">
+          <Link href="/dashboard" className="text-gray-500 hover:text-[#1a1a1a] transition-colors bg-[#f9f9f9] p-2 rounded-full border border-[#e5e5e5]" title="Dashboard">
             <ArrowLeft className="h-4 w-4" />
           </Link>
-          <div className="flex items-center gap-2">
+          <Link href="/profile" className="text-gray-500 hover:text-[#1a1a1a] transition-colors bg-[#f9f9f9] p-2 rounded-full border border-[#e5e5e5]" title="Profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </Link>
+          <div className="hidden md:flex items-center gap-2">
              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-xs">T</div>
              <h1 className="text-sm font-semibold">Talently Resume</h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           {/* Auto-Save Indicator */}
           <div className="hidden md:flex items-center justify-center min-w-[100px] h-9 px-3">
             <AnimatePresence mode="wait">
@@ -87,10 +90,10 @@ export default function BuilderPage() {
           
           <button 
             onClick={() => setIsShareModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm"
+            className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm"
           >
             <Share2 className="h-3.5 w-3.5" />
-            Share
+            <span className="hidden sm:inline">Share</span>
           </button>
           
           <PdfExportButton data={data} />
@@ -98,7 +101,7 @@ export default function BuilderPage() {
       </header>
 
       {/* Main Content Split */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden mb-14 md:mb-0">
         {/* Document Editor & Preview container */}
         <div className="flex-1 flex overflow-hidden relative">
           
@@ -107,7 +110,7 @@ export default function BuilderPage() {
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full md:w-[320px] h-full z-10 bg-[#f9f9f9] border-r border-[#e5e5e5] shadow-sm flex-shrink-0"
+            className={`${showMobilePreview === 'edit' || !showMobilePreview ? 'flex' : 'hidden'} md:flex w-full md:w-[320px] h-full z-10 bg-[#f9f9f9] border-r border-[#e5e5e5] shadow-sm flex-shrink-0 flex-col`}
           >
             <EditorPane />
           </motion.div>
@@ -117,7 +120,7 @@ export default function BuilderPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-            className="hidden md:flex flex-1 h-full z-0 bg-[#F2F1ED] flex-col overflow-hidden"
+            className={`${showMobilePreview === 'preview' ? 'flex' : 'hidden'} md:flex flex-1 h-full z-0 bg-[#F2F1ED] flex-col overflow-hidden`}
           >
             <PreviewPane />
           </motion.div>
@@ -127,7 +130,7 @@ export default function BuilderPage() {
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-            className="hidden md:block w-[280px] h-full z-10 bg-[#f9f9f9] border-l border-[#e5e5e5] shadow-sm flex-shrink-0"
+            className={`${showMobilePreview === 'style' ? 'flex' : 'hidden'} md:flex w-full md:w-[280px] h-full z-10 bg-[#f9f9f9] border-l border-[#e5e5e5] shadow-sm flex-shrink-0 flex-col`}
           >
             <RightSidebar />
           </motion.div>
@@ -135,42 +138,30 @@ export default function BuilderPage() {
         </div>
       </div>
 
-      {/* Mobile Floating Action Button */}
-      <div className="md:hidden fixed bottom-6 right-6 z-40">
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-white border-t border-[#e5e5e5] z-50 flex items-center justify-around px-2 pb-safe">
         <button
-          onClick={() => setShowMobilePreview(true)}
-          className="flex items-center gap-2 px-5 py-3 rounded-full bg-[#1a1a1a] text-white text-sm font-medium hover:bg-black transition-all shadow-lg"
+          onClick={() => setShowMobilePreview('edit')}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${(!showMobilePreview || showMobilePreview === 'edit') ? 'text-blue-600' : 'text-gray-500'}`}
         >
-          <FileText className="h-4 w-4" />
-          Preview
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          <span className="text-[10px] font-medium">Edit</span>
+        </button>
+        <button
+          onClick={() => setShowMobilePreview('preview')}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${showMobilePreview === 'preview' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <FileText className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Preview</span>
+        </button>
+        <button
+          onClick={() => setShowMobilePreview('style')}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${showMobilePreview === 'style' ? 'text-blue-600' : 'text-gray-500'}`}
+        >
+          <Sparkles className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Style</span>
         </button>
       </div>
-
-      {/* Mobile Slide-Over Preview */}
-      <AnimatePresence>
-        {showMobilePreview && (
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="md:hidden fixed inset-0 z-50 bg-[#F2F1ED] flex flex-col pt-4"
-          >
-            <div className="px-4 pb-2 flex justify-between items-center border-b border-[#e5e5e5]">
-              <h2 className="text-[#1a1a1a] font-medium font-playfair">Resume Preview</h2>
-              <button
-                onClick={() => setShowMobilePreview(false)}
-                className="p-2 bg-white rounded-full text-gray-500 hover:text-[#1a1a1a] transition-colors border border-[#e5e5e5]"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <PreviewPane />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       
       <AIChatbot />
       <CommandPalette />
