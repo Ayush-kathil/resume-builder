@@ -65,45 +65,106 @@ export function PreviewPane() {
   };
 
   const renderTemplate = () => {
+    const order = data.sectionOrder || ['summary', 'education', 'achievements', 'projects', 'experience', 'responsibilities', 'skills'];
+
     return (
-      <div className={`w-full min-h-[1131px] bg-white text-black p-10 text-sm flex flex-col ${themeConfig.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}`}>
+      <div className={`w-full min-h-[1131px] bg-white text-black py-8 px-10 flex flex-col ${themeConfig.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}`}>
         {/* Header */}
-        <div className="text-center mb-6 border-b-2 pb-4" style={{ borderColor: themeConfig.accentColor }}>
-          <h1 className="text-3xl font-bold uppercase tracking-wider mb-2" style={{ color: themeConfig.accentColor }}>{data.personalInfo.fullName || "YOUR NAME"}</h1>
-          <div className="flex justify-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700">
-            {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
-            {data.personalInfo.phone && <span>• {data.personalInfo.phone}</span>}
-            {data.personalInfo.location && <span>• {data.personalInfo.location}</span>}
-            {data.personalInfo.linkedin && <span>• {data.personalInfo.linkedin}</span>}
-            {data.personalInfo.github && <span>• {data.personalInfo.github}</span>}
+        <div className="text-center mb-4 border-b-2 pb-2" style={{ borderColor: themeConfig.accentColor }}>
+          <h1 className="text-2xl font-bold uppercase tracking-wider mb-1" style={{ color: themeConfig.accentColor }}>{data.personalInfo.fullName || "YOUR NAME"}</h1>
+          <div className="flex justify-center flex-wrap gap-1 text-[11px] text-gray-800">
+            {data.personalInfo.email && <a href={`mailto:${data.personalInfo.email}`} className="text-blue-600 hover:underline">{data.personalInfo.email}</a>}
+            {(data.personalInfo.email && (data.personalInfo.phone || data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+            
+            {data.personalInfo.phone && <span>{data.personalInfo.phone}</span>}
+            {(data.personalInfo.phone && (data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+            
+            {data.personalInfo.linkedin && <a href={data.personalInfo.linkedin} className="text-blue-600 hover:underline">LinkedIn</a>}
+            {(data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+            
+            {data.personalInfo.github && <a href={data.personalInfo.github} className="text-blue-600 hover:underline">GitHub</a>}
+            {(data.personalInfo.github && data.personalInfo.website) && <span>|</span>}
+            
+            {data.personalInfo.website && <a href={data.personalInfo.website} className="text-blue-600 hover:underline">Portfolio</a>}
           </div>
         </div>
 
         {/* Dynamic Sections */}
         <AnimatePresence>
-          {(data.sectionOrder || ['summary', 'experience', 'projects', 'education', 'skills']).map((sectionId) => {
+          {order.map((sectionId) => {
             if (sectionId === 'summary' && data.personalInfo.summary) {
               return (
-                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="summary" className="mb-4">
-                  <p className="text-justify leading-relaxed">{processATS(data.personalInfo.summary)}</p>
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="summary" className="mb-3">
+                  <p className="text-justify text-[11px] leading-relaxed">{processATS(data.personalInfo.summary)}</p>
+                </motion.div>
+              );
+            }
+            if (sectionId === 'education' && data.education.length > 0) {
+              return (
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="education" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Education</h2>
+                  {data.education.map(edu => (
+                    <div key={edu.id} className="mb-1.5">
+                      <div className="flex justify-between items-baseline font-bold text-[11px]">
+                        <span>{edu.institution}</span>
+                        <span className="font-normal">{edu.location}</span>
+                      </div>
+                      <div className="flex justify-between items-baseline text-[11px] text-gray-800">
+                        <span>{edu.degree} in {edu.fieldOfStudy} {edu.gpa && <span className="font-bold text-black"> CGPA: {edu.gpa}</span>}</span>
+                        <span>{edu.startDate} - {edu.endDate}</span>
+                      </div>
+                      {edu.coursework && (
+                        <div className="text-[11px]"><span className="font-bold">Relevant Coursework:</span> {edu.coursework}</div>
+                      )}
+                    </div>
+                  ))}
+                </motion.div>
+              );
+            }
+            if (sectionId === 'achievements' && data.achievements && data.achievements.length > 0) {
+              return (
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="achievements" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Achievements</h2>
+                  <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
+                    {data.achievements.map((achieve, i) => <li key={i}>{processATS(achieve)}</li>)}
+                  </ul>
+                </motion.div>
+              );
+            }
+            if (sectionId === 'projects' && data.projects.length > 0) {
+              return (
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="projects" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Projects</h2>
+                  {data.projects.map(proj => (
+                    <div key={proj.id} className="mb-2">
+                      <div className="flex justify-between items-baseline text-[11px]">
+                        <div className="font-bold">
+                          {proj.name}
+                          {proj.technologies && proj.technologies.length > 0 && (
+                            <span className="font-normal italic"> | {proj.technologies.join(", ")}</span>
+                          )}
+                        </div>
+                        {proj.url && <a href={proj.url} className="text-blue-600 hover:underline font-normal">[GitHub]</a>}
+                      </div>
+                      <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
+                        {proj.description.map((desc, i) => <li key={i}>{processATS(desc)}</li>)}
+                      </ul>
+                    </div>
+                  ))}
                 </motion.div>
               );
             }
             if (sectionId === 'experience' && data.experience.length > 0) {
               return (
-                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="experience" className="mb-4">
-                  <h2 className="text-lg font-bold uppercase border-b mb-2 pb-1" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Experience</h2>
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="experience" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Experience</h2>
                   {data.experience.map(exp => (
-                    <div key={exp.id} className="mb-3">
-                      <div className="flex justify-between items-baseline font-bold">
-                        <span>{exp.company}</span>
-                        <span className="text-xs font-normal">{exp.location}</span>
+                    <div key={exp.id} className="mb-2">
+                      <div className="flex justify-between items-baseline text-[11px]">
+                        <span className="font-bold">{exp.position} | {exp.company}</span>
+                        <span>{exp.startDate} - {exp.endDate}</span>
                       </div>
-                      <div className="flex justify-between items-baseline italic text-gray-800 mb-1">
-                        <span>{exp.position}</span>
-                        <span className="text-xs font-normal not-italic">{exp.startDate} - {exp.endDate}</span>
-                      </div>
-                      <ul className="list-disc pl-5 space-y-1 text-[13px] leading-snug">
+                      <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
                         {exp.description.map((desc, i) => <li key={i}>{processATS(desc)}</li>)}
                       </ul>
                     </div>
@@ -111,41 +172,18 @@ export function PreviewPane() {
                 </motion.div>
               );
             }
-            if (sectionId === 'education' && data.education.length > 0) {
+            if (sectionId === 'responsibilities' && data.responsibilities && data.responsibilities.length > 0) {
               return (
-                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="education" className="mb-4">
-                  <h2 className="text-lg font-bold uppercase border-b mb-2 pb-1" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Education</h2>
-                  {data.education.map(edu => (
-                    <div key={edu.id} className="mb-2">
-                      <div className="flex justify-between items-baseline font-bold">
-                        <span>{edu.institution}</span>
-                        <span className="text-xs font-normal">{edu.location}</span>
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="responsibilities" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Position of Responsibility</h2>
+                  {data.responsibilities.map(resp => (
+                    <div key={resp.id} className="mb-2">
+                      <div className="flex justify-between items-baseline text-[11px]">
+                        <span className="font-bold">{resp.position} | {resp.company}</span>
+                        <span>{resp.startDate}</span>
                       </div>
-                      <div className="flex justify-between items-baseline text-gray-800">
-                        <span>{edu.degree} in {edu.fieldOfStudy}</span>
-                        <span className="text-xs">{edu.startDate} - {edu.endDate}</span>
-                      </div>
-                      {edu.gpa && <div className="text-[13px] text-gray-600">GPA: {edu.gpa}</div>}
-                    </div>
-                  ))}
-                </motion.div>
-              );
-            }
-            if (sectionId === 'projects' && data.projects.length > 0) {
-              return (
-                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="projects" className="mb-4">
-                  <h2 className="text-lg font-bold uppercase border-b mb-2 pb-1" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Projects</h2>
-                  {data.projects.map(proj => (
-                    <div key={proj.id} className="mb-2">
-                      <div className="font-bold flex items-center gap-2">
-                        {proj.name}
-                        {proj.url && <span className="text-xs font-normal text-blue-600 underline">{proj.url}</span>}
-                      </div>
-                      {proj.technologies && proj.technologies.length > 0 && (
-                        <div className="text-xs italic text-gray-600 mb-1">Technologies: {proj.technologies.join(", ")}</div>
-                      )}
-                      <ul className="list-disc pl-5 space-y-1 text-[13px] leading-snug">
-                        {proj.description.map((desc, i) => <li key={i}>{processATS(desc)}</li>)}
+                      <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
+                        {resp.description.map((desc, i) => <li key={i}>{processATS(desc)}</li>)}
                       </ul>
                     </div>
                   ))}
@@ -154,12 +192,13 @@ export function PreviewPane() {
             }
             if (sectionId === 'skills' && data.skills.length > 0) {
               return (
-                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="skills" className="mb-4">
-                  <h2 className="text-lg font-bold uppercase border-b mb-2 pb-1" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Skills</h2>
-                  <div className="space-y-1">
+                <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} key="skills" className="mb-3">
+                  <h2 className="text-[12px] font-bold uppercase border-b mb-1.5 pb-0.5" style={{ borderColor: themeConfig.accentColor, color: themeConfig.accentColor }}>Skills</h2>
+                  <div className="space-y-0.5 w-full">
                     {data.skills.map(skill => (
-                      <div key={skill.id} className="text-[13px] leading-snug">
-                        <span className="font-bold">{skill.category}:</span> {skill.items.join(", ")}
+                      <div key={skill.id} className="flex text-[11px] leading-snug">
+                        <div className="font-bold w-[130px] flex-shrink-0">{skill.category}:</div>
+                        <div>{skill.items.join(", ")}</div>
                       </div>
                     ))}
                   </div>
