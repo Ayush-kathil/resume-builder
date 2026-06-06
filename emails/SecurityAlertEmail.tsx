@@ -49,7 +49,7 @@ export const SecurityAlertEmail = ({ userName, action, time }: SecurityAlertEmai
             {/* Hero Image */}
             <Section className="w-full">
               <Img 
-                src={`${baseUrl}/emails/security_hero.png`} 
+                src="https://raw.githubusercontent.com/Ayush-kathil/resume-builder/main/public/emails/security_hero_animated.png" 
                 width="100%" 
                 height="auto"
                 alt="Security Alert Graphic" 

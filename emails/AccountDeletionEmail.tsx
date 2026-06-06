@@ -48,7 +48,7 @@ export const AccountDeletionEmail = ({ userName, otp }: AccountDeletionEmailProp
             {/* Hero Image */}
             <Section className="w-full">
               <Img 
-                src={`${baseUrl}/emails/deletion_hero.png`} 
+                src="https://raw.githubusercontent.com/Ayush-kathil/resume-builder/main/public/emails/deletion_hero_animated.png" 
                 width="100%" 
                 height="auto"
                 alt="Account Deletion Graphic" 

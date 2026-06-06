@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     // Send Welcome Email
     if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
       try {
-        const emailHtml = await render(React.createElement(WelcomeEmail, { userName: email.split('@')[0] }));
+        const emailHtml = await render(React.createElement(WelcomeEmail, { userName: name }));
         
         await transporter.sendMail({
           from: `"Resume Builder" <${process.env.SMTP_EMAIL}>`,

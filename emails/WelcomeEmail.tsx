@@ -49,7 +49,7 @@ export const WelcomeEmail = ({ userName = 'there', password }: WelcomeEmailProps
             {/* Hero Image */}
             <Section className="w-full">
               <Img 
-                src={`${baseUrl}/emails/welcome_hero.png`} 
+                src="https://raw.githubusercontent.com/Ayush-kathil/resume-builder/main/public/emails/welcome_hero_animated.png" 
                 width="100%" 
                 height="auto"
                 alt="Welcome Hero Graphic" 
