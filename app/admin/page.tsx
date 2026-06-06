@@ -25,6 +25,7 @@ export default async function AdminDashboard() {
     email: user.email,
     createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : undefined,
     emailVerified: user.emailVerified ? new Date(user.emailVerified).toISOString() : undefined,
+    banned: user.banned || false,
   }));
   
   const passcode = process.env.ADMIN_PASSCODE || "0000";

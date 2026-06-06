@@ -8,6 +8,7 @@ export interface IUser extends Document {
   tier: 'freemium' | 'premium' | 'enterprise';
   tokenBalance: number;
   monthlyLimit: number;
+  banned?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +48,10 @@ const UserSchema = new Schema<IUser>(
     monthlyLimit: {
       type: Number,
       default: 50000, // Default 50k tokens for freemium
+    },
+    banned: {
+      type: Boolean,
+      default: false,
     },
   },
   {

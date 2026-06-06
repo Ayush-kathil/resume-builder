@@ -8,6 +8,8 @@ import { render } from "@react-email/render";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import React from 'react';
 
+import SystemSettings from "@/models/SystemSettings";
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -34,6 +36,11 @@ export async function POST(request: Request) {
         family: 4,
         serverSelectionTimeoutMS: 5000,
       });
+    }
+
+    const settings = await SystemSettings.findOne({});
+    if (settings && settings.allowNewSignups === false) {
+      return NextResponse.json({ error: "New registrations are currently disabled by the administrator." }, { status: 403 });
     }
 
     // Validate OTP

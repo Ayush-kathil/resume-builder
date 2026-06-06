@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { Footer } from '@/components/ui/Footer';
 import { SessionProvider } from '@/components/SessionProvider';
+import { GlobalSettingsWrapper } from '@/components/GlobalSettingsWrapper';
 
 export default function RootLayout({
   children,
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${playfair.variable} ${robotoMono.variable} ${caveat.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased font-sans relative pb-20">
         <SessionProvider>
-          {children}
+          <GlobalSettingsWrapper>
+            {children}
+          </GlobalSettingsWrapper>
           <Footer />
           <Toaster toastOptions={{ className: 'glass text-foreground border-border' }} />
         </SessionProvider>

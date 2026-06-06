@@ -7,6 +7,8 @@ import {
   Preview,
   Text,
   Section,
+  Tailwind,
+  Hr,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -20,85 +22,47 @@ export const AccountDeletionEmail = ({ userName, otp }: AccountDeletionEmailProp
     <Html>
       <Head />
       <Preview>Account Deletion Request - Verification Code</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Heading style={h1}>Account Deletion Request</Heading>
-          <Text style={text}>Hi {userName},</Text>
-          <Text style={text}>
-            We received a request to permanently delete your Resume Maker account and all associated data. If you initiated this request, please use the verification code below to confirm:
-          </Text>
-          <Section style={codeBox}>
-            <Text style={codeText}>{otp}</Text>
-          </Section>
-          <Text style={text}>
-            <strong>Warning:</strong> This action cannot be undone. All your resumes and profile data will be permanently erased.
-          </Text>
-          <Text style={text}>
-            If you did not request this, please ignore this email and your account will remain secure. We also recommend changing your password immediately.
-          </Text>
-          <Text style={footer}>
-            — The Resume Maker Team
-          </Text>
-        </Container>
-      </Body>
+      <Tailwind>
+        <Body className="bg-[#F2F1ED] my-auto mx-auto font-sans text-[#1a1a1a]">
+          <Container className="border border-solid border-[#e5e5e5] bg-white rounded-[2rem] my-[40px] mx-auto p-[30px] sm:p-[50px] w-full max-w-[500px] shadow-xl">
+            <Section className="text-center mb-[32px]">
+              <Heading className="text-[#1a1a1a] text-[24px] font-medium text-center p-0 m-0 tracking-tight font-serif">
+                Account Deletion Request
+              </Heading>
+            </Section>
+            
+            <Text className="text-[#1a1a1a] text-[16px] leading-[26px]">
+              Hi {userName},
+            </Text>
+            
+            <Text className="text-gray-600 text-[15px] leading-[26px]">
+              We received a request to permanently delete your ResumeAI account and all associated data. If you initiated this request, please use the verification code below to confirm:
+            </Text>
+
+            <Section className="bg-gray-50 rounded-2xl p-[24px] my-[32px] border border-solid border-gray-200 text-center">
+              <Text className="text-[32px] font-bold tracking-[8px] m-0 text-[#1a1a1a] font-mono">
+                {otp}
+              </Text>
+            </Section>
+            
+            <Text className="text-red-600 text-[14px] leading-[22px] font-medium">
+              Warning: This action cannot be undone. All your resumes and profile data will be permanently erased.
+            </Text>
+
+            <Text className="text-gray-500 text-[13px] leading-[22px] mt-4">
+              If you did not request this, please ignore this email and your account will remain secure. We also recommend changing your password immediately.
+            </Text>
+            
+            <Hr className="border border-solid border-[#e5e5e5] my-[32px] mx-0 w-full" />
+            
+            <Text className="text-gray-400 text-[13px] leading-[24px] text-center">
+              — The ResumeAI Team
+            </Text>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   );
 };
 
 export default AccountDeletionEmail;
-
-const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-};
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
-  borderRadius: "5px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)",
-  maxWidth: "600px",
-};
-
-const h1 = {
-  color: "#d93025",
-  fontSize: "24px",
-  fontWeight: "600",
-  lineHeight: "40px",
-  margin: "0 0 20px",
-  padding: "0 48px",
-};
-
-const text = {
-  color: "#333",
-  fontSize: "16px",
-  lineHeight: "26px",
-  padding: "0 48px",
-};
-
-const codeBox = {
-  backgroundColor: "#f4f4f4",
-  borderRadius: "4px",
-  margin: "20px 48px",
-  padding: "16px",
-  textAlign: "center" as const,
-};
-
-const codeText = {
-  fontSize: "32px",
-  fontWeight: "bold",
-  letterSpacing: "6px",
-  margin: "0",
-  color: "#333",
-};
-
-const footer = {
-  color: "#8898aa",
-  fontSize: "12px",
-  lineHeight: "16px",
-  padding: "0 48px",
-  marginTop: "48px",
-};

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   ShieldCheck, 
   Users, 
@@ -20,19 +20,26 @@ import {
   AlertCircle,
   Crown,
   Lock,
-  KeyRound
+  KeyRound,
+  AlertTriangle,
+  Fingerprint
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import PromptIDE from "./PromptIDE";
 import CostControls from "./CostControls";
 import HumanReview from "./HumanReview";
+import SystemSettingsTab from "./SystemSettingsTab";
+import AnalyticsDashTab from "./AnalyticsDashTab";
+import SecurityAbuseTab from "./SecurityAbuseTab";
 
 type User = {
   _id: string;
   email: string;
+  name?: string;
   createdAt?: string;
   emailVerified?: string;
+  banned?: boolean;
 };
 
 export default function AdminDashboardClient({ 
@@ -47,11 +54,41 @@ export default function AdminDashboardClient({
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [activeTab, setActiveTab] = useState("users");
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  
+  const [globalSettings, setGlobalSettings] = useState<any>(null);
+
   // Lock Screen State
   const [isLocked, setIsLocked] = useState(true);
   const [passcodeInput, setPasscodeInput] = useState("");
   const [lockError, setLockError] = useState(false);
+
+  useEffect(() => {
+    fetchUsers();
+    fetchSettings();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('/api/admin/users');
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setGlobalSettings(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err);
+    }
+  };
 
   const router = useRouter();
 
@@ -93,6 +130,32 @@ export default function AdminDashboardClient({
     }
   };
 
+  const handleToggleBan = async (id: string, email: string, currentStatus: boolean) => {
+    if (!window.confirm(`Are you sure you want to ${currentStatus ? 'unban' : 'ban'} user ${email}?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ banned: !currentStatus }),
+      });
+
+      if (res.ok) {
+        setUsers(users.map(u => u._id === id ? { ...u, banned: !currentStatus } : u));
+      } else {
+        const data = await res.json();
+        alert(`Failed to update user: ${data.error}`);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred while updating the user.');
+    }
+  };
+
   const tabs = [
     { id: "users", name: "User Directory", icon: Users },
     { id: "security", name: "Security & Abuse", icon: ShieldCheck },
@@ -105,23 +168,30 @@ export default function AdminDashboardClient({
 
   if (isLocked) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#F2F1ED] text-[#1a1a1a] font-sans selection:bg-[#1a1a1a] selection:text-[#F2F1ED]">
-        <div className="w-full max-w-md p-8 bg-white border border-[#e5e5e5] rounded-[2rem] shadow-xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none" />
+      <div className="flex h-screen w-full items-center justify-center bg-[#F2F1ED] text-[#1a1a1a] font-sans selection:bg-[#1a1a1a] selection:text-[#F2F1ED] relative overflow-hidden">
+        {/* Subtle animated background grid */}
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#e5e5e5 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.5 }} />
+        
+        <div className="w-full max-w-md p-10 bg-white border border-[#e5e5e5] rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] relative z-10 overflow-hidden transform transition-all group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 opacity-80" />
           
-          <div className="relative z-10 flex flex-col items-center text-center">
-            <div className="h-16 w-16 bg-[#F2F1ED] rounded-2xl flex items-center justify-center border border-[#e5e5e5] mb-6 shadow-sm">
-              <Lock className="h-8 w-8 text-[#1a1a1a]" />
+          <div className="relative z-20 flex flex-col items-center text-center">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-blue-100 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition-opacity duration-500" />
+              <div className="h-20 w-20 bg-white rounded-2xl flex items-center justify-center border border-[#e5e5e5] shadow-sm relative z-10 overflow-hidden">
+                <Fingerprint className="h-10 w-10 text-indigo-600 absolute transition-transform duration-1000 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/20 to-transparent translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-[2s] ease-in-out" />
+              </div>
             </div>
             
-            <h1 className="text-2xl font-playfair font-medium text-[#1a1a1a] mb-2 tracking-tight">Admin Locked</h1>
-            <p className="text-gray-500 text-sm mb-8">Enter your 4-digit passcode to access the enterprise dashboard.</p>
+            <h1 className="text-3xl font-playfair font-semibold text-[#1a1a1a] mb-2 tracking-tight">Identity Verification</h1>
+            <div className="flex items-center gap-1.5 justify-center mb-10 text-xs font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Enterprise MFA Enforced
+            </div>
             
             <form onSubmit={handleUnlock} className="w-full">
               <div className="relative mb-6">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <KeyRound className="h-5 w-5 text-gray-400" />
-                </div>
                 <input
                   type="password"
                   maxLength={4}
@@ -130,22 +200,25 @@ export default function AdminDashboardClient({
                     setPasscodeInput(e.target.value);
                     setLockError(false);
                   }}
-                  className={`w-full bg-white border ${lockError ? 'border-red-500 focus:ring-red-500' : 'border-[#e5e5e5] focus:ring-black'} rounded-xl py-3 pl-10 pr-4 text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:ring-1 transition-all text-center tracking-[1em] text-lg font-mono`}
+                  className={`w-full bg-[#fafafa] border ${lockError ? 'border-red-400 focus:ring-red-400' : 'border-[#e5e5e5] focus:border-indigo-400 focus:ring-indigo-400'} rounded-2xl py-4 text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:ring-1 transition-all text-center tracking-[1em] text-2xl font-mono shadow-inner`}
                   placeholder="••••"
                   autoFocus
                 />
               </div>
               
               {lockError && (
-                <p className="text-red-500 text-xs mb-4 text-center">Incorrect passcode. Try again.</p>
+                <p className="text-red-500 text-xs mb-6 text-center font-medium bg-red-50 py-2 rounded-lg border border-red-100 flex items-center justify-center gap-1">
+                  <AlertTriangle className="w-3 h-3" />
+                  Authentication failed. Please try again.
+                </p>
               )}
               
               <button
                 type="submit"
                 disabled={passcodeInput.length !== 4}
-                className="w-full bg-[#1a1a1a] hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 text-white font-medium py-3 rounded-full transition-colors"
+                className="w-full bg-[#1a1a1a] hover:bg-black disabled:bg-gray-100 disabled:text-gray-400 disabled:border disabled:border-gray-200 text-white font-medium py-4 rounded-xl transition-all shadow-md active:scale-[0.98]"
               >
-                Unlock Dashboard
+                Authenticate & Access
               </button>
             </form>
           </div>
@@ -266,12 +339,16 @@ export default function AdminDashboardClient({
                           <tr key={user._id} className="hover:bg-gray-50 transition-colors">
                             <td className="py-3 px-6">
                               <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded-full bg-[#F2F1ED] flex items-center justify-center text-xs font-bold border border-[#e5e5e5] text-[#1a1a1a]">
+                                <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs shrink-0">
                                   {user.email.substring(0, 2).toUpperCase()}
                                 </div>
                                 <div>
-                                  <div className="font-medium text-sm text-[#1a1a1a]">{user.email}</div>
-                                  <div className="text-xs text-gray-500">Freemium Plan</div>
+                                  <div className="font-medium text-sm text-[#1a1a1a]">{user.name || "Unknown"}</div>
+                                  <div className="text-xs text-gray-500">
+                                    {globalSettings?.piiMasking && user.email.includes('@') ? 
+                                      `${user.email.split('@')[0].substring(0, 2)}***@${user.email.split('@')[1]}` : 
+                                      user.email}
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -285,11 +362,18 @@ export default function AdminDashboardClient({
                               </div>
                             </td>
                             <td className="py-3 px-6">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-green-50 text-green-700 border border-green-200">
-                                Active
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${user.banned ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                                {user.banned ? 'Banned' : 'Active'}
                               </span>
                             </td>
-                            <td className="py-3 px-6 text-right">
+                            <td className="py-3 px-6 text-right space-x-2">
+                              <button
+                                onClick={() => handleToggleBan(user._id, user.email, user.banned || false)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 transition-colors"
+                                title={user.banned ? "Unban User" : "Ban User"}
+                              >
+                                {user.banned ? 'Unban' : 'Ban'}
+                              </button>
                               <button
                                 onClick={() => handleDeleteUser(user._id, user.email)}
                                 disabled={isDeleting === user._id}
@@ -335,8 +419,29 @@ export default function AdminDashboardClient({
             </div>
           )}
 
+          {/* Tab Content: Settings */}
+          {activeTab === "settings" && (
+            <div className="h-[calc(100vh-140px)]">
+              <SystemSettingsTab />
+            </div>
+          )}
+
+          {/* Tab Content: Analytics */}
+          {activeTab === "analytics" && (
+            <div className="h-[calc(100vh-140px)]">
+              <AnalyticsDashTab />
+            </div>
+          )}
+
+          {/* Tab Content: Security */}
+          {activeTab === "security" && (
+            <div className="h-[calc(100vh-140px)]">
+              <SecurityAbuseTab />
+            </div>
+          )}
+
           {/* Tab Content: Mocked/Coming Soon Tabs */}
-          {activeTab !== "users" && activeTab !== "prompt_ide" && activeTab !== "cost_controls" && activeTab !== "human_review" && (
+          {activeTab !== "users" && activeTab !== "prompt_ide" && activeTab !== "cost_controls" && activeTab !== "human_review" && activeTab !== "settings" && activeTab !== "analytics" && activeTab !== "security" && (
             <div className="bg-white border border-[#e5e5e5] rounded-2xl p-12 text-center shadow-sm relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none" />
               <div className="mx-auto w-16 h-16 bg-[#F2F1ED] rounded-2xl flex items-center justify-center border border-[#e5e5e5] mb-4 shadow-sm">

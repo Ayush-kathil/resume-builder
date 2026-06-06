@@ -7,6 +7,9 @@ import {
   Preview,
   Text,
   Section,
+  Tailwind,
+  Hr,
+  Button
 } from "@react-email/components";
 import * as React from "react";
 
@@ -21,81 +24,60 @@ export const SecurityAlertEmail = ({ userName, action, time }: SecurityAlertEmai
     <Html>
       <Head />
       <Preview>Security Alert: Your account was recently updated</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Heading style={h1}>Security Alert</Heading>
-          <Text style={text}>Hi {userName},</Text>
-          <Text style={text}>
-            We're letting you know that the following action was taken on your account:
-          </Text>
-          <Section style={alertBox}>
-            <Text style={alertText}><strong>Action:</strong> {action}</Text>
-            <Text style={alertText}><strong>Time:</strong> {time}</Text>
-          </Section>
-          <Text style={text}>
-            If you made this change, you don't need to do anything. If you didn't make this change, please reset your password immediately and contact support.
-          </Text>
-          <Text style={footer}>
-            — The Resume Maker Team
-          </Text>
-        </Container>
-      </Body>
+      <Tailwind>
+        <Body className="bg-[#F2F1ED] my-auto mx-auto font-sans text-[#1a1a1a]">
+          <Container className="border border-solid border-[#e5e5e5] bg-white rounded-[2rem] my-[40px] mx-auto p-[30px] sm:p-[50px] w-full max-w-[500px] shadow-xl">
+            <Section className="text-center mb-[32px]">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
+                <span className="text-red-600 text-xl">⚠️</span>
+              </div>
+              <Heading className="text-[#1a1a1a] text-[24px] font-medium text-center p-0 m-0 tracking-tight font-serif">
+                Security Alert
+              </Heading>
+            </Section>
+            
+            <Text className="text-[#1a1a1a] text-[16px] leading-[26px]">
+              Hi {userName},
+            </Text>
+            
+            <Text className="text-gray-600 text-[15px] leading-[26px]">
+              We're letting you know that the following action was taken on your account:
+            </Text>
+
+            <Section className="bg-red-50 rounded-2xl p-[24px] my-[32px] border border-solid border-red-100">
+              <Text className="text-red-800 text-[14px] leading-[22px] m-0 mb-[8px]">
+                <strong>Action Performed:</strong><br/>
+                <span className="text-red-900 font-medium">{action}</span>
+              </Text>
+              <Text className="text-red-800 text-[14px] leading-[22px] m-0">
+                <strong>Timestamp:</strong><br/>
+                <span className="text-red-900 font-mono text-xs">{time}</span>
+              </Text>
+            </Section>
+            
+            <Text className="text-gray-600 text-[15px] leading-[26px]">
+              If you made this change, you don't need to do anything. If you didn't make this change, please secure your account immediately.
+            </Text>
+
+            <Section className="text-center mt-[32px] mb-[32px]">
+              <Button
+                className="bg-[#1a1a1a] rounded-xl text-white text-[14px] font-medium no-underline text-center px-6 py-3 shadow-md hover:bg-black transition-colors"
+                href="https://handhold.io/forgot-password"
+              >
+                Secure My Account
+              </Button>
+            </Section>
+            
+            <Hr className="border border-solid border-[#e5e5e5] my-[32px] mx-0 w-full" />
+            
+            <Text className="text-gray-400 text-[13px] leading-[24px] text-center">
+              — The ResumeAI Security Team
+            </Text>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   );
 };
 
 export default SecurityAlertEmail;
-
-const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-};
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
-  borderRadius: "5px",
-  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.05)",
-  maxWidth: "600px",
-};
-
-const h1 = {
-  color: "#333",
-  fontSize: "24px",
-  fontWeight: "600",
-  lineHeight: "40px",
-  margin: "0 0 20px",
-  padding: "0 48px",
-};
-
-const text = {
-  color: "#333",
-  fontSize: "16px",
-  lineHeight: "26px",
-  padding: "0 48px",
-};
-
-const alertBox = {
-  backgroundColor: "#fff4f4",
-  borderLeft: "4px solid #d93025",
-  margin: "20px 48px",
-  padding: "16px",
-  borderRadius: "4px",
-};
-
-const alertText = {
-  margin: "4px 0",
-  fontSize: "16px",
-  color: "#333",
-};
-
-const footer = {
-  color: "#8898aa",
-  fontSize: "12px",
-  lineHeight: "16px",
-  padding: "0 48px",
-  marginTop: "48px",
-};
