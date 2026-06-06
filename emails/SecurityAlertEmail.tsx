@@ -22,9 +22,9 @@ interface SecurityAlertEmailProps {
 export const SecurityAlertEmail = ({ userName, action, time }: SecurityAlertEmailProps) => {
   return (
     <Html>
-      <Head />
-      <Preview>Security Alert: Your account was recently updated</Preview>
       <Tailwind>
+        <Head />
+        <Preview>Security Alert: Your account was recently updated</Preview>
         <Body className="bg-[#F2F1ED] my-auto mx-auto font-sans text-[#1a1a1a]">
           <Container className="border border-solid border-[#e5e5e5] bg-white rounded-[2rem] my-[40px] mx-auto p-[30px] sm:p-[50px] w-full max-w-[500px] shadow-xl">
             <Section className="text-center mb-[32px]">
