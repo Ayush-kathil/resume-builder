@@ -55,7 +55,7 @@ You MUST actively bias the extraction of their Experience, Skills, and Projects 
       return NextResponse.json({ error: 'GEMINI_API_KEY is missing' }, { status: 500 });
     }
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const prompt = `
 You are an elite Resume Optimizer. 
