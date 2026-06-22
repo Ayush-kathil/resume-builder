@@ -55,7 +55,7 @@ You MUST actively bias the extraction of their Experience, Skills, and Projects 
       return NextResponse.json({ error: 'GEMINI_API_KEY is missing' }, { status: 500 });
     }
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     const prompt = `
 You are an elite Resume Optimizer. 
@@ -177,12 +177,10 @@ ${rawText}
     let errorMessage = 'An unexpected error occurred while parsing the document.';
 
     const errStr = error.message || String(error);
-    if (errStr.includes('503') || errStr.toLowerCase().includes('high demand') || errStr.toLowerCase().includes('busy') || errStr.toLowerCase().includes('quota')) {
-      statusCode = 503;
-      errorMessage = 'AI service is temporarily busy due to high demand. Spikes in demand are usually temporary. Please try again in a few moments.';
-    } else {
-      errorMessage = errStr;
-    }
+    
+    // Return the exact error string so we know if it's 404 Model Not Found or 503 Quota
+    errorMessage = errStr;
+    statusCode = errStr.includes('404') ? 404 : (errStr.includes('503') || errStr.includes('quota') ? 503 : 500);
 
     return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
