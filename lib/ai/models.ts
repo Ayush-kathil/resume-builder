@@ -1,20 +1,20 @@
 export const AI_MODELS = {
   // Fast, cheap models for standard parsing and extraction
-  PARSER: "gemini-3.1-flash",
-  ATS: "gemini-3.1-flash",
-  SKILLS: "gemini-3.1-flash",
-  PROJECTS: "gemini-3.1-flash",
-  CHAT: "gemini-3.1-flash",
+  PARSER: "gemini-2.5-flash",
+  ATS: "gemini-2.5-flash",
+  SKILLS: "gemini-2.5-flash",
+  PROJECTS: "gemini-2.5-flash",
+  CHAT: "gemini-2.5-flash",
 
   // Slower, powerful reasoning models for writing and transformation
-  REWRITER: "gemini-3.1-pro",
-  JD_MATCHER: "gemini-3.1-pro",
-  SUMMARY: "gemini-3.1-pro",
-  MODERNIZE: "gemini-3.1-pro",
-  ENHANCE: "gemini-3.1-pro",
+  REWRITER: "gemini-2.5-pro",
+  JD_MATCHER: "gemini-2.5-pro",
+  SUMMARY: "gemini-2.5-pro",
+  MODERNIZE: "gemini-2.5-pro",
+  ENHANCE: "gemini-2.5-pro",
 };
 
 export const MODEL_FALLBACKS = [
-  "gemini-3.1-flash",
-  "gemini-3.1-pro",
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
 ];

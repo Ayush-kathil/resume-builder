@@ -55,7 +55,9 @@ You MUST actively bias the extraction of their Experience, Skills, and Projects 
       return NextResponse.json({ error: 'GEMINI_API_KEY is missing' }, { status: 500 });
     }
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash' });
+    // Use gemini-2.5-flash as the primary, fallback to pro if needed
+    const primaryModelName = 'gemini-2.5-flash';
+    let model = genAI.getGenerativeModel({ model: primaryModelName });
 
     const prompt = `
 You are an elite Resume Optimizer. 
@@ -153,12 +155,35 @@ ${rawText}
 """
 `;
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
+    let result;
+    try {
+      console.log(`[AI] Attempting generation with primary model: ${primaryModelName}`);
+      result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+        }
+      });
+    } catch (primaryError: any) {
+      console.warn(`[AI] Primary model (${primaryModelName}) failed:`, primaryError.message);
+      
+      // Fallback logic
+      const fallbackModelName = 'gemini-2.5-pro';
+      console.log(`[AI] Attempting fallback with model: ${fallbackModelName}`);
+      
+      try {
+        model = genAI.getGenerativeModel({ model: fallbackModelName });
+        result = await model.generateContent({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+          }
+        });
+      } catch (fallbackError: any) {
+        console.error(`[AI] Fallback model (${fallbackModelName}) also failed:`, fallbackError.message);
+        throw new Error(`Both primary and fallback models failed. Last error: ${fallbackError.message}`);
       }
-    });
+    }
     
     const responseText = result.response.text();
     let jsonData;
@@ -174,14 +199,22 @@ ${rawText}
     console.error('PDF Parse Error:', error);
     
     let statusCode = 500;
-    let errorMessage = 'An unexpected error occurred while parsing the document.';
-
     const errStr = error.message || String(error);
     
-    // Return the exact error string so we know if it's 404 Model Not Found or 503 Quota
-    errorMessage = errStr;
-    statusCode = errStr.includes('404') ? 404 : (errStr.includes('503') || errStr.includes('quota') ? 503 : 500);
+    // User-friendly error mapping
+    let errorMessage = 'An unexpected error occurred while processing your resume.';
+    
+    if (errStr.includes('404') || errStr.includes('not found')) {
+      statusCode = 404;
+      errorMessage = 'The AI model requested is currently unavailable. Please contact support to update the model configuration.';
+    } else if (errStr.includes('503') || errStr.toLowerCase().includes('quota') || errStr.toLowerCase().includes('exhausted')) {
+      statusCode = 503;
+      errorMessage = 'Our AI service is currently experiencing high demand. Please try again in a few moments.';
+    } else if (errStr.includes('401') || errStr.includes('403') || errStr.includes('API_KEY_INVALID')) {
+      statusCode = 401;
+      errorMessage = 'AI service authentication failed. The system API key may be invalid or expired.';
+    }
 
-    return NextResponse.json({ error: errorMessage }, { status: statusCode });
+    return NextResponse.json({ error: errorMessage, details: errStr }, { status: statusCode });
   }
 }
