@@ -18,9 +18,9 @@ export async function GlobalSettingsWrapper({
     }
     settings = await SystemSettings.findOne({}).lean();
   } catch (e) {
-    console.error("Failed to fetch global settings:", e);
+    // Only log a concise warning instead of a massive stack trace 20 times during build
+    console.warn("⚠️ [DB] Could not connect to MongoDB for global settings (likely IP whitelist issue or build phase).");
   }
-
   // If Maintenance Mode is strictly active, show the maintenance screen
   // (We do not block /admin routes because the layout is wrapping everything, so we assume admin knows the direct URL. Wait, if we wrap everything, how does admin access?
   // We should probably allow access to everything, but show the maintenance screen ONLY on non-admin routes. However, next/headers can read the URL.)
