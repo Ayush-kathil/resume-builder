@@ -48,8 +48,8 @@ function CustomDropdown({ value, onChange, options, placeholder, label }: { valu
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">{label}</label>
-      <div className="relative">
+      <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">{label}</label>
+      <div className="relative group">
         <input 
           type="text" 
           value={value} 
@@ -59,19 +59,19 @@ function CustomDropdown({ value, onChange, options, placeholder, label }: { valu
           }} 
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder} 
-          className="w-full bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all font-sans" 
+          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all font-sans shadow-sm" 
         />
-        <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-hover:text-gray-600 transition-colors pointer-events-none" />
       </div>
       
       <AnimatePresence>
         {isOpen && filteredOptions.length > 0 && (
           <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute z-50 w-full mt-2 bg-white border border-[#e5e5e5] rounded-2xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar"
+            initial={{ opacity: 0, y: -5, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -5, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-56 overflow-y-auto custom-scrollbar"
           >
             {filteredOptions.map((opt) => (
               <div 
@@ -80,7 +80,7 @@ function CustomDropdown({ value, onChange, options, placeholder, label }: { valu
                   onChange(opt);
                   setIsOpen(false);
                 }}
-                className="px-5 py-3 hover:bg-[#F2F1ED] cursor-pointer transition-colors text-sm text-[#1a1a1a]"
+                className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors text-sm text-gray-700 hover:text-black border-b border-gray-50 last:border-0"
               >
                 {opt}
               </div>
@@ -230,13 +230,16 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
           <X className="h-6 w-6" />
         </button>
 
-        <div className="flex items-center gap-3 mb-10 text-[#1a1a1a]">
-          <div className="w-8 h-8 rounded-full bg-[#F2F1ED] flex items-center justify-center">
-            <Sparkles className="h-4 w-4" />
+        <div className="flex items-center gap-3 mb-8 text-[#1a1a1a]">
+          <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center shadow-md">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
-          <span className="font-playfair tracking-wide font-medium text-lg">
-            {mode === 'fresh' ? 'AI Setup: Start Fresh' : 'AI Setup: Upgrade Resume'}
-          </span>
+          <div>
+            <span className="font-playfair tracking-wide font-semibold text-xl block leading-none">
+              {mode === 'fresh' ? 'Start Fresh' : 'Upgrade Resume'}
+            </span>
+            <span className="text-xs text-gray-400 font-medium tracking-wider uppercase mt-1 block">AI Setup Wizard</span>
+          </div>
         </div>
 
         {/* Hidden File Input for Upload Mode */}
@@ -253,39 +256,41 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
             
             {/* STEP 1: Core Target */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-                <div>
-                  <h2 className="text-4xl font-playfair font-medium text-[#1a1a1a] mb-3 tracking-tight">Target Role & Aspirations</h2>
-                  <p className="text-gray-500 text-base">Let the AI perfectly align your resume with your next dream role.</p>
+              <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8 pb-4">
+                <div className="border-b border-gray-100 pb-5">
+                  <h2 className="text-3xl font-playfair font-semibold text-[#1a1a1a] mb-2 tracking-tight">Target Role & Aspirations</h2>
+                  <p className="text-gray-500 text-sm">Let our AI perfectly tailor your resume trajectory to your dream role.</p>
                 </div>
                 
                 <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">What is your exact target job title?</label>
+                  <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                    <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-widest">Primary Objective</label>
                     <input 
                       type="text" 
                       value={targetRole} 
                       onChange={e => setTargetRole(e.target.value)} 
-                      placeholder="e.g. Senior Software Engineer" 
-                      className="w-full bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all font-sans" 
+                      placeholder="e.g. Senior Frontend Engineer" 
+                      className="w-full bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-3.5 text-lg text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all font-medium placeholder:font-normal placeholder:text-gray-300" 
                     />
                   </div>
                   
-                  <CustomDropdown 
-                    label="Target Company (Optional)"
-                    value={targetCompany}
-                    onChange={setTargetCompany}
-                    options={ASIAN_COMPANIES}
-                    placeholder="e.g. TCS, Infosys, Flipkart..."
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <CustomDropdown 
+                      label="Target Company"
+                      value={targetCompany}
+                      onChange={setTargetCompany}
+                      options={ASIAN_COMPANIES}
+                      placeholder="e.g. Amazon, Stripe..."
+                    />
 
-                  <CustomDropdown 
-                    label="Key Skills / Technologies to Highlight"
-                    value={targetSkills}
-                    onChange={setTargetSkills}
-                    options={TECH_SKILLS}
-                    placeholder="e.g. React, Next.js, System Design"
-                  />
+                    <CustomDropdown 
+                      label="Core Skills to Inject"
+                      value={targetSkills}
+                      onChange={setTargetSkills}
+                      options={TECH_SKILLS}
+                      placeholder="e.g. React, Node.js"
+                    />
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -327,36 +332,33 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
           </AnimatePresence>
         </div>
 
-        {/* Footer Navigation */}
-        <div className="mt-8 flex justify-between items-center border-t border-[#e5e5e5] pt-8">
-          <div className="flex gap-2">
+        <div className="mt-8 flex justify-between items-center border-t border-gray-100 pt-6">
+          <div className="flex gap-1.5">
             {[1, 2].map((i) => (
-              <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${step >= i ? 'bg-[#1a1a1a]' : 'bg-gray-200'}`} />
+              <div key={i} className={`h-2 rounded-full transition-all duration-300 ${step === i ? 'w-8 bg-black' : step > i ? 'w-2 bg-black' : 'w-2 bg-gray-200'}`} />
             ))}
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {step > 1 && (
-              <button onClick={handlePrev} disabled={isProcessing} className="px-5 py-3 text-sm text-gray-500 hover:text-[#1a1a1a] transition-colors disabled:opacity-50 font-medium">
+              <button onClick={handlePrev} disabled={isProcessing} className="px-5 py-2.5 text-sm text-gray-500 hover:text-black transition-colors disabled:opacity-50 font-semibold hover:bg-gray-50 rounded-xl">
                 Back
               </button>
             )}
             <button
               onClick={handleNext}
               disabled={isProcessing || (step === 1 && !targetRole)}
-              className="group flex items-center gap-3 bg-[#1a1a1a] text-[#F2F1ED] px-8 py-4 rounded-full font-medium hover:bg-black transition-all disabled:opacity-50"
+              className="group flex items-center gap-3 bg-black text-white px-7 py-3 rounded-xl font-medium shadow-lg shadow-black/10 hover:shadow-black/20 hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
               {isProcessing ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /> Processing...</>
+                <><Loader2 className="h-4 w-4 animate-spin" /> Processing</>
               ) : step === 2 ? (
-                mode === 'fresh' ? <><Sparkles className="h-4 w-4" /> Generate</> : 
-                (rawText ? <><FileText className="h-4 w-4" /> Parse Text</> : <><Upload className="h-4 w-4" /> Upload Document</>)
+                mode === 'fresh' ? <><Sparkles className="h-4 w-4 text-yellow-400" /> Generate</> : 
+                (rawText ? <><FileText className="h-4 w-4" /> Parse Text</> : <><Upload className="h-4 w-4" /> Upload PDF</>)
               ) : (
                 <>
-                  <span>Next Step</span>
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <ArrowRight className="h-3 w-3" />
-                  </div>
+                  <span>Continue</span>
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
