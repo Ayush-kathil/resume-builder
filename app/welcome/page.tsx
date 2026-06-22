@@ -10,6 +10,7 @@ export default function WelcomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [displayedText, setDisplayedText] = useState('');
+  const [isTypingDone, setIsTypingDone] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -22,13 +23,15 @@ export default function WelcomePage() {
       const nameParts = session.user.name.split(' ');
       const firstName = nameParts[0] || '';
       const fullText = `hello ${firstName.toLowerCase()}...`;
-      let i = 0;
+      let i = 1;
+      setDisplayedText(fullText.slice(0, 1));
       
       const interval = setInterval(() => {
         setDisplayedText(fullText.slice(0, i));
         i++;
         if (i > fullText.length) {
           clearInterval(interval);
+          setIsTypingDone(true);
           setTimeout(() => {
             router.push('/dashboard');
           }, 1500); // 1.5 seconds pause after typing completes
@@ -59,17 +62,18 @@ export default function WelcomePage() {
         className="text-center flex items-center justify-center"
       >
         <h1 
-          className="text-7xl md:text-9xl text-[#1a1a1a] tracking-tight"
-          style={{ fontFamily: 'var(--font-caveat), cursive', fontStyle: 'italic' }}
+          className="text-7xl md:text-9xl text-[#1a1a1a] tracking-tight font-caveat italic"
         >
           {displayedText}
-          <motion.span
-            animate={{ opacity: [1, 0] }}
-            transition={{ repeat: Infinity, duration: 0.8 }}
-            className="inline-block ml-1 font-sans text-5xl md:text-7xl relative -top-2"
-          >
-            |
-          </motion.span>
+          {!isTypingDone && (
+            <motion.span
+              animate={{ opacity: [1, 0] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              className="inline-block ml-1 font-sans text-5xl md:text-7xl relative -top-2"
+            >
+              |
+            </motion.span>
+          )}
         </h1>
       </motion.div>
     </div>

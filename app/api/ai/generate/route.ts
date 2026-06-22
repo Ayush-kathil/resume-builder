@@ -1,16 +1,38 @@
+import { parseAIJson } from '@/lib/ai/json-parser';
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { AI_MODELS } from '@/lib/ai/models';
+import { aiRateLimiter } from '@/lib/rateLimit';
+
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const data = await req.json();
-    const { 
-      targetRole, targetJD, industryKeywords,
-      achievements, newSkills, gaps,
-      metrics, businessOutcomes, peopleBudgets,
-      tone, layout, sectionsToRemove
-    } = data;
+    // Rate Limiting: Check IP before doing any expensive work
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    if (!aiRateLimiter.check(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a moment before trying again.' },
+        { status: 429 }
+      );
+    }
+
+    const body = await req.json();
+
+    const {
+      targetRole,
+      targetJD,
+      industryKeywords,
+      achievements,
+      newSkills,
+      gaps,
+      metrics,
+      businessOutcomes,
+      peopleBudgets,
+      tone,
+      layout,
+      sectionsToRemove,
+    } = body;
 
     if (!targetRole) {
       return NextResponse.json({ error: 'Target role is required' }, { status: 400 });
@@ -87,21 +109,21 @@ RETURN ONLY VALID JSON. NO MARKDOWN FORMATTING OR BACKTICKS.
 `;
 
     const content = await generateContentWithFallback(
-      prompt, 
+      prompt,
       { temperature: 0.7 },
       AI_MODELS.REWRITER
     );
-    
+
     let text = content.trim();
     text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
 
-    const parsedData = JSON.parse(text);
+    const parsedData = parseAIJson(text);
     return NextResponse.json(parsedData);
 
   } catch (error) {
     console.error('AI Generation Error:', error);
     return NextResponse.json(
-      { error: `Generation Error: ${error instanceof Error ? error.message : String(error)}` }, 
+      { error: `Generation Error: ${error instanceof Error ? error.message : String(error)}` },
       { status: 500 }
     );
   }

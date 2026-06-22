@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/ai/json-parser';
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, Schema } from '@google/generative-ai';
 import { JdMatchingSchema } from '@/lib/ai-pipeline';
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
 
       const prompt = `RESUME JSON:\n${JSON.stringify(resumeData)}\n\nJOB DESCRIPTION:\n${jobDescription}`;
       const result = await model.generateContent(prompt);
-      return JSON.parse(result.response.text());
+      return parseAIJson(result.response.text());
     }, AI_MODELS.JD_MATCHER);
 
     return NextResponse.json({ success: true, data: finalResult });

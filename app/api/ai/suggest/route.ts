@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/ai/json-parser';
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { AI_MODELS } from '@/lib/ai/models';
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
       cleanContent = cleanContent.replace(/^```/, '').replace(/```$/, '').trim();
     }
 
-    const suggestions = JSON.parse(cleanContent);
+    const suggestions = parseAIJson(cleanContent);
     return NextResponse.json({ suggestions });
   } catch (error) {
     console.error('Error generating suggestion:', error);

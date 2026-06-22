@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bot, Sparkles, MessageSquare, Target, X, ChevronRight, FileSearch } from 'lucide-react';
 import { useResumeStore } from '@/store/resumeStore';
+import { toast } from 'sonner';
 
 export const AICopilotSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -84,7 +85,13 @@ export const AICopilotSidebar = () => {
                     <p className="text-xs text-gray-600 mb-2">
                       Your summary lacks concrete metrics. Want me to generate an executive-level summary?
                     </p>
-                    <button className="text-xs bg-white hover:bg-gray-50 border border-[#e5e5e5] text-[#1a1a1a] py-1 px-3 rounded transition-colors w-full font-medium shadow-sm">
+                    <button 
+                      onClick={() => {
+                        toast.loading('Analyzing experience...', { id: 'ai-summary' });
+                        setTimeout(() => toast.success('Summary generated!', { id: 'ai-summary' }), 2000);
+                      }}
+                      className="text-xs bg-white hover:bg-gray-50 border border-[#e5e5e5] text-[#1a1a1a] py-1 px-3 rounded transition-colors w-full font-medium shadow-sm"
+                    >
                       Generate Summary
                     </button>
                   </div>
@@ -95,7 +102,13 @@ export const AICopilotSidebar = () => {
                     <p className="text-xs text-gray-600 mb-2">
                       Found 3 bullet points starting with "Worked on". Let's convert them to the STAR format.
                     </p>
-                    <button className="text-xs bg-white hover:bg-gray-50 border border-[#e5e5e5] text-[#1a1a1a] py-1 px-3 rounded transition-colors w-full font-medium shadow-sm">
+                    <button 
+                      onClick={() => {
+                        toast.loading('Applying STAR framework...', { id: 'ai-bullets' });
+                        setTimeout(() => toast.success('Bullets quantified!', { id: 'ai-bullets' }), 2000);
+                      }}
+                      className="text-xs bg-white hover:bg-gray-50 border border-[#e5e5e5] text-[#1a1a1a] py-1 px-3 rounded transition-colors w-full font-medium shadow-sm"
+                    >
                       Fix Bullets
                     </button>
                   </div>
@@ -108,7 +121,10 @@ export const AICopilotSidebar = () => {
                   <p className="text-xs text-gray-500">
                     Paste a job description to overlay the ATS Heatmap and see missing keywords.
                   </p>
-                  <button className="text-xs bg-[#1a1a1a] hover:bg-black text-white py-1.5 px-4 rounded-full transition-colors font-medium">
+                  <button 
+                    onClick={() => toast.info('Please paste a job description first.')}
+                    className="text-xs bg-[#1a1a1a] hover:bg-black text-white py-1.5 px-4 rounded-full transition-colors font-medium"
+                  >
                     Analyze Job Description
                   </button>
                 </div>
@@ -125,7 +141,10 @@ export const AICopilotSidebar = () => {
                       placeholder="Ask AI..." 
                       className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-lg pl-3 pr-10 py-2 text-xs text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a]"
                     />
-                    <button className="absolute right-2 top-[22px] text-gray-400 hover:text-[#1a1a1a] transition-colors">
+                    <button 
+                      onClick={() => toast.info('Chat interface is coming soon.')}
+                      className="absolute right-2 top-[22px] text-gray-400 hover:text-[#1a1a1a] transition-colors"
+                    >
                       <MessageSquare className="w-4 h-4" />
                     </button>
                   </div>

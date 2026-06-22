@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [confirmDeleteStep, setConfirmDeleteStep] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -35,7 +36,7 @@ export default function ProfilePage() {
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F2F1ED]">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#1a1a1a]" />
       </div>
     );
   }
@@ -90,7 +91,10 @@ export default function ProfilePage() {
   };
 
   const handleRequestDeletion = async () => {
-    if (!window.confirm("Are you absolutely sure you want to delete your account? This action cannot be undone.")) return;
+    if (!confirmDeleteStep) {
+      setConfirmDeleteStep(true);
+      return;
+    }
 
     setIsDeleting(true);
     toast.loading('Sending verification code to your email...', { id: 'delete-req' });
@@ -178,7 +182,7 @@ export default function ProfilePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your full name"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all mb-4"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-[#1a1a1a] focus:border-transparent transition-all mb-4"
               />
               <div className="flex justify-end">
                 <button 
@@ -266,14 +270,23 @@ export default function ProfilePage() {
                 Permanently remove your personal account and all of its contents from our servers. This action is not reversible.
               </p>
             </div>
-            <button 
-              onClick={handleRequestDeletion}
-              disabled={isDeleting}
-              className="px-5 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition-colors shrink-0 flex items-center gap-2 shadow-sm shadow-red-600/20"
-            >
-              {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
-              Delete Account
-            </button>
+            <div className="flex flex-col items-end gap-2">
+              <button 
+                onClick={handleRequestDeletion}
+                disabled={isDeleting}
+                className={`px-5 py-2.5 text-white text-sm font-medium rounded-xl transition-colors shrink-0 flex items-center gap-2 shadow-sm ${
+                  confirmDeleteStep ? 'bg-red-800 hover:bg-red-900 shadow-red-900/20' : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
+                }`}
+              >
+                {isDeleting && <Loader2 className="w-4 h-4 animate-spin" />}
+                {confirmDeleteStep ? 'Are you sure? Click to confirm' : 'Delete Account'}
+              </button>
+              {confirmDeleteStep && (
+                <button onClick={() => setConfirmDeleteStep(false)} className="text-xs text-gray-500 hover:underline">
+                  Cancel deletion
+                </button>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -282,9 +295,12 @@ export default function ProfilePage() {
       {showOtpModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl relative overflow-hidden">
+            <button onClick={() => setShowOtpModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
             <div className="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
             
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 mb-4 mx-auto">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 mb-4 mx-auto mt-2">
               <AlertTriangle className="w-6 h-6" />
             </div>
             
@@ -296,11 +312,13 @@ export default function ProfilePage() {
             <form onSubmit={handleVerifyDeletion}>
               <input 
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                 maxLength={6}
                 placeholder="Enter 6-digit code"
-                className="w-full text-center tracking-[0.5em] text-2xl font-mono px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all mb-6 uppercase"
+                className="w-full text-center tracking-[0.5em] placeholder:tracking-normal text-2xl font-mono px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all mb-6 uppercase"
                 required
               />
 

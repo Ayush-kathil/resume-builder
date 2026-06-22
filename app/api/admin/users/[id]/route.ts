@@ -5,6 +5,11 @@ import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 import { AuditLog } from '@/models/AuditLog';
 
+// Fix Crash #6: Validate ObjectId before using it to prevent Mongoose crashes on invalid IDs.
+function isValidObjectId(id: string): boolean {
+  return /^[a-fA-F0-9]{24}$/.test(id);
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -24,6 +29,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
+    // Fix Crash #6: Validate ObjectId format before querying MongoDB
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
+    }
+
     const client = await clientPromise;
     const db = client.db();
 
@@ -36,10 +46,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Optional: Also clean up any OTPs associated with this user if they exist
-    // If the user had a registered email, we can try to find it first
-    // This is just a nice-to-have cleanup
-    
     // Record Audit Log
     const ip = request.headers.get("x-forwarded-for") || "unknown";
     await AuditLog.create({
@@ -77,6 +83,11 @@ export async function PATCH(
 
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
+
+    // Fix Crash #6: Validate ObjectId format before querying MongoDB
+    if (!isValidObjectId(id)) {
+      return NextResponse.json({ error: 'Invalid user ID format' }, { status: 400 });
     }
 
     const body = await request.json();

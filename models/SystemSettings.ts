@@ -27,7 +27,7 @@ const SystemSettingsSchema = new Schema<ISystemSettings>({
     backgroundColor: { type: String, default: '#1a1a1a' },
     textColor: { type: String, default: '#ffffff' },
   },
-  defaultAiModel: { type: String, default: 'gemini-2.5-flash' },
+  defaultAiModel: { type: String, default: 'gemini-1.5-flash' },
   updatedAt: { type: Date, default: Date.now },
   mfaEnforced: { type: Boolean, default: false },
   sessionTimeout: { type: Number, default: 60 },

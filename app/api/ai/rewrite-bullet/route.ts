@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { AI_MODELS } from '@/lib/ai/models';
+import { validatePrompt } from '@/lib/ai/errors';
 
 export async function POST(req: NextRequest) {
   try {
     const { bullet, company, position } = await req.json();
+
+    // Fix Crash #17: Validate prompt before sending to Gemini
+    validatePrompt(bullet, 'Bullet point');
+
 
     const prompt = `
       You are an expert technical recruiter and FAANG-tier AI resume writer.

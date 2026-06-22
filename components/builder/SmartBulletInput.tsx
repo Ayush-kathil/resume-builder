@@ -44,26 +44,31 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
     >
       <div className="flex items-start gap-2 w-full relative">
         <span className="text-gray-400 mt-2 text-xs">•</span>
-        <textarea
-          className={`w-full bg-[#f9f9f9] border rounded-lg px-3 py-2 text-[#1a1a1a] text-sm focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all min-h-[60px] ${
-            isAiEditing ? 'border-[#1a1a1a] shadow-[0_0_10px_rgba(26,26,26,0.1)]' : 'border-[#e5e5e5]'
-          }`}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={isAiEditing}
-        />
-        <AnimatePresence>
-          {isAiEditing && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute -top-3 -right-3 bg-[#1a1a1a] text-white p-1.5 rounded-full shadow-md flex items-center justify-center z-10"
-            >
-              <Sparkles className="w-4 h-4 animate-pulse" />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div className="relative w-full">
+          <textarea
+            className={`w-full bg-[#f9f9f9] border rounded-lg px-3 py-2 text-[#1a1a1a] text-sm focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all min-h-[60px] ${
+              isAiEditing ? 'border-[#1a1a1a] opacity-50 shadow-[0_0_10px_rgba(26,26,26,0.1)]' : 'border-[#e5e5e5]'
+            }`}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={isAiEditing}
+          />
+          <AnimatePresence>
+            {isAiEditing && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-lg z-10"
+              >
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#1a1a1a] text-white text-xs font-medium rounded-full shadow-md">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse text-amber-300" />
+                  Generating...
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         <div className="absolute right-2 top-2 opacity-0 group-hover/bullet:opacity-100 transition-opacity flex items-center gap-1">
           <button
             onClick={onRemove}

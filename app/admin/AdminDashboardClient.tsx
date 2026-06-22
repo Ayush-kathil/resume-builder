@@ -32,6 +32,7 @@ import HumanReview from "./HumanReview";
 import SystemSettingsTab from "./SystemSettingsTab";
 import AnalyticsDashTab from "./AnalyticsDashTab";
 import SecurityAbuseTab from "./SecurityAbuseTab";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 type User = {
   _id: string;
@@ -358,7 +359,9 @@ export default function AdminDashboardClient({
                             <td className="py-3 px-6 text-gray-500 text-sm">
                               <div className="flex items-center gap-2">
                                 <Calendar className="h-3 w-3" />
-                                {new Date(user.createdAt || user.emailVerified || Date.now()).toLocaleDateString()}
+                                {/* Fix Crash #10: toLocaleDateString() causes SSR/client hydration mismatch.
+                                    Use a fixed format that's identical on server and client. */}
+                                {new Date(user.createdAt || user.emailVerified || Date.now()).toISOString().slice(0, 10)}
                               </div>
                             </td>
                             <td className="py-3 px-6">
@@ -401,44 +404,57 @@ export default function AdminDashboardClient({
           {/* Tab Content: Prompt IDE */}
           {activeTab === "prompt_ide" && (
             <div className="h-[calc(100vh-140px)]">
-              <PromptIDE />
+              <ErrorBoundary label="PromptIDE">
+                <PromptIDE />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* Tab Content: Cost Controls */}
           {activeTab === "cost_controls" && (
             <div className="h-[calc(100vh-140px)]">
-              <CostControls />
+              <ErrorBoundary label="CostControls">
+                <CostControls />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* Tab Content: Human Review */}
           {activeTab === "human_review" && (
             <div className="h-[calc(100vh-140px)]">
-              <HumanReview />
+              <ErrorBoundary label="HumanReview">
+                <HumanReview />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* Tab Content: Settings */}
           {activeTab === "settings" && (
             <div className="h-[calc(100vh-140px)]">
-              <SystemSettingsTab />
+              <ErrorBoundary label="SystemSettings">
+                <SystemSettingsTab />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* Tab Content: Analytics */}
           {activeTab === "analytics" && (
             <div className="h-[calc(100vh-140px)]">
-              <AnalyticsDashTab />
+              <ErrorBoundary label="Analytics">
+                <AnalyticsDashTab />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* Tab Content: Security */}
           {activeTab === "security" && (
             <div className="h-[calc(100vh-140px)]">
-              <SecurityAbuseTab />
+              <ErrorBoundary label="Security">
+                <SecurityAbuseTab />
+              </ErrorBoundary>
             </div>
           )}
+
 
           {/* Tab Content: Mocked/Coming Soon Tabs */}
           {activeTab !== "users" && activeTab !== "prompt_ide" && activeTab !== "cost_controls" && activeTab !== "human_review" && activeTab !== "settings" && activeTab !== "analytics" && activeTab !== "security" && (

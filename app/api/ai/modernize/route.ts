@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/ai/json-parser';
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI, SchemaType, Schema } from '@google/generative-ai';
 import { AI_MODELS } from '@/lib/ai/models';
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
 
       const prompt = `Modernize this legacy resume:\n\n${JSON.stringify(legacyResume)}`;
       const result = await model.generateContent(prompt);
-      return JSON.parse(result.response.text());
+      return parseAIJson(result.response.text());
     }, AI_MODELS.MODERNIZE);
 
     return NextResponse.json({ success: true, data: finalResult });

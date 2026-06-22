@@ -5,6 +5,7 @@ import { CheckCircle2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -12,6 +13,7 @@ export default function SignupPage() {
   const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const router = useRouter();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -89,7 +91,7 @@ export default function SignupPage() {
       
       if (res.ok) {
         toast.success("Account created successfully!");
-        window.location.href = '/login?registered=true';
+        router.push('/login?registered=true');
       } else {
         toast.error(data.error || 'Signup failed');
       }
@@ -104,7 +106,7 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen w-full flex bg-white text-[#1a1a1a] font-sans">
       {/* Left Column - Form */}
-      <div className="w-full lg:w-1/2 flex flex-col p-8 lg:p-16 xl:p-24 justify-center relative">
+      <div className="w-full lg:w-1/2 flex flex-col p-5 sm:p-8 lg:p-16 xl:p-24 justify-center relative">
         <Link href="/" className="absolute top-8 left-8 lg:top-12 lg:left-12 flex items-center gap-2 group">
           <div className="flex gap-[2px]">
             <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
@@ -151,7 +153,8 @@ export default function SignupPage() {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSubmitting || !name || !email || emailExists === true}
-                    className="bg-[#1a1a1a] text-white font-medium rounded-xl px-4 hover:bg-black transition-colors disabled:opacity-50 min-w-[80px] flex items-center justify-center"
+                    title={emailExists === true ? "This email is already registered" : ""}
+                    className="bg-[#1a1a1a] text-white font-medium rounded-xl px-4 hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px] flex items-center justify-center"
                   >
                     {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : 'Verify'}
                   </button>
@@ -161,9 +164,11 @@ export default function SignupPage() {
                   </div>
                 )}
               </div>
-              {emailExists === true && (
-                <p className="text-red-500 text-xs mt-1">This email is already registered. Please log in.</p>
-              )}
+              <div className="min-h-[20px] mt-1">
+                {emailExists === true && (
+                  <p className="text-red-500 text-xs">This email is already registered. Please log in.</p>
+                )}
+              </div>
             </div>
 
             {otpSent && (
@@ -177,7 +182,7 @@ export default function SignupPage() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                     placeholder="Enter 6-digit code"
-                    className="w-full tracking-widest bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
+                    className="w-full tracking-widest placeholder:tracking-normal bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
                   />
                 </div>
 
@@ -209,7 +214,7 @@ export default function SignupPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || !otp || !password || !confirmPassword}
-                    className="w-full bg-[#1a1a1a] text-white font-medium rounded-full py-2.5 px-6 hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center"
+                    className="w-full bg-[#1a1a1a] text-white font-medium rounded-full py-2.5 px-6 hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin text-white" /> : 'Create account'}
                   </button>
@@ -218,12 +223,14 @@ export default function SignupPage() {
             )}
           </form>
 
-          <div className="mt-12 text-sm text-gray-500">
-            Already have an account?{' '}
-            <Link href="/login" className="text-[#1a1a1a] font-medium hover:underline transition-colors">
-              Log in
-            </Link>
-          </div>
+          {!otpSent && (
+            <div className="mt-12 text-sm text-gray-500">
+              Already have an account?{' '}
+              <Link href="/login" className="text-[#1a1a1a] font-medium hover:underline transition-colors">
+                Log in
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

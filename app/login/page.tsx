@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailExists, setEmailExists] = useState<boolean | null>(null);
+  const searchParams = useSearchParams();
+  const isExpired = searchParams.get('expired') === 'true';
+
 
   useEffect(() => {
     if (!email || !email.includes('@')) {
@@ -70,6 +74,13 @@ export default function LoginPage() {
         </Link>
 
         <div className="max-w-md w-full mx-auto">
+          {/* Fix Crash #18: Session expired banner shown when redirected from a protected route */}
+          {isExpired && (
+            <div className="mb-6 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 text-sm flex items-center gap-2">
+              <span>⚠️</span>
+              <span>Your session has expired. Please sign in again to continue.</span>
+            </div>
+          )}
           <h1 className="text-4xl lg:text-5xl font-playfair font-medium tracking-tight mb-12">
             Sign in
           </h1>
@@ -85,9 +96,11 @@ export default function LoginPage() {
                 placeholder="Enter your email"
                 className="w-full bg-[#f9f9f9] border border-[#e5e5e5] rounded-xl py-3 px-4 text-[#1a1a1a] placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all"
               />
-              {emailExists === false && email.includes('@') && (
-                <p className="text-red-500 text-xs mt-1">Account not found. Please sign up first.</p>
-              )}
+              <div className="min-h-[20px] mt-1">
+                {emailExists === false && email.includes('@') && (
+                  <p className="text-red-500 text-xs">Account not found. Please sign up first.</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -139,5 +152,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
   );
 }

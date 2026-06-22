@@ -14,6 +14,7 @@ import { SyncModal } from '@/components/builder/SyncModal';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import dynamic from 'next/dynamic';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const PdfExportButton = dynamic(() => import('@/components/builder/PdfExportButton'), {
   ssr: false,
@@ -112,7 +113,9 @@ export default function BuilderPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className={`${showMobilePreview === 'edit' || !showMobilePreview ? 'flex' : 'hidden'} md:flex w-full md:w-[320px] h-full z-10 bg-[#f9f9f9] border-r border-[#e5e5e5] shadow-sm flex-shrink-0 flex-col`}
           >
-            <EditorPane />
+            <ErrorBoundary label="EditorPane">
+              <EditorPane />
+            </ErrorBoundary>
           </motion.div>
 
           {/* Middle Column: Preview Canvas */}
@@ -122,7 +125,9 @@ export default function BuilderPage() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             className={`${showMobilePreview === 'preview' ? 'flex' : 'hidden'} md:flex flex-1 h-full z-0 bg-[#F2F1ED] flex-col overflow-hidden`}
           >
-            <PreviewPane />
+            <ErrorBoundary label="PreviewPane">
+              <PreviewPane />
+            </ErrorBoundary>
           </motion.div>
 
           {/* Right Column: Settings & Insights */}
@@ -132,7 +137,9 @@ export default function BuilderPage() {
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
             className={`${showMobilePreview === 'style' ? 'flex' : 'hidden'} md:flex w-full md:w-[280px] h-full z-10 bg-[#f9f9f9] border-l border-[#e5e5e5] shadow-sm flex-shrink-0 flex-col`}
           >
-            <RightSidebar />
+            <ErrorBoundary label="RightSidebar">
+              <RightSidebar />
+            </ErrorBoundary>
           </motion.div>
 
         </div>

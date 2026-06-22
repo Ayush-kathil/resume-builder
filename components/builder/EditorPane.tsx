@@ -15,7 +15,7 @@ import { AICopilotSidebar } from './AICopilot';
 import Link from 'next/link';
 
 export function EditorPane() {
-  const { data, updatePersonalInfo, setResumeData, setSectionOrder } = useResumeStore();
+  const { data, updatePersonalInfo, setResumeData, setSectionOrder, undo, redo, activeAccordion, setActiveAccordion } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,21 +28,18 @@ export function EditorPane() {
       if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
         e.preventDefault();
         if (e.shiftKey) {
-          useResumeStore.getState().redo();
-          toast.success('Redo');
+          redo();
         } else {
-          useResumeStore.getState().undo();
-          toast.success('Undo');
+          undo();
         }
       } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
         e.preventDefault();
-        useResumeStore.getState().redo();
-        toast.success('Redo');
+        redo();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [undo, redo]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,7 +92,7 @@ export function EditorPane() {
           className="space-y-2"
         >
           {(data.sectionOrder || ['summary', 'experience', 'projects', 'education', 'skills']).map((sectionId) => {
-            const isActive = useResumeStore.getState().activeAccordion === sectionId;
+            const isActive = activeAccordion === sectionId;
 
             const sectionTitles: Record<string, string> = {
               'summary': 'Professional Summary',
@@ -115,7 +112,7 @@ export function EditorPane() {
                   className={`px-4 py-3 flex justify-between items-center bg-white hover:bg-gray-50 transition-colors ${isActive ? 'border-b border-[#e5e5e5]' : ''}`}
                   onPointerDown={(e) => {
                     // Prevent drag when clicking the toggle itself
-                    useResumeStore.getState().setActiveAccordion(isActive ? '' : sectionId);
+                    setActiveAccordion(isActive ? '' : sectionId);
                   }}
                 >
                   <h3 className="text-sm font-semibold text-[#1a1a1a]">

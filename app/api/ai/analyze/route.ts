@@ -3,6 +3,7 @@ import { GoogleGenerativeAI, Schema } from '@google/generative-ai';
 import { ExperienceAnalysisSchema, SkillAnalysisSchema, ProjectAnalysisSchema, AtsAnalysisSchema } from '@/lib/ai-pipeline';
 import { AI_MODELS } from '@/lib/ai/models';
 import { executeWithRetry } from '@/lib/ai/retry';
+import { parseAIJson } from '@/lib/ai/json-parser';
 
 export async function POST(req: Request) {
   try {
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
 
       const prompt = `Analyze the following resume JSON:\n\n${JSON.stringify(resumeData, null, 2)}`;
       const result = await model.generateContent(prompt);
-      return JSON.parse(result.response.text());
+      return parseAIJson(result.response.text());
     }, preferredModel);
 
     return NextResponse.json({ success: true, data: finalResult });

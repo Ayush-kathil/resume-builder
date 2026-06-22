@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/ai/json-parser';
 import { NextResponse } from 'next/server';
 import { generateContentWithFallback } from '@/lib/gemini';
 import { AI_MODELS } from '@/lib/ai/models';
@@ -39,7 +40,7 @@ ${JSON.stringify(resumeData)}
       cleanContent = cleanContent.replace(/^```/, '').replace(/```$/, '').trim();
     }
 
-    const parsedData = JSON.parse(cleanContent);
+    const parsedData = parseAIJson(cleanContent);
     return NextResponse.json(parsedData);
 
   } catch (error) {

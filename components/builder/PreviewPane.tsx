@@ -213,10 +213,10 @@ export function PreviewPane() {
   };
 
   return (
-    <div className="w-full h-full bg-[#F2F1ED] p-8 flex flex-col items-center overflow-y-auto relative print-container custom-scrollbar pb-32">
+    <div className="w-full h-full bg-[#F2F1ED] p-4 md:p-8 overflow-auto relative print-container custom-scrollbar pb-32">
       
       {/* Floating Formatting Toolbar */}
-      <div className="sticky top-0 z-20 w-auto mb-8 bg-white border border-[#e5e5e5] rounded-full shadow-md px-4 py-2 flex items-center gap-2 text-gray-600 print:hidden transition-all">
+      <div className="sticky top-0 z-20 w-max mx-auto mb-8 bg-white border border-[#e5e5e5] rounded-full shadow-md px-4 py-2 flex items-center gap-2 text-gray-600 print:hidden transition-all">
         <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Bold"><strong className="font-serif">B</strong></button>
         <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Italic"><em className="font-serif">I</em></button>
         <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Underline"><span className="underline font-serif">U</span></button>
@@ -238,7 +238,7 @@ export function PreviewPane() {
       <div 
         ref={resumeRef}
         id="resume-preview"
-        className="w-full max-w-[800px] transition-all duration-300 print:max-w-none print:w-full print:p-0 print:shadow-none print:bg-white relative shadow-2xl"
+        className="mx-auto w-[800px] min-w-[800px] transition-all duration-300 print:min-w-0 print:max-w-none print:w-full print:p-0 print:shadow-none print:bg-white relative shadow-2xl"
       >
         {renderTemplate()}
 
