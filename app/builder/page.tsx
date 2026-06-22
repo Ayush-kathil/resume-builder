@@ -12,6 +12,7 @@ import { AIChatbot } from '@/components/builder/AIChatbot';
 import { ShareModal } from '@/components/builder/ShareModal';
 import { SyncModal } from '@/components/builder/SyncModal';
 import { useAutoSave } from '@/hooks/useAutoSave';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -31,9 +32,15 @@ export default function BuilderPage() {
   
   // Hook up the enterprise auto-save
   const saveStatus = useAutoSave();
+  
+  // Hook up time-travel debugging (Undo/Redo) via keyboard
+  useKeyboardShortcuts();
+  
+  // Pull undo/redo functions for UI buttons
+  const { undo, redo, past, future } = useResumeStore();
 
   return (
-    <div className="h-screen w-full flex flex-col bg-[#F2F1ED] text-[#1a1a1a] overflow-hidden relative font-sans">
+    <div className="h-[100dvh] w-full flex flex-col bg-background text-foreground overflow-hidden relative font-sans selection:bg-black selection:text-white">
       
       {/* Top Navbar */}
       <header className="h-16 flex-shrink-0 border-b border-[#e5e5e5] bg-white px-4 md:px-6 flex items-center justify-between z-10 relative shadow-sm">
@@ -89,6 +96,25 @@ export default function BuilderPage() {
             Analyze
           </button>
           
+          <div className="flex items-center gap-1 md:gap-2 mr-2 border-r border-gray-200 pr-2">
+            <button
+              onClick={undo}
+              disabled={past.length === 0}
+              className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              title="Undo (Ctrl+Z)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            </button>
+            <button
+              onClick={redo}
+              disabled={future.length === 0}
+              className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              title="Redo (Ctrl+Y)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+            </button>
+          </div>
+
           <button 
             onClick={() => setIsShareModalOpen(true)}
             className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-all shadow-sm"
@@ -97,7 +123,9 @@ export default function BuilderPage() {
             <span className="hidden sm:inline">Share</span>
           </button>
           
-          <PdfExportButton data={data} />
+          <div className="min-w-[130px] flex justify-end">
+            <PdfExportButton data={data} />
+          </div>
         </div>
       </header>
 

@@ -29,6 +29,21 @@ export function ExperienceEditor() {
       </div>
 
       <div className="space-y-6">
+        {data.experience.length === 0 && (
+          <div className="flex flex-col items-center justify-center p-8 bg-[#f9f9f9] border border-dashed border-[#e5e5e5] rounded-xl text-center">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-[#e5e5e5]">
+              <Sparkles className="w-5 h-5 text-gray-400" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-900 mb-1">No experience added yet</h4>
+            <p className="text-xs text-gray-500 max-w-[200px] mb-4">Add your work history to start building your professional profile.</p>
+            <button 
+              onClick={() => addExperience({ id: uuidv4(), company: '', position: '', startDate: '', endDate: '', current: false, location: '', description: [''] })}
+              className="text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors shadow-sm"
+            >
+              Add Experience
+            </button>
+          </div>
+        )}
         {data.experience.map((exp, index) => (
           <div key={exp.id} className="p-4 bg-white border border-[#e5e5e5] rounded-xl relative group hover:shadow-md transition-shadow">
             <button 

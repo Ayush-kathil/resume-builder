@@ -61,16 +61,16 @@ function LoginPageInner() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white text-[#1a1a1a] font-sans">
+    <div className="min-h-screen w-full flex bg-background text-foreground font-sans selection:bg-[#1a1a1a] selection:text-[#F2F1ED]">
       {/* Left Column - Form */}
       <div className="w-full lg:w-1/2 flex flex-col p-8 lg:p-16 xl:p-24 justify-center relative">
         <Link href="/" className="absolute top-8 left-8 lg:top-12 lg:left-12 flex items-center gap-2 group">
           <div className="flex gap-[2px]">
-            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
-            <div className="w-1.5 h-6 bg-[#1a1a1a] rounded-full translate-y-[-4px]"></div>
-            <div className="w-1.5 h-4 bg-[#1a1a1a] rounded-full"></div>
+            <div className="w-1.5 h-4 bg-foreground rounded-full"></div>
+            <div className="w-1.5 h-6 bg-foreground rounded-full translate-y-[-4px]"></div>
+            <div className="w-1.5 h-4 bg-foreground rounded-full"></div>
           </div>
-          <span className="font-playfair text-xl tracking-tight text-[#1a1a1a]">resume maker</span>
+          <span className="font-playfair text-xl tracking-tight text-foreground">resume maker</span>
         </Link>
 
         <div className="max-w-md w-full mx-auto">

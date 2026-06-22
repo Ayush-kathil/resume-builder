@@ -1,7 +1,7 @@
 'use client';
 
 import { useResumeStore } from '@/store/resumeStore';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Sparkles } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { motion } from 'framer-motion';
@@ -27,6 +27,21 @@ export function ProjectsEditor() {
       </div>
 
       <div className="space-y-6">
+        {data.projects.length === 0 && (
+          <div className="flex flex-col items-center justify-center p-8 bg-[#f9f9f9] border border-dashed border-[#e5e5e5] rounded-xl text-center">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 border border-[#e5e5e5]">
+              <Sparkles className="w-5 h-5 text-gray-400" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-900 mb-1">No projects added yet</h4>
+            <p className="text-xs text-gray-500 max-w-[200px] mb-4">Showcase your side projects, open-source contributions, or portfolio work.</p>
+            <button 
+              onClick={() => addProject({ id: uuidv4(), name: '', description: [], url: '', technologies: [] })}
+              className="text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-full transition-colors shadow-sm"
+            >
+              Add Project
+            </button>
+          </div>
+        )}
         {data.projects.map((project) => (
           <div key={project.id} className="p-4 bg-white border border-[#e5e5e5] rounded-xl relative group hover:shadow-md transition-shadow">
             <button 

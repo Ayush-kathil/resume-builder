@@ -297,31 +297,31 @@ export function SmartSetupModal({ isOpen, mode, onClose }: SmartSetupModalProps)
 
             {/* STEP 2: Updates & Import */}
             {step === 2 && (
-              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-                <div>
-                  <h2 className="text-4xl font-playfair font-medium text-[#1a1a1a] mb-3 tracking-tight">{mode === 'fresh' ? 'Recent Achievements' : 'Import Your Data'}</h2>
-                  <p className="text-gray-500 text-base">{mode === 'fresh' ? 'What have you achieved recently?' : 'Paste text from LinkedIn, or simply click upload for your PDF/DOCX.'}</p>
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8 pb-4">
+                <div className="border-b border-gray-100 pb-5">
+                  <h2 className="text-3xl font-playfair font-semibold text-[#1a1a1a] mb-2 tracking-tight">{mode === 'fresh' ? 'Recent Achievements' : 'Import Your Data'}</h2>
+                  <p className="text-gray-500 text-sm">{mode === 'fresh' ? 'What have you achieved recently? Give us the raw highlights.' : 'Paste text from LinkedIn, or simply click upload for your PDF/DOCX.'}</p>
                 </div>
                 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Any specific achievements to guarantee inclusion? (Optional)</label>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Any specific achievements to guarantee inclusion? (Optional)</label>
                     <textarea 
                       value={achievements} 
                       onChange={e => setAchievements(e.target.value)} 
                       placeholder="e.g. Led a team of 5, increased sales by 20%, won Hackathon..." 
-                      className="w-full h-24 bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all resize-none font-sans" 
+                      className="w-full h-24 bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all resize-none font-sans shadow-sm" 
                     />
                   </div>
                   
                   {mode === 'upload' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">Paste Raw Text (LinkedIn, Portfolio)</label>
+                      <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Paste Raw Text (LinkedIn, Portfolio)</label>
                       <textarea 
                         value={rawText} 
                         onChange={e => setRawText(e.target.value)} 
                         placeholder="Leave blank to upload a file instead..." 
-                        className="w-full h-32 bg-[#F2F1ED] border border-[#e5e5e5] rounded-2xl px-5 py-4 text-[#1a1a1a] focus:outline-none focus:border-[#1a1a1a] transition-all resize-none font-sans" 
+                        className="w-full h-32 bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all resize-none font-sans shadow-sm" 
                       />
                     </div>
                   )}
