@@ -60,27 +60,47 @@ You MUST actively bias the extraction of their Experience, Skills, and Projects 
     let model = genAI.getGenerativeModel({ model: primaryModelName });
 
     const prompt = `
-You are an elite Resume Optimizer. 
-Your goal is to parse the raw text of the user's resume below and extract it into a strictly formatted JSON structure.
+You are an elite Senior Technical Recruiter at Google. 
+Your goal is to parse the raw text of the user's resume below and extract it into a strictly formatted JSON structure that meets the highest FAANG hiring bars.
 ${setupContext}
 
-CRITICAL INSTRUCTIONS FOR A STRICT 1-PAGE, HUMANIZED RESUME:
-1. STRICT LENGTH LIMITS (1-PAGE RULE):
-   - Keep the summary to a maximum of 2 short, impactful sentences.
-   - Limit Experience bullet points to MAXIMUM 3-4 bullets per job. Only keep the most impactful achievements.
-   - Limit Projects to a MAXIMUM of 2-3 best projects. Discard minor or irrelevant projects. Limit project bullets to 2-3.
-2. 100% HUMANIZED LANGUAGE (NO AI BUZZWORDS):
-   - DO NOT use obvious AI words like: "Spearheaded", "Architected", "Engineered", "Orchestrated", "Delve", "Synergized", "Revolutionized", "Pioneered".
-   - Use natural, professional, and grounded action verbs (e.g., Developed, Built, Led, Managed, Created, Improved).
-   - Write in a tone that sounds like a real senior professional wrote it, not an AI.
-3. FORMATTING:
-   - Rewrite bullet points to focus on Impact (What you did + What the result was).
-   - Do NOT hallucinate entirely new jobs or fake metrics, but optimize the existing ones.
-   - Tailor and group skills logically (Languages, Frameworks, Tools) based on modern job requirements.
-   - For 'achievements', meticulously extract LeetCode/CodeChef ratings, Hackathon ranks, and awards as a simple array of strings.
-   - For 'responsibilities', extract leadership roles and extracurriculars. 
-   - CRITICAL DUPLICATION RULE: Ensure ABSOLUTELY NO DUPLICATES exist within or across any sections. An item must belong to ONE section only. If it's a job/internship, put it ONLY in 'experience'. If it's a club/volunteer role, put it ONLY in 'responsibilities'. NEVER output the exact same company/role twice.
-   - For 'projects' and 'experience', generate EXACTLY 2-3 highly impactful, pro-level, 100% humanized bullet points per item. Emphasize senior-level phrasing. Perfect balance between technical metrics and natural language. Avoid robotic extremes.
+CRITICAL FAANG-LEVEL INSTRUCTIONS (THE 10 ENGINE DIRECTIVES & 20 ERROR DESTRUCTIONS):
+
+1. STRICT LENGTH & VISUAL HIERARCHY (1-PAGE RULE):
+   - Keep the summary to a maximum of 2 short, impactful sentences. No Objective Statements (e.g. "Seeking a software engineering role").
+   - Limit Experience to MAXIMUM 4 bullets per job. Limit Projects to 2-3 best projects with max 3 bullets each.
+   - Ruthlessly summarize to prevent "orphan lines" (single words wrapping to a new line) and exceeding 1 page.
+
+2. THE STAR / XYZ FRAMEWORK ENFORCER:
+   - EVERY single bullet point MUST be rewritten into the XYZ format: "Accomplished [X] as measured by [Y], by doing [Z]".
+   - Distinguish between "Impact" (what value was delivered) and "Duty" (what they were told to do). Delete task-based bullets entirely.
+
+3. METRIC & QUANTIFICATION VALIDATOR:
+   - Hunt down "Ghost Metrics" (e.g. "improved performance significantly"). You MUST quantify bullet points (%, $, ms, users). If no metric exists, intelligently extrapolate a realistic scale based on context, but do not hallucinate fake numbers randomly.
+
+4. ACTION-VERB OPTIMIZER & LANGUAGE:
+   - DESTROY weak openers ("Worked on", "Responsible for", "Helped with", "Duties included").
+   - REPLACE them with elite verbs ("Architected", "Engineered", "Optimized", "Designed", "Developed").
+   - NEVER use first-person pronouns ("I", "Me", "We", "My").
+   - 100% HUMANIZED: Avoid robotic AI buzzwords ("Spearheaded", "Delve", "Synergized", "Revolutionized").
+
+5. TECH STACK TAXONOMY & ATS RELEVANCY:
+   - Intelligently group skills into categories like "Languages", "Frameworks", "Databases", "Tools".
+   - DESTROY soft skills from the skills list ("Team Player", "Hard Worker"). Soft skills must be demonstrated in bullets, not listed.
+   - Filter out vague tech exposure ("Familiar with React"). If it's in the skills list, it should ideally appear in the bullets.
+   - Avoid keyword stuffing.
+
+6. CONTENT FILTERS & REDUNDANCY ELIMINATOR:
+   - Strip out internal company jargon and translate to industry-standard terminology.
+   - Detect and eliminate task duplication (saying the exact same thing across multiple jobs).
+   - Omit irrelevant hobbies. Extract competitive programming (LeetCode/CodeChef) or Hackathon ranks into 'achievements'.
+   - Extract leadership/club roles into 'responsibilities'.
+   - ONLY include "City, State" for location. Remove full street addresses.
+
+7. CRITICAL DUPLICATION RULE: 
+   - An item must belong to ONE section only. A job goes ONLY in 'experience'. A club goes ONLY in 'responsibilities'. NEVER output the exact same company/role twice.
+
+8. JSON OUTPUT REQUIREMENTS:
    - Return ONLY valid JSON matching this exact structure:
 
 {
