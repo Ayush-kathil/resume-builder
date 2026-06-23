@@ -127,26 +127,50 @@ export function ExperienceEditor() {
                         newDesc.splice(i, 1);
                         updateExperience(exp.id, { description: newDesc });
                       }}
-                      onRewrite={async () => {
+                      onRewrite={async (actionType) => {
                         const fieldId = `exp-${exp.id}-desc-${i}`;
-                        const action = careerGrade === 'Super Senior' ? 'legacy-filter' : 'xyz-formula';
                         setActiveAiEditField(fieldId);
                         
                         try {
-                          const res = await fetch('/api/ai/pro-tools', {
+                          let endpoint = '/api/ai/pro-tools';
+                          let body = { action: actionType, content: bullet };
+
+                          if (actionType === 'show-dont-tell') {
+                            endpoint = '/api/ai/show-dont-tell';
+                            body = { text: bullet } as any;
+                          } else if (actionType === 'star-validator') {
+                            endpoint = '/api/ai/star-validator';
+                            body = { text: bullet } as any;
+                          } else if (actionType === 'enhance' || actionType === 'improve') {
+                            endpoint = '/api/ai/enhance';
+                            body = { text: bullet, context: exp.position } as any;
+                          } else if (actionType === 'shorten') {
+                            endpoint = '/api/ai/shorten';
+                            body = { text: bullet } as any;
+                          }
+
+                          const res = await fetch(endpoint, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action, content: bullet })
+                            body: JSON.stringify(body)
                           });
                           const result = await res.json();
                           if (!res.ok) throw new Error(result.error);
                           
-                          const newDesc = [...(exp.description || [])];
-                          newDesc[i] = result.result;
-                          updateExperience(exp.id, { description: newDesc });
-                          toast.success('Bullet upgraded!', { id: `rewrite-${exp.id}-${i}` });
-                        } catch (e: any) {
-                          toast.error(e.message || 'Rewrite failed', { id: `rewrite-${exp.id}-${i}` });
+                          if (actionType === 'star-validator') {
+                            if (result.isValid) {
+                              toast.success('STAR Format Valid: ' + result.feedback);
+                            } else {
+                              toast.error('STAR Format Invalid: ' + result.feedback, { duration: 5000 });
+                            }
+                          } else {
+                            const newDesc = [...(exp.description || [])];
+                            newDesc[i] = result.text || result.result;
+                            updateExperience(exp.id, { description: newDesc });
+                            toast.success('Bullet point enhanced!');
+                          }
+                        } catch (err: any) {
+                          toast.error(err.message || 'AI request failed');
                         } finally {
                           setActiveAiEditField(null);
                         }

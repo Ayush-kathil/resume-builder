@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { scanForWeakVerbs, strongVerbs } from '@/lib/actionVerbs';
-import { AlertTriangle, Trash2, Sparkles, ChevronDown } from 'lucide-react';
+import { LinterService, LintResult } from './LinterService';
+import { strongVerbs } from '@/lib/actionVerbs';
+import { AlertTriangle, Trash2, Sparkles, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SmartBulletInputProps {
@@ -13,7 +14,13 @@ interface SmartBulletInputProps {
 }
 
 export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEditing = false }: SmartBulletInputProps) {
-  const [weakVerbsDetected, setWeakVerbsDetected] = useState<string[]>([]);
+  const [lintResult, setLintResult] = useState<LintResult>({
+    text: '',
+    hasNumbers: false,
+    weakVerbs: [],
+    isTooLong: false
+  });
+  
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -23,12 +30,11 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
 
     timeoutRef.current = setTimeout(() => {
       if (value.trim()) {
-        const detected = scanForWeakVerbs(value);
-        setWeakVerbsDetected(detected);
+        setLintResult(LinterService.analyzeBullet(value));
       } else {
-        setWeakVerbsDetected([]);
+        setLintResult({ text: '', hasNumbers: false, weakVerbs: [], isTooLong: false });
       }
-    }, 500);
+    }, 300);
 
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -44,15 +50,23 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
     >
       <div className="flex items-start gap-2 w-full relative">
         <span className="text-gray-400 mt-2 text-xs">•</span>
-        <div className="relative w-full">
+        <div className="relative w-full group/textarea">
+          {/* Visual Overlay for Linter (Heatmap & Underlines) */}
+          <div 
+            className={`absolute inset-0 pointer-events-none px-3 py-2 text-sm whitespace-pre-wrap break-words overflow-hidden ${isAiEditing ? 'opacity-0' : 'opacity-100'} text-transparent z-0`}
+            dangerouslySetInnerHTML={{ __html: LinterService.generateHighlightedHtml(value) }}
+          />
+          
           <textarea
-            className={`w-full bg-[#f9f9f9] border rounded-lg px-3 py-2 text-[#1a1a1a] text-sm focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all min-h-[60px] ${
-              isAiEditing ? 'border-[#1a1a1a] opacity-50 shadow-[0_0_10px_rgba(26,26,26,0.1)]' : 'border-[#e5e5e5]'
+            className={`w-full bg-transparent relative z-10 border rounded-lg px-3 py-2 text-[#1a1a1a] text-sm focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all min-h-[60px] ${
+              isAiEditing ? 'border-[#1a1a1a] bg-[#f9f9f9] opacity-50 shadow-[0_0_10px_rgba(26,26,26,0.1)]' : 'border-[#e5e5e5]'
             }`}
+            style={{ color: lintResult.hasNumbers || lintResult.weakVerbs.length > 0 ? 'transparent' : 'inherit', caretColor: '#1a1a1a' }}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={isAiEditing}
           />
+          
           <AnimatePresence>
             {isAiEditing && (
               <motion.div 
@@ -97,10 +111,9 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
               >
                 <div className="flex flex-col py-1">
                   {[
-                    { label: 'Improve', action: 'improve' },
-                    { label: 'Quantify Impact', action: 'quantify' },
-                    { label: 'ATS Optimize', action: 'ats-optimize' },
-                    { label: 'Make Professional', action: 'professional' },
+                    { label: 'Improve Grammar', action: 'improve' },
+                    { label: 'Show, Don\'t Tell', action: 'show-dont-tell' },
+                    { label: 'Verify STAR Format', action: 'star-validator' },
                     { label: 'Shorten', action: 'shorten' },
                   ].map((item) => (
                     <button
@@ -121,23 +134,46 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
         </div>
       </div>
 
+      {/* Linter Feedback UI */}
       <AnimatePresence>
-        {weakVerbsDetected.length > 0 && (
+        {(lintResult.weakVerbs.length > 0 || lintResult.isTooLong || (!lintResult.hasNumbers && value.length > 20)) && (
           <motion.div
             initial={{ opacity: 0, y: -5, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -5, height: 0 }}
-            className="pl-4 overflow-hidden"
+            className="pl-4 overflow-hidden flex flex-col gap-1.5 mt-1"
           >
-            <div className="bg-orange-50 border border-orange-200 rounded-md p-2 flex items-start gap-2 mt-1">
-              <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-              <div className="text-xs text-orange-800 leading-relaxed">
-                <span className="font-semibold text-orange-600">Weak verb detected: </span> 
-                '{weakVerbsDetected.join("', '")}'. 
-                Consider using stronger FAANG-tier verbs like: <br />
-                <span className="italic text-orange-700">{strongVerbs.slice(0, 4).join(", ")}, etc.</span>
+            {lintResult.weakVerbs.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-2 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                <div className="text-xs text-red-800 leading-relaxed">
+                  <span className="font-semibold text-red-600">Weak verb detected: </span> 
+                  '{lintResult.weakVerbs.join("', '")}'. 
+                  Consider using stronger FAANG-tier verbs like: <br />
+                  <span className="italic text-red-700">{strongVerbs.slice(0, 4).join(", ")}, etc.</span>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {lintResult.isTooLong && (
+              <div className="bg-amber-50 border border-amber-200 rounded-md p-2 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-800 leading-relaxed">
+                  <span className="font-semibold text-amber-600">Bullet length warning: </span> 
+                  This bullet exceeds 160 characters. FAANG recruiters scan rapidly. Keep bullets concise (1-2 lines maximum) for highest impact.
+                </div>
+              </div>
+            )}
+            
+            {!lintResult.hasNumbers && value.length > 20 && (
+              <div className="bg-gray-50 border border-gray-200 rounded-md p-2 flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-gray-600 leading-relaxed">
+                  <span className="font-medium text-gray-700">Quantification Check: </span> 
+                  No numbers or metrics detected. Use the STAR method and quantify your impact (e.g., "Increased X by Y%").
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,11 +1,34 @@
 'use client';
 
 import { useResumeStore } from '@/store/resumeStore';
-import { Sparkles, Type, AlignLeft, AlignCenter, AlignRight, AlignJustify } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Sparkles, Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, Loader2, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export function RightSidebar() {
-  const { themeConfig, setThemeConfig, targetJobDescription, data } = useResumeStore();
+  const { themeConfig, setThemeConfig, targetJobDescription, data, setResumeData } = useResumeStore();
+  const [isPolishing, setIsPolishing] = useState(false);
+
+  const handleFaangPolish = async () => {
+    setIsPolishing(true);
+    try {
+      const res = await fetch('/api/ai/faang-polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeData: data })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+      
+      setResumeData(result);
+      toast.success('FAANG Polish Complete! Your resume has been structurally optimized.');
+    } catch (err: any) {
+      toast.error(err.message || 'FAANG Polish failed');
+    } finally {
+      setIsPolishing(false);
+    }
+  };
 
   const calculateDensity = () => {
     const textStr = JSON.stringify(data);
@@ -41,7 +64,48 @@ export function RightSidebar() {
   const atsScoreData = calculateATSScore();
 
   return (
-    <div className="w-full h-full p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar font-sans bg-white text-[#1a1a1a]">
+    <div className="w-full h-full p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar font-sans bg-white text-[#1a1a1a] relative">
+      
+      <AnimatePresence>
+        {isPolishing && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm"
+          >
+            <div className="flex flex-col items-center gap-4 px-8 py-6 bg-white border border-[#e5e5e5] rounded-2xl shadow-2xl text-center max-w-[280px]">
+              <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center border border-indigo-100 mb-2">
+                <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Applying FAANG Polish</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">Rewriting bullets, fixing grammar, and optimizing ATS keywords...</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FAANG Polish Action */}
+      <div>
+        <button 
+          onClick={handleFaangPolish}
+          disabled={isPolishing}
+          className="w-full relative overflow-hidden group bg-gradient-to-br from-indigo-600 to-violet-700 text-white rounded-xl p-4 flex items-center justify-between shadow-md hover:shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+        >
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+          <div className="relative z-10 flex flex-col items-start text-left">
+            <span className="font-bold text-sm flex items-center gap-1.5 mb-0.5">
+              <ShieldCheck className="w-4 h-4" /> 1-Click FAANG Polish
+            </span>
+            <span className="text-[10px] text-indigo-100 font-medium opacity-90">Auto-fix grammar, verbs, & ATS format</span>
+          </div>
+          <Sparkles className="w-5 h-5 text-indigo-200 relative z-10 group-hover:rotate-12 transition-transform" />
+        </button>
+      </div>
+
+      <div className="w-full h-[1px] bg-[#e5e5e5]"></div>
       
       {/* Target Job Description */}
       <div>
@@ -91,6 +155,24 @@ export function RightSidebar() {
               Paste a Job Description above to see missing skills.
             </p>
           )}
+        </div>
+      </div>
+
+      <div className="w-full h-[1px] bg-[#e5e5e5]"></div>
+
+      {/* Visual Density Scorer */}
+      <div>
+        <h3 className="text-sm font-medium mb-3">Document Health</h3>
+        <div className={`border rounded-xl p-4 ${calculateDensity().bg} border-${calculateDensity().color.split('-')[1]}-200`}>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-semibold text-gray-700">Visual Density</span>
+            <span className={`text-xs font-bold ${calculateDensity().color}`}>{calculateDensity().label}</span>
+          </div>
+          <p className="text-[10px] text-gray-500 leading-relaxed mt-1">
+            {calculateDensity().label === 'Overcrowded' 
+              ? 'Your resume is too text-heavy. Recruiters prefer white space. Try shortening bullets.' 
+              : 'Your resume has a great balance of text and white space for easy reading.'}
+          </p>
         </div>
       </div>
 
