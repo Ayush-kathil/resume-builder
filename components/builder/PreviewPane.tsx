@@ -1,13 +1,15 @@
 'use client';
 
 import { useResumeStore } from '@/store/resumeStore';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PencilLine, ScanSearch, FileText } from 'lucide-react';
+import { PencilLine, ScanSearch, FileText, Download, Code } from 'lucide-react';
+import { exportToDocx } from '@/lib/exportDocx';
 // PDF Renderer removed
 
 export function PreviewPane() {
   const { data, isEditing, atsViewMode, setAtsViewMode, themeConfig, targetJobDescription, setTargetJobDescription } = useResumeStore();
+  const [rawAtsMode, setRawAtsMode] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
 
   // Simple Density Analyzer
@@ -66,6 +68,26 @@ export function PreviewPane() {
 
   const renderTemplate = () => {
     const order = data.sectionOrder || ['summary', 'education', 'achievements', 'projects', 'experience', 'responsibilities', 'skills'];
+
+    if (rawAtsMode) {
+      // Pure, unstyled ATS extraction output
+      const rawText = JSON.stringify(data, null, 2);
+      return (
+        <div className="w-full min-h-[1131px] bg-white text-black p-10 font-mono text-xs whitespace-pre-wrap">
+          {`--- ATS PARSER EXTRACTION PREVIEW ---\n\n`}
+          {data.personalInfo.fullName}\n
+          {data.personalInfo.email} | {data.personalInfo.phone}\n\n
+          {order.map(section => {
+            if (section === 'summary' && data.personalInfo.summary) return `SUMMARY\n${data.personalInfo.summary}\n\n`;
+            if (section === 'education' && data.education.length) return `EDUCATION\n${data.education.map(e => `${e.institution} - ${e.degree}\n`).join('')}\n`;
+            if (section === 'experience' && data.experience.length) return `EXPERIENCE\n${data.experience.map(e => `${e.company} - ${e.position}\n${e.description.join('\n')}\n`).join('\n')}\n`;
+            if (section === 'skills' && data.skills.length) return `SKILLS\n${data.skills.map(s => `${s.category}: ${s.items.join(', ')}\n`).join('')}\n`;
+            return '';
+          }).join('')}
+          {`\n--- RAW JSON DATA ---\n${rawText}`}
+        </div>
+      );
+    }
 
     return (
       <div className={`w-full min-h-[1131px] bg-white text-black py-8 px-10 flex flex-col ${themeConfig.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}`}>
@@ -231,6 +253,21 @@ export function PreviewPane() {
         >
           <ScanSearch className="w-3.5 h-3.5" />
           {atsViewMode ? 'Pro-Score ON' : 'Pro-Score OFF'}
+        </button>
+        <button 
+          onClick={() => setRawAtsMode(!rawAtsMode)}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${rawAtsMode ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+        >
+          <Code className="w-3.5 h-3.5" />
+          {rawAtsMode ? 'Raw ATS ON' : 'Raw ATS OFF'}
+        </button>
+        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+        <button 
+          onClick={() => exportToDocx(data)}
+          className="px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
+        >
+          <Download className="w-3.5 h-3.5" />
+          DOCX
         </button>
       </div>
 

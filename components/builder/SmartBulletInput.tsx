@@ -18,7 +18,9 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
     text: '',
     hasNumbers: false,
     weakVerbs: [],
-    isTooLong: false
+    buzzwords: [],
+    isTooLong: false,
+    missingPeriod: false
   });
   
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -32,7 +34,7 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
       if (value.trim()) {
         setLintResult(LinterService.analyzeBullet(value));
       } else {
-        setLintResult({ text: '', hasNumbers: false, weakVerbs: [], isTooLong: false });
+        setLintResult({ text: '', hasNumbers: false, weakVerbs: [], buzzwords: [], isTooLong: false, missingPeriod: false });
       }
     }, 300);
 
@@ -61,7 +63,7 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
             className={`w-full bg-transparent relative z-10 border rounded-lg px-3 py-2 text-[#1a1a1a] text-sm focus:outline-none focus:ring-1 focus:ring-[#1a1a1a] transition-all min-h-[60px] ${
               isAiEditing ? 'border-[#1a1a1a] bg-[#f9f9f9] opacity-50 shadow-[0_0_10px_rgba(26,26,26,0.1)]' : 'border-[#e5e5e5]'
             }`}
-            style={{ color: lintResult.hasNumbers || lintResult.weakVerbs.length > 0 ? 'transparent' : 'inherit', caretColor: '#1a1a1a' }}
+            style={{ color: lintResult.hasNumbers || lintResult.weakVerbs.length > 0 || lintResult.buzzwords.length > 0 ? 'transparent' : 'inherit', caretColor: '#1a1a1a' }}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={isAiEditing}
@@ -136,7 +138,7 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
 
       {/* Linter Feedback UI */}
       <AnimatePresence>
-        {(lintResult.weakVerbs.length > 0 || lintResult.isTooLong || (!lintResult.hasNumbers && value.length > 20)) && (
+        {(lintResult.weakVerbs.length > 0 || lintResult.buzzwords.length > 0 || lintResult.isTooLong || lintResult.missingPeriod || (!lintResult.hasNumbers && value.length > 20)) && (
           <motion.div
             initial={{ opacity: 0, y: -5, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
@@ -151,6 +153,17 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
                   '{lintResult.weakVerbs.join("', '")}'. 
                   Consider using stronger FAANG-tier verbs like: <br />
                   <span className="italic text-red-700">{strongVerbs.slice(0, 4).join(", ")}, etc.</span>
+                </div>
+              </div>
+            )}
+            
+            {lintResult.buzzwords.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+                <div className="text-xs text-yellow-800 leading-relaxed">
+                  <span className="font-semibold text-yellow-600">Corporate Buzzword detected: </span> 
+                  '{lintResult.buzzwords.join("', '")}'. 
+                  Recruiters ignore these. Replace with hard technical skills or measurable metrics.
                 </div>
               </div>
             )}
@@ -171,6 +184,16 @@ export function SmartBulletInput({ value, onChange, onRemove, onRewrite, isAiEdi
                 <div className="text-xs text-gray-600 leading-relaxed">
                   <span className="font-medium text-gray-700">Quantification Check: </span> 
                   No numbers or metrics detected. Use the STAR method and quantify your impact (e.g., "Increased X by Y%").
+                </div>
+              </div>
+            )}
+
+            {lintResult.missingPeriod && value.length > 10 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-2 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+                <div className="text-xs text-blue-800 leading-relaxed">
+                  <span className="font-semibold text-blue-600">Punctuation Check: </span> 
+                  Missing a period at the end. Be perfectly consistent with punctuation across your resume.
                 </div>
               </div>
             )}
