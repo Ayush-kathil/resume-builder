@@ -1,47 +1,91 @@
-# 🚀 ResumeAI - Enterprise-Grade AI Resume Builder
-
 <div align="center">
   <img alt="ResumeAI Logo" src="https://raw.githubusercontent.com/Ayush-kathil/resume-builder/main/public/emails/welcome_hero_animated.png" width="160" height="160" />
+  <h1>🚀 ResumeAI: Enterprise-Grade FAANG AI Resume Builder</h1>
+  <p><strong>A Next-Generation, AI-powered career hub designed to engineer professional, ATS-friendly, FAANG-level resumes in minutes.</strong></p>
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+  [![Zustand](https://img.shields.io/badge/Zustand-State-orange?style=for-the-badge)](https://zustand-demo.pmnd.rs/)
+  [![Gemini AI](https://img.shields.io/badge/Google_Gemini-AI-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
 </div>
 
-<p align="center">
-  <strong>An advanced, AI-powered resume builder designed to help users craft professional, ATS-friendly resumes in minutes.</strong>
-</p>
+<br/>
+
+ResumeAI is a modern, full-stack application built with Next.js 16. It leverages cutting-edge Artificial Intelligence (Google Gemini 2.5) to automatically generate, format, and optimize your CV to pass strict legacy Applicant Tracking Systems (ATS) and impress highly technical recruiters.
 
 ---
 
-## 🌟 Overview
+## 🌟 Next-Gen FAANG Engines
 
-ResumeAI is a modern, full-stack application built with Next.js 16. It leverages cutting-edge Artificial Intelligence to automatically generate, format, and optimize your CV. With an intuitive builder interface, intelligent AI suggestions, enterprise-grade security, and robust administrative tools, crafting the perfect resume has never been easier or more secure.
+Unlike standard builders, ResumeAI is equipped with **5 specialized AI Engines** that act as your personal executive career coach:
+
+1. **FAANG Polish (Nuclear Option)**: A one-click structural overhaul that rewrites your bullet points using the strict Action-Verb + Quantified Impact + Tech Stack format expected by top-tier tech companies.
+2. **Mock Interview Prep Engine**: Automatically analyzes the claims in your resume and generates 5 highly aggressive, tailored behavioral/technical interview questions to grill you.
+3. **Psychological Tone Dial**: An interactive slider that seamlessly rewrites your entire resume to project an "Aggressive", "Analytical", or "Collaborative" persona depending on the target corporate culture.
+4. **Career Velocity Radar**: A live, animated Recharts radar that scores your resume's Impact, Technical Depth, Leadership, and Clarity against synthetic FAANG benchmarks.
+5. **Magic LinkedIn Import**: Paste raw, unstructured text from your LinkedIn profile, and the AI will perfectly extract and map the data into a strict JSON schema instantly.
 
 ---
 
-## ✨ Key Features
+## 🏗️ System Architecture
 
-### 🛠️ Core Resume Builder
-- **Intuitive Visual Interface**: A user-friendly, drag-and-drop dashboard to manage, create, and preview resumes seamlessly.
-- **Real-time Preview Engine**: Watch your resume compile and update in real-time as you type, with zero lag.
-- **Premium Templates**: Choose from a variety of professionally designed, ATS-optimized resume templates.
-- **Comprehensive Sections**: Complete support for personal details, professional summaries, work experiences, education, skills, and custom project sections.
+```mermaid
+graph TD
+    %% Client Layer
+    subgraph Client [Frontend UI]
+        Zustand[Zustand Store]
+        Editor[Editor Pane]
+        Preview[Live Preview Pane]
+        Sidebar[AI Engines Sidebar]
+        
+        Editor <--> Zustand
+        Preview <--> Zustand
+        Sidebar <--> Zustand
+    end
 
-### 🤖 AI-Powered Capabilities
-- **AI Summary Generation**: Automatically generate compelling professional summaries tailored to your unique profile.
-- **Bullet Point Rewriter**: Use AI to rewrite and enhance specific bullet points for maximum impact and action-oriented language.
-- **Smart Skill Suggestions**: Get tailored suggestions for skills and experience bullet points based on your target role and industry.
-- **Conversational 'Chat to Edit'**: A conversational AI interface to edit and refine your resume content naturally.
-- **Text Shortening & Expansion**: Concisely shorten lengthy descriptions or expand brief points without losing key context.
-- **Smart CV Parsing**: Upload an existing resume (PDF/DOCX) and have the AI extract, categorize, and populate your details automatically.
+    %% Backend API Layer
+    subgraph Backend [Next.js API Routes]
+        Parse[/api/resume/parse]
+        Polish[/api/ai/faang-polish]
+        Interview[/api/ai/interview-prep]
+        Tone[/api/ai/tone-shift]
+        LinkedIn[/api/ai/parse-linkedin]
+    end
 
-### 🛡️ Enterprise Security & Admin Dashboard
-- **Admin Analytics Dashboard**: Comprehensive metrics tracking user engagement, resume generations, and AI token usage.
-- **Role-Based Access Control (RBAC)**: Secure routes and actions based on user roles.
-- **Security Alerts & Auditing**: Automated security email alerts for account modifications and robust audit logging.
-- **Prompt Engineering IDE**: Built-in admin workspace for developing, testing, and fine-tuning the AI prompts that power the platform.
+    %% External Services
+    subgraph External [External Services]
+        Gemini[Google Gemini 2.5 Pro]
+        MongoDB[(MongoDB Atlas)]
+    end
 
-### 💾 Export & Sharing
-- **High-Fidelity PDF Export**: Generate pixel-perfect, high-quality PDFs ready for printing or emailing.
-- **DOCX Export**: Download your resume as a Word document for offline manual editing.
-- **TXT Export**: Plain text export for easy copying and pasting into restrictive online application forms.
+    %% Data Flow
+    Sidebar -->|Triggers AI Action| Polish
+    Sidebar -->|Requests Prep| Interview
+    Editor -->|Imports| LinkedIn
+    
+    Polish <-->|JSON Prompting| Gemini
+    Interview <-->|JSON Prompting| Gemini
+    Tone <-->|JSON Prompting| Gemini
+    LinkedIn <-->|JSON Prompting| Gemini
+    
+    Parse <--> MongoDB
+```
+
+---
+
+## ✨ Core Features
+
+### 🛡️ Enterprise-Grade Formatting
+- **Anti-Bias "Blind Mode"**: Instantly redact your name, email, specific university names, and company names to generate an anonymized resume for unbiased screening.
+- **ATS "Raw Text" View**: Toggle a raw text view to see exactly what an ancient Applicant Tracking System scraper will see, ensuring zero invisible formatting errors.
+- **DOCX & PDF Export**: Native browser-side rendering for both high-fidelity PDFs and ATS-compliant Microsoft Word `.docx` files.
+- **Real-Time Linter**: A live engine that highlights weak verbs in red, missing metrics in green, overused corporate buzzwords in yellow, and punctuation inconsistencies in blue.
+
+### 💾 Robust Persistence & State
+- **Undo/Redo History**: Granular, state-based history tracking allowing you to reverse major AI rewrites.
+- **Dynamic Reordering**: Drag-and-drop structural organization for sections (e.g., moving Education below Experience for senior roles).
+- **Target Job Matcher**: Paste a job description to get a live keyword match percentage and visual heatmap of missing skills.
 
 ---
 
@@ -49,21 +93,21 @@ ResumeAI is a modern, full-stack application built with Next.js 16. It leverages
 
 - **Framework**: [Next.js 16](https://nextjs.org) (App Router, Turbopack)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/) (Local storage persistence)
 - **Database**: [MongoDB](https://www.mongodb.com/) via [Mongoose](https://mongoosejs.com/)
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)
-- **AI Providers**: [Google Generative AI (Gemini)](https://ai.google.dev/) & [OpenAI](https://openai.com/)
-- **Emails**: [React Email](https://react.email/) & [Nodemailer](https://nodemailer.com/)
+- **AI Core**: [Google Generative AI (Gemini 2.5)](https://ai.google.dev/) 
+- **Document Generation**: `docx` library & React-to-Print
 
 ---
 
 ## 🚀 Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+Follow these instructions to get a copy of the project up and running on your local machine.
 
 ### Prerequisites
 
-Make sure you have Node.js (v18+) and npm installed. You will also need a MongoDB database cluster (e.g., MongoDB Atlas) and API keys for the AI providers (OpenAI and/or Gemini).
+Make sure you have Node.js (v18+) and npm installed. You will also need a MongoDB database cluster (e.g., MongoDB Atlas) and an API key for Google Gemini.
 
 ### Installation & Running Commands
 
@@ -89,8 +133,7 @@ Make sure you have Node.js (v18+) and npm installed. You will also need a MongoD
    NEXTAUTH_URL=http://localhost:3000
 
    # AI Provider Keys
-   OPENAI_API_KEY=your_openai_api_key
-   GOOGLE_GEMINI_API_KEY=your_gemini_api_key
+   GEMINI_API_KEY=your_gemini_api_key
 
    # Email Configuration (SMTP for transactional emails)
    SMTP_HOST=smtp.your-email-provider.com
@@ -111,11 +154,6 @@ Make sure you have Node.js (v18+) and npm installed. You will also need a MongoD
    To create an optimized production build:
    ```bash
    npm run build
-   ```
-
-6. **Start Production Server:**
-   After building, start the production server:
-   ```bash
    npm run start
    ```
 
