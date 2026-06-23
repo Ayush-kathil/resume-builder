@@ -3,14 +3,38 @@
 import { useResumeStore } from '@/store/resumeStore';
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PencilLine, ScanSearch, FileText, Download, Code } from 'lucide-react';
+import { PencilLine, ScanSearch, FileText, Download, Code, EyeOff, Eye } from 'lucide-react';
 import { exportToDocx } from '@/lib/exportDocx';
+import { toast } from 'sonner';
 // PDF Renderer removed
 
 export function PreviewPane() {
-  const { data, isEditing, atsViewMode, setAtsViewMode, themeConfig, targetJobDescription, setTargetJobDescription } = useResumeStore();
+  const { data, isEditing, atsViewMode, setAtsViewMode, blindMode, setBlindMode, themeConfig, targetJobDescription, setTargetJobDescription } = useResumeStore();
   const [rawAtsMode, setRawAtsMode] = useState(false);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewQuestions, setInterviewQuestions] = useState<string[]>([]);
+  const [isGeneratingInterview, setIsGeneratingInterview] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
+
+  const generateInterview = async () => {
+    setIsGeneratingInterview(true);
+    setShowInterviewModal(true);
+    try {
+      const res = await fetch('/api/ai/interview-prep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeData: data })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+      setInterviewQuestions(result);
+    } catch (error: any) {
+      toast.error('Failed to generate interview questions');
+      setShowInterviewModal(false);
+    } finally {
+      setIsGeneratingInterview(false);
+    }
+  };
 
   // Simple Density Analyzer
   const calculateDensity = () => {
@@ -93,21 +117,30 @@ export function PreviewPane() {
       <div className={`w-full min-h-[1131px] bg-white text-black py-8 px-10 flex flex-col ${themeConfig.fontFamily === 'sans' ? 'font-sans' : 'font-serif'}`}>
         {/* Header */}
         <div className="text-center mb-4 border-b-2 pb-2" style={{ borderColor: themeConfig.accentColor }}>
-          <h1 className="text-2xl font-bold uppercase tracking-wider mb-1" style={{ color: themeConfig.accentColor }}>{data.personalInfo.fullName || "YOUR NAME"}</h1>
+          <h1 className="text-2xl font-bold uppercase tracking-wider mb-1" style={{ color: themeConfig.accentColor }}>
+            {blindMode ? '[Candidate Name]' : (data.personalInfo.fullName || "YOUR NAME")}
+          </h1>
+          
           <div className="flex justify-center flex-wrap gap-1 text-[11px] text-gray-800">
-            {data.personalInfo.email && <a href={`mailto:${data.personalInfo.email}`} className="text-blue-600 hover:underline">{data.personalInfo.email}</a>}
-            {(data.personalInfo.email && (data.personalInfo.phone || data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
-            
-            {data.personalInfo.phone && <span>{data.personalInfo.phone}</span>}
-            {(data.personalInfo.phone && (data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
-            
-            {data.personalInfo.linkedin && <a href={data.personalInfo.linkedin} className="text-blue-600 hover:underline">LinkedIn</a>}
-            {(data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
-            
-            {data.personalInfo.github && <a href={data.personalInfo.github} className="text-blue-600 hover:underline">GitHub</a>}
-            {(data.personalInfo.github && data.personalInfo.website) && <span>|</span>}
-            
-            {data.personalInfo.website && <a href={data.personalInfo.website} className="text-blue-600 hover:underline">Portfolio</a>}
+            {blindMode ? (
+              <span className="text-gray-500 italic">[Contact Information Redacted for Bias-Free Screening]</span>
+            ) : (
+              <>
+                {data.personalInfo.email && <a href={`mailto:${data.personalInfo.email}`} className="text-blue-600 hover:underline">{data.personalInfo.email}</a>}
+                {(data.personalInfo.email && (data.personalInfo.phone || data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+                
+                {data.personalInfo.phone && <span>{data.personalInfo.phone}</span>}
+                {(data.personalInfo.phone && (data.personalInfo.linkedin || data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+                
+                {data.personalInfo.linkedin && <a href={data.personalInfo.linkedin} className="text-blue-600 hover:underline">LinkedIn</a>}
+                {(data.personalInfo.linkedin && (data.personalInfo.github || data.personalInfo.website)) && <span>|</span>}
+                
+                {data.personalInfo.github && <a href={data.personalInfo.github} className="text-blue-600 hover:underline">GitHub</a>}
+                {(data.personalInfo.github && data.personalInfo.website) && <span>|</span>}
+                
+                {data.personalInfo.website && <a href={data.personalInfo.website} className="text-blue-600 hover:underline">Portfolio</a>}
+              </>
+            )}
           </div>
         </div>
 
@@ -128,8 +161,8 @@ export function PreviewPane() {
                   {data.education.map(edu => (
                     <div key={edu.id} className="mb-1.5">
                       <div className="flex justify-between items-baseline font-bold text-[11px]">
-                        <span>{edu.institution}</span>
-                        <span className="font-normal">{edu.location}</span>
+                        <span>{blindMode ? '[Top Tier University]' : edu.institution}</span>
+                        <span className="font-normal">{blindMode ? '[City, State]' : edu.location}</span>
                       </div>
                       <div className="flex justify-between items-baseline text-[11px] text-gray-800">
                         <span>{edu.degree} in {edu.fieldOfStudy} {edu.gpa && <span className="font-bold text-black"> CGPA: {edu.gpa}</span>}</span>
@@ -183,7 +216,7 @@ export function PreviewPane() {
                   {data.experience.map(exp => (
                     <div key={exp.id} className="mb-2">
                       <div className="flex justify-between items-baseline text-[11px]">
-                        <span className="font-bold">{exp.position} | {exp.company}</span>
+                        <span className="font-bold">{exp.position} | {blindMode ? '[Top Tech Company]' : exp.company}</span>
                         <span>{exp.startDate} - {exp.endDate}</span>
                       </div>
                       <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
@@ -201,7 +234,7 @@ export function PreviewPane() {
                   {data.responsibilities.map(resp => (
                     <div key={resp.id} className="mb-2">
                       <div className="flex justify-between items-baseline text-[11px]">
-                        <span className="font-bold">{resp.position} | {resp.company}</span>
+                        <span className="font-bold">{resp.position} | {blindMode ? '[Organization]' : resp.company}</span>
                         <span>{resp.startDate}</span>
                       </div>
                       <ul className="list-disc pl-5 space-y-0.5 text-[11px] leading-snug">
@@ -237,6 +270,58 @@ export function PreviewPane() {
   return (
     <div className="w-full h-full bg-[#F2F1ED] p-4 md:p-8 overflow-auto relative print-container custom-scrollbar pb-32">
       
+      {/* Mock Interview Modal */}
+      <AnimatePresence>
+        {showInterviewModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setShowInterviewModal(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto custom-scrollbar"
+            >
+              <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
+                <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                  <PencilLine className="w-5 h-5 text-indigo-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">FAANG Mock Interview</h3>
+                  <p className="text-xs text-gray-500">Based strictly on your resume bullet points.</p>
+                </div>
+              </div>
+
+              {isGeneratingInterview ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-3">
+                  <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                  <p className="text-sm font-medium text-gray-600">The Hiring Manager is analyzing your resume...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {interviewQuestions.map((q, i) => (
+                    <div key={i} className="bg-gray-50 border border-gray-100 p-4 rounded-xl">
+                      <p className="text-sm font-medium text-gray-800 leading-relaxed"><span className="text-indigo-600 font-bold mr-1">Q{i+1}:</span> {q}</p>
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => setShowInterviewModal(false)}
+                    className="w-full mt-4 bg-gray-900 text-white font-medium py-2.5 rounded-xl hover:bg-gray-800 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Floating Formatting Toolbar */}
       <div className="sticky top-0 z-20 w-max mx-auto mb-8 bg-white border border-[#e5e5e5] rounded-full shadow-md px-4 py-2 flex items-center gap-2 text-gray-600 print:hidden transition-all">
         <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors tooltip" title="Bold"><strong className="font-serif">B</strong></button>
@@ -247,6 +332,14 @@ export function PreviewPane() {
           <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: themeConfig.accentColor }}></span>
         </button>
         <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+        <button 
+          onClick={() => setBlindMode(!blindMode)}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${blindMode ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+          title="Redact name, contact info, and company names for unbiased screening"
+        >
+          {blindMode ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          {blindMode ? 'Blind Mode ON' : 'Blind Mode OFF'}
+        </button>
         <button 
           onClick={() => setAtsViewMode(!atsViewMode)}
           className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${atsViewMode ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
@@ -260,6 +353,14 @@ export function PreviewPane() {
         >
           <Code className="w-3.5 h-3.5" />
           {rawAtsMode ? 'Raw ATS ON' : 'Raw ATS OFF'}
+        </button>
+        <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
+        <button 
+          onClick={generateInterview}
+          className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-colors shadow-sm"
+        >
+          <FileText className="w-3.5 h-3.5" />
+          Mock Interview
         </button>
         <div className="w-[1px] h-4 bg-gray-300 mx-1"></div>
         <button 

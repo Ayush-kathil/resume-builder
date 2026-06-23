@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { useResumeStore } from '@/store/resumeStore';
 import { Sparkles, GripVertical, Upload, Loader2, Undo2, Redo2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { FileUp } from 'lucide-react';
 
 import { ExperienceEditor } from './ExperienceEditor';
 import { EducationEditor } from './EducationEditor';
@@ -17,6 +18,9 @@ import Link from 'next/link';
 export function EditorPane() {
   const { data, updatePersonalInfo, setResumeData, setSectionOrder, undo, redo, activeAccordion, setActiveAccordion } = useResumeStore();
   const [isParsing, setIsParsing] = useState(false);
+  const [linkedinText, setLinkedinText] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -74,15 +78,73 @@ export function EditorPane() {
     }
   };
 
+  const handleLinkedInImport = async () => {
+    if (!linkedinText.trim()) return toast.error('Please paste your LinkedIn profile text');
+    
+    setIsImporting(true);
+    try {
+      const res = await fetch('/api/ai/parse-linkedin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ linkedinText })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+      
+      setResumeData(result);
+      toast.success('Successfully imported from LinkedIn!');
+      setShowImportModal(false);
+      setLinkedinText('');
+    } catch (err: any) {
+      toast.error(err.message || 'Import failed');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
 
   return (
     <div className="relative w-full h-full bg-white border-r border-[#e5e5e5] overflow-hidden font-sans">
       <div className="w-full h-full p-4 overflow-y-auto custom-scrollbar">
         {/* Top Tabs */}
-        <div className="flex bg-[#f5f5f5] p-1 rounded-xl mb-6">
+        <div className="flex bg-[#f5f5f5] p-1 rounded-xl mb-4">
           <button className="flex-1 py-1.5 bg-white shadow-sm rounded-lg text-sm font-medium">Builder</button>
           <button className="flex-1 py-1.5 text-gray-500 rounded-lg text-sm font-medium hover:text-gray-700">Templates</button>
         </div>
+
+        {/* LinkedIn Import Button */}
+        <button 
+          onClick={() => setShowImportModal(true)}
+          className="w-full mb-6 py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-semibold rounded-xl border border-blue-200 transition-colors flex items-center justify-center gap-2"
+        >
+          <FileUp className="w-4 h-4" />
+          Magic LinkedIn Import
+        </button>
+
+        {showImportModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setShowImportModal(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Import from LinkedIn</h3>
+              <p className="text-xs text-gray-500 mb-4">Go to your LinkedIn profile, press Ctrl+A (Select All), Ctrl+C (Copy), and paste everything here.</p>
+              <textarea
+                className="w-full h-48 p-3 border border-gray-200 rounded-xl text-sm mb-4 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                placeholder="Paste LinkedIn text here..."
+                value={linkedinText}
+                onChange={e => setLinkedinText(e.target.value)}
+              />
+              <div className="flex gap-2 justify-end">
+                <button onClick={() => setShowImportModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl">Cancel</button>
+                <button 
+                  onClick={handleLinkedInImport}
+                  disabled={isImporting}
+                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isImporting ? 'Importing...' : 'Magic Import'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Dynamic Reorderable Sections */}
         <Reorder.Group 

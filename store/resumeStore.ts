@@ -43,6 +43,8 @@ interface ResumeState {
   setActiveAccordion: (accordion: string) => void;
   atsViewMode: boolean;
   setAtsViewMode: (mode: boolean) => void;
+  blindMode: boolean;
+  setBlindMode: (mode: boolean) => void;
 
   // History tracking (Undo/Redo)
   past: ResumeData[];
@@ -69,6 +71,8 @@ export const useResumeStore = create<ResumeState>((set) => ({
   setIsEditing: (isEditing) => set({ isEditing }),
   atsViewMode: false,
   setAtsViewMode: (mode) => set({ atsViewMode: mode }),
+  blindMode: false,
+  setBlindMode: (mode) => set({ blindMode: mode }),
   setCareerGrade: (grade) => set({ careerGrade: grade }),
   activeAiEditField: null,
   setActiveAiEditField: (field) => set({ activeAiEditField: field }),

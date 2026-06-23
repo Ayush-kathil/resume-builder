@@ -1,14 +1,17 @@
 'use client';
 
 import { useResumeStore } from '@/store/resumeStore';
-import { Sparkles, Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, Loader2, ShieldCheck } from 'lucide-react';
+import { Sparkles, Type, AlignLeft, AlignCenter, AlignRight, AlignJustify, Loader2, ShieldCheck, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 export function RightSidebar() {
   const { themeConfig, setThemeConfig, targetJobDescription, data, setResumeData } = useResumeStore();
   const [isPolishing, setIsPolishing] = useState(false);
+  const [isShiftingTone, setIsShiftingTone] = useState(false);
+  const [activeTone, setActiveTone] = useState<string>('Standard');
 
   const handleFaangPolish = async () => {
     setIsPolishing(true);
@@ -27,6 +30,29 @@ export function RightSidebar() {
       toast.error(err.message || 'FAANG Polish failed');
     } finally {
       setIsPolishing(false);
+    }
+  };
+
+  const handleToneShift = async (tone: string) => {
+    setActiveTone(tone);
+    if (tone === 'Standard') return; // Don't do anything for standard
+
+    setIsShiftingTone(true);
+    try {
+      const res = await fetch('/api/ai/tone-shift', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeData: data, tone })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error);
+      
+      setResumeData(result);
+      toast.success(`Tone shifted to ${tone}!`);
+    } catch (err: any) {
+      toast.error(err.message || 'Tone shift failed');
+    } finally {
+      setIsShiftingTone(false);
     }
   };
 
@@ -63,11 +89,24 @@ export function RightSidebar() {
 
   const atsScoreData = calculateATSScore();
 
+  // Synthetic metrics based on resume length/content
+  const impactScore = Math.min(100, (data.experience.length * 15) + (JSON.stringify(data).match(/\d+/g)?.length || 0) * 5);
+  const techScore = Math.min(100, data.skills.flatMap(s => s.items).length * 8);
+  const leadScore = Math.min(100, (JSON.stringify(data).match(/led|managed|spearheaded|architected/gi)?.length || 0) * 15);
+  const clarityScore = calculateDensity().label === 'Overcrowded' ? 60 : 95;
+
+  const radarData = [
+    { subject: 'Impact', A: impactScore, fullMark: 100 },
+    { subject: 'Tech Depth', A: techScore, fullMark: 100 },
+    { subject: 'Leadership', A: leadScore, fullMark: 100 },
+    { subject: 'Clarity', A: clarityScore, fullMark: 100 },
+  ];
+
   return (
     <div className="w-full h-full p-6 flex flex-col gap-6 overflow-y-auto custom-scrollbar font-sans bg-white text-[#1a1a1a] relative">
       
       <AnimatePresence>
-        {isPolishing && (
+        {(isPolishing || isShiftingTone) && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -79,8 +118,8 @@ export function RightSidebar() {
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">Applying FAANG Polish</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">Rewriting bullets, fixing grammar, and optimizing ATS keywords...</p>
+                <h3 className="text-base font-bold text-[#1a1a1a] mb-1">{isPolishing ? 'Applying FAANG Polish' : 'Shifting Tone...'}</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">{isPolishing ? 'Rewriting bullets, fixing grammar, and optimizing ATS keywords...' : 'Applying psychological persona rewriting...'}</p>
               </div>
             </div>
           </motion.div>
@@ -106,7 +145,44 @@ export function RightSidebar() {
       </div>
 
       <div className="w-full h-[1px] bg-[#e5e5e5]"></div>
+
+      {/* Tone Dial Engine */}
+      <div>
+        <h3 className="text-sm font-medium mb-3">Psychological Tone</h3>
+        <div className="grid grid-cols-3 gap-2 bg-[#f9f9f9] p-1.5 rounded-xl border border-[#e5e5e5]">
+          {['Standard', 'Aggressive', 'Analytical'].map(tone => (
+            <button
+              key={tone}
+              onClick={() => handleToneShift(tone)}
+              className={`py-1.5 px-1 text-[10px] font-medium rounded-lg transition-all ${activeTone === tone ? 'bg-white shadow-sm border border-gray-200 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              {tone}
+            </button>
+          ))}
+        </div>
+      </div>
       
+      <div className="w-full h-[1px] bg-[#e5e5e5]"></div>
+
+      {/* Career Velocity Radar */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium">Career Velocity</h3>
+          <span className="text-[10px] font-medium text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-200">FAANG Benchmark</span>
+        </div>
+        <div className="w-full h-[200px] bg-gradient-to-br from-gray-50 to-white rounded-xl border border-[#e5e5e5] p-2 flex items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart cx="50%" cy="50%" outerRadius="60%" data={radarData}>
+              <PolarGrid stroke="#e5e5e5" />
+              <PolarAngleAxis dataKey="subject" tick={{ fill: '#666', fontSize: 10, fontWeight: 600 }} />
+              <Radar name="Resume" dataKey="A" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.3} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      <div className="w-full h-[1px] bg-[#e5e5e5]"></div>
+
       {/* Target Job Description */}
       <div>
         <h3 className="text-sm font-medium mb-3">Target Job Matcher</h3>
