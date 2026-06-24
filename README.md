@@ -16,15 +16,28 @@ ResumeAI is a modern, full-stack application built with Next.js 16. It leverages
 
 ---
 
-## 🌟 Next-Gen FAANG Engines
+## ⚙️ How the Engine Works
 
-Unlike standard builders, ResumeAI is equipped with **5 specialized AI Engines** that act as your personal executive career coach:
+ResumeAI is not just a text editor; it is a pipeline of intelligent engines working together to craft your career narrative.
 
-1. **FAANG Polish (Nuclear Option)**: A one-click structural overhaul that rewrites your bullet points using the strict Action-Verb + Quantified Impact + Tech Stack format expected by top-tier tech companies.
-2. **Mock Interview Prep Engine**: Automatically analyzes the claims in your resume and generates 5 highly aggressive, tailored behavioral/technical interview questions to grill you.
-3. **Psychological Tone Dial**: An interactive slider that seamlessly rewrites your entire resume to project an "Aggressive", "Analytical", or "Collaborative" persona depending on the target corporate culture.
-4. **Career Velocity Radar**: A live, animated Recharts radar that scores your resume's Impact, Technical Depth, Leadership, and Clarity against synthetic FAANG benchmarks.
-5. **Magic LinkedIn Import**: Paste raw, unstructured text from your LinkedIn profile, and the AI will perfectly extract and map the data into a strict JSON schema instantly.
+1. **Ingestion Engine**: You can upload a PDF or paste your raw LinkedIn profile. The parser extracts the text and maps it perfectly into a strict internal JSON schema.
+2. **Analysis & Scoring**: As you type, the `LinterService` runs locally in your browser. It scans every bullet point for:
+   - 🔴 **Weak Verbs** (e.g., "helped", "worked")
+   - 🟢 **Missing Metrics** (ensuring you quantify your impact)
+   - 🟡 **Corporate Buzzwords** (e.g., "synergy", "ninja")
+   - 🔵 **Punctuation Consistency**
+3. **AI Persona Rewriting**: You select a psychological tone (Aggressive, Analytical, or Collaborative). The app communicates securely with Gemini 2.5 to rewrite your entire JSON state to match that persona.
+4. **Rendering & Export**: The engine takes the state and perfectly renders it onto an A4 boundary, ensuring 100% legacy ATS compatibility via high-fidelity PDF or native `.docx` export.
+
+---
+
+## 🌟 Next-Gen FAANG Features
+
+- **FAANG Polish (Nuclear Option)**: A one-click structural overhaul that rewrites your bullet points using the strict Action-Verb + Quantified Impact + Tech Stack format expected by top-tier tech companies.
+- **Mock Interview Prep Engine**: Automatically analyzes the claims in your resume and generates 5 highly aggressive, tailored behavioral/technical interview questions to grill you.
+- **Psychological Tone Dial**: An interactive slider that seamlessly rewrites your entire resume to project an "Aggressive", "Analytical", or "Collaborative" persona depending on the target corporate culture.
+- **Career Velocity Radar**: A live, animated Recharts radar that scores your resume's Impact, Technical Depth, Leadership, and Clarity against synthetic FAANG benchmarks.
+- **Anti-Bias "Blind Mode"**: Instantly redact your name, email, specific university names, and company names to generate an anonymized resume for unbiased screening.
 
 ---
 
@@ -33,11 +46,11 @@ Unlike standard builders, ResumeAI is equipped with **5 specialized AI Engines**
 ```mermaid
 graph TD
     %% Client Layer
-    subgraph Client [Frontend UI]
-        Zustand[Zustand Store]
-        Editor[Editor Pane]
-        Preview[Live Preview Pane]
-        Sidebar[AI Engines Sidebar]
+    subgraph Client ["Frontend UI (Next.js Client Components)"]
+        Zustand["Zustand Store (Global State)"]
+        Editor["Editor Pane (Data Entry)"]
+        Preview["Live Preview Pane (PDF/DOCX Render)"]
+        Sidebar["AI Engines Sidebar (Linter/Radar)"]
         
         Editor <--> Zustand
         Preview <--> Zustand
@@ -45,47 +58,32 @@ graph TD
     end
 
     %% Backend API Layer
-    subgraph Backend [Next.js API Routes]
-        Parse[/api/resume/parse]
-        Polish[/api/ai/faang-polish]
-        Interview[/api/ai/interview-prep]
-        Tone[/api/ai/tone-shift]
-        LinkedIn[/api/ai/parse-linkedin]
+    subgraph Backend ["Next.js API Routes (Serverless)"]
+        Parse["/api/resume/parse"]
+        Polish["/api/ai/faang-polish"]
+        Interview["/api/ai/interview-prep"]
+        Tone["/api/ai/tone-shift"]
+        LinkedIn["/api/ai/parse-linkedin"]
     end
 
     %% External Services
-    subgraph External [External Services]
-        Gemini[Google Gemini 2.5 Pro]
-        MongoDB[(MongoDB Atlas)]
+    subgraph External ["External Services"]
+        Gemini["Google Gemini 2.5 Pro"]
+        MongoDB["MongoDB Atlas (Storage)"]
     end
 
     %% Data Flow
-    Sidebar -->|Triggers AI Action| Polish
-    Sidebar -->|Requests Prep| Interview
-    Editor -->|Imports| LinkedIn
+    Sidebar -->|"Triggers AI Action"| Polish
+    Sidebar -->|"Requests Prep"| Interview
+    Editor -->|"Imports Profile"| LinkedIn
     
-    Polish <-->|JSON Prompting| Gemini
-    Interview <-->|JSON Prompting| Gemini
-    Tone <-->|JSON Prompting| Gemini
-    LinkedIn <-->|JSON Prompting| Gemini
+    Polish <-->|"JSON Prompting"| Gemini
+    Interview <-->|"JSON Prompting"| Gemini
+    Tone <-->|"JSON Prompting"| Gemini
+    LinkedIn <-->|"JSON Prompting"| Gemini
     
     Parse <--> MongoDB
 ```
-
----
-
-## ✨ Core Features
-
-### 🛡️ Enterprise-Grade Formatting
-- **Anti-Bias "Blind Mode"**: Instantly redact your name, email, specific university names, and company names to generate an anonymized resume for unbiased screening.
-- **ATS "Raw Text" View**: Toggle a raw text view to see exactly what an ancient Applicant Tracking System scraper will see, ensuring zero invisible formatting errors.
-- **DOCX & PDF Export**: Native browser-side rendering for both high-fidelity PDFs and ATS-compliant Microsoft Word `.docx` files.
-- **Real-Time Linter**: A live engine that highlights weak verbs in red, missing metrics in green, overused corporate buzzwords in yellow, and punctuation inconsistencies in blue.
-
-### 💾 Robust Persistence & State
-- **Undo/Redo History**: Granular, state-based history tracking allowing you to reverse major AI rewrites.
-- **Dynamic Reordering**: Drag-and-drop structural organization for sections (e.g., moving Education below Experience for senior roles).
-- **Target Job Matcher**: Paste a job description to get a live keyword match percentage and visual heatmap of missing skills.
 
 ---
 
@@ -103,13 +101,11 @@ graph TD
 
 ## 🚀 Getting Started
 
-Follow these instructions to get a copy of the project up and running on your local machine.
-
 ### Prerequisites
 
 Make sure you have Node.js (v18+) and npm installed. You will also need a MongoDB database cluster (e.g., MongoDB Atlas) and an API key for Google Gemini.
 
-### Installation & Running Commands
+### Installation
 
 1. **Clone the repository:**
    ```bash
@@ -123,7 +119,7 @@ Make sure you have Node.js (v18+) and npm installed. You will also need a MongoD
    ```
 
 3. **Environment Setup:**
-   Create a `.env.local` file in the root directory and configure your environment variables:
+   Create a `.env.local` file in the root directory:
    ```env
    # Database Configuration
    MONGODB_URI=your_mongodb_connection_string
@@ -134,28 +130,13 @@ Make sure you have Node.js (v18+) and npm installed. You will also need a MongoD
 
    # AI Provider Keys
    GEMINI_API_KEY=your_gemini_api_key
-
-   # Email Configuration (SMTP for transactional emails)
-   SMTP_HOST=smtp.your-email-provider.com
-   SMTP_PORT=587
-   SMTP_USER=your_email_address
-   SMTP_PASSWORD=your_email_password
-   SMTP_EMAIL=your_sending_email_address
    ```
 
 4. **Run the Development Server:**
-   Start the application in development mode with hot-reloading:
    ```bash
    npm run dev
    ```
    *Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.*
-
-5. **Build for Production:**
-   To create an optimized production build:
-   ```bash
-   npm run build
-   npm run start
-   ```
 
 ---
 
